@@ -59,3 +59,9 @@ El certificado del APK es **Android Debug**, no una clave de distribución. El J
 6. Validar iOS en macOS/Xcode; no se generó IPA en Windows.
 
 PharmaMobile y PharmaMobile-Backend no se modificaron. Sus credenciales, datos y artefactos se mantienen separados.
+
+## Cierre de la revisión inicial en dispositivo
+
+Se detectó y corrigió IND-AS-001: cierre al iniciar en Samsung/API 37 por solicitar `Window.getInsetsController()` antes de crear la vista. Solución: configurar las barras después de `setContent`, desde `window.decorView.post`. El APK corregido tuvo arranque frío correcto y se volvió a comprobar login, inicio, menú e inventario en el Samsung. Las cuatro capturas se actualizaron con esta ejecución; la primera captura incorrecta del escritorio del teléfono quedó sustituida y no es evidencia del login.
+
+El cambio de código está en `3de365b`; trazabilidad exacta de APK, tamaño, hash y certificado en `build-sprint1.json`. APK local `entrega/Indumotos-AS-Sprint1-debug.apk`, 23 270 113 bytes. La comprobación no certifica registros de llegada/ficha ni cambios de permisos: esas operaciones continúan pendientes de validación manual.

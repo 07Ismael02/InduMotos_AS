@@ -1,0 +1,12 @@
+{
+  "Version": "0.1.0-sprint1",
+  "ApplicationId": "pe.indumotos.asapp",
+  "Tipo": "debug",
+  "CommitCodigo": "3de365b6c3a837a4bc233881286583e9b325ba76",
+  "APK": "Indumotos-AS-Sprint1-debug.apk",
+  "Bytes": 23270113,
+  "SHA256": "706A9AB48287463505E7DBC00102BE1EB80CCF3AC96AFAF091519E2F5CA00A91",
+  "CertificadoSHA256": "23c1a0373560f28c3d2b64103e50a0dff54bb955fd75b20ac40d52253e33b0f0",
+  "BackendCommit": "d4acdd0641de470b3777ac0910fb7e76b04ad610",
+  "Fecha": "2026-11-17T16:01:23.3719271-05:00"
+}
