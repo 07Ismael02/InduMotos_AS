@@ -1,0 +1,13 @@
+.gradle/
+.kotlin/
+.idea/
+**/build/
+local.properties
+.env
+*.jks
+*.keystore
+keystore.properties
+google-services.json
+GoogleService-Info.plist
+*.log
+entrega/
