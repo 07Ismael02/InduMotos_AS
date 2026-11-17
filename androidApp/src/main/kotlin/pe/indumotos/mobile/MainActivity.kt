@@ -10,7 +10,9 @@ import androidx.activity.compose.setContent
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // The app uses a light surface, including the status and navigation bars.
+        setContent { App() }
+        // Wait for the decor view before requesting its insets controller (Samsung/API 37).
+        window.decorView.post {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.insetsController?.setSystemBarsAppearance(
                 WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS or
@@ -22,6 +24,6 @@ class MainActivity : ComponentActivity() {
             @Suppress("DEPRECATION")
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
         }
-        setContent { App() }
+        }
     }
 }
