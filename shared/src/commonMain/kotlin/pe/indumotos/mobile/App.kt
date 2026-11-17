@@ -12,120 +12,169 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.koin.compose.viewmodel.koinViewModel
+import org.jetbrains.compose.resources.painterResource
+import pe.indumotos.mobile.resources.Res
+import pe.indumotos.mobile.resources.indumotos_logo
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.*
 import pe.indumotos.mobile.domain.*
 import pe.indumotos.mobile.presentation.*
 
-private val Green=Color(0xFF166534)
+private val Ink=Color(0xFF171A1F)
+private val Yellow=Color(0xFFE4D92B)
+private val Blue=Color(0xFF244F7B)
+private val Muted=Color(0xFF647080)
 private fun JsonObject.text(key:String)=get(key)?.jsonPrimitive?.contentOrNull.orEmpty()
-private fun Field(key:String,label:String,numeric:Boolean)=pe.indumotos.mobile.domain.Field(key,label,numeric,emptyList(),false)
-private val Roles=listOf("ADMIN","ALMACEN","INVENTARIOS","COMERCIAL","FACTURACION","ENSAMBLAJE")
-private val ModelFields=listOf(Field("marca","Marca"),Field("modelo","Modelo"),Field("color","Color"))
+private val roleNames=RoleCodes.associateWith(::roleLabel)
+private fun icon(m:Module)=when(m){Module.INVENTORY->Icons.Default.Inventory2;Module.ARRIVALS->Icons.Default.LocalShipping;Module.FICHAS->Icons.Default.Description;Module.USERS->Icons.Default.PersonAdd;Module.PERMISSIONS->Icons.Default.AdminPanelSettings}
 private fun createForm(module:Module):Form=when(module){
- Module.INVENTORY->Form("Registrar motocicleta","motocicletas",listOf(Field("llegadaId","ID de recepción",true))+ModelFields+listOf(Field("chasisCompleto","Chasis completo"),Field("numeroMotor","Número de motor"),Field("dua","DUA"),Field("itemDua","Ítem DUA")))
- Module.ARRIVALS->Form("Nueva recepción","llegadas",listOf(Field("numeroGuia","Número de guía"),Field("cantidadDeclarada","Cantidad declarada",true),Field("cantidadRecibida","Cantidad recibida",true),Field("observacion","Observación")))
- Module.LOCATIONS->Form("Nueva ubicación","mobile/ubicaciones",listOf(Field("codigo","Código"),Field("nombre","Nombre"),Field("tipo","Tipo",options=listOf("ALMACEN","TIENDA","TALLER"))))
- Module.REQUESTS->Form("Solicitar ensamblaje","mobile/solicitudes",listOf(Field("destinoId","ID de ubicación destino",true))+ModelFields+listOf(Field("cantidad","Cantidad",true),Field("nota","Nota de la solicitud")))
- Module.MOVEMENTS->Form("Registrar movimiento","mobile/movimientos",listOf(Field("motocicletaId","ID de motocicleta",true),Field("destinoId","ID de ubicación destino",true),Field("nota","Motivo del movimiento")))
- Module.ISSUES->Form("Reportar inconsistencia","mobile/inconsistencias",listOf(Field("motocicletaId","ID de motocicleta",true),Field("descripcion","Descripción del problema")))
- Module.USERS->Form("Crear cuenta","usuarios",listOf(Field("nombreCompleto","Nombre completo"),Field("nombreUsuario","Usuario"),Field("clave","Contraseña (mínimo 12 caracteres)",secret=true),Field("rolCodigo","Rol",options=Roles)))
+ Module.INVENTORY,Module.FICHAS->Form("Registrar ficha de motocicleta","motocicletas",listOf(Field("llegadaId","ID de llegada",numeric=true),Field("marca","Marca"),Field("modelo","Modelo"),Field("color","Color"),Field("chasisCompleto","Chasis completo"),Field("numeroMotor","Número de motor"),Field("dua","DUA"),Field("itemDua","Ítem DUA")))
+ Module.ARRIVALS->Form("Registrar llegada","llegadas",listOf(Field("numeroGuia","Número de guía"),Field("cantidadDeclarada","Cantidad declarada",numeric=true),Field("cantidadRecibida","Cantidad recibida",numeric=true),Field("observacion","Observación (opcional)",required=false,maxLength=1000)))
+ Module.USERS->Form("Crear cuenta","usuarios",listOf(Field("nombreCompleto","Nombre completo",maxLength=180),Field("nombreUsuario","Usuario",maxLength=80),Field("clave","Contraseña inicial (12–100 caracteres)",secret=true,maxLength=100),Field("rolCodigo","Rol",options=RoleCodes,labels=roleNames)))
+ Module.PERMISSIONS->error("Selecciona primero una cuenta")
 }
-private fun icon(m:Module)=when(m){Module.INVENTORY->Icons.Default.Inventory2;Module.ARRIVALS->Icons.Default.LocalShipping;Module.LOCATIONS->Icons.Default.Place;Module.REQUESTS->Icons.Default.Build;Module.MOVEMENTS->Icons.Default.SwapHoriz;Module.ISSUES->Icons.Default.ReportProblem;Module.USERS->Icons.Default.Group}
+@Composable private fun Brand(modifier:Modifier=Modifier){Image(painterResource(Res.drawable.indumotos_logo),"Logo de Indumotos",modifier.background(Color.Black),contentScale=ContentScale.Crop)}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable fun App(){
  val vm:LogisticsViewModel=koinViewModel();val state by vm.state.collectAsState()
- MaterialTheme(colorScheme=lightColorScheme(primary=Green,secondary=Color(0xFF0F766E),background=Color(0xFFF4F7F5),surface=Color.White),shapes=Shapes(medium=RoundedCornerShape(18.dp),large=RoundedCornerShape(24.dp))){
+ MaterialTheme(colorScheme=lightColorScheme(primary=Ink,onPrimary=Color.White,secondary=Blue,tertiary=Yellow,background=Color(0xFFF4F5F7),surface=Color.White,primaryContainer=Color(0xFFF6F3CD),onPrimaryContainer=Ink,secondaryContainer=Color(0xFFF6F3CD),onSecondaryContainer=Ink,outline=Color(0xFFCBD1D9),outlineVariant=Color(0xFFE2E6EC),surfaceTint=Color.Transparent,error=Color(0xFFB3261E)),shapes=Shapes(small=RoundedCornerShape(8.dp),medium=RoundedCornerShape(12.dp),large=RoundedCornerShape(18.dp))){
   Surface(Modifier.fillMaxSize(),color=MaterialTheme.colorScheme.background){
-   if(state.access==null)Login(state,vm)else{
-    var menu by remember{mutableStateOf(false)};var search by remember(state.module){mutableStateOf("")};var detail by remember{mutableStateOf<JsonObject?>(null)}
-    Scaffold(containerColor=MaterialTheme.colorScheme.background,topBar={TopAppBar(title={Column{Text("INDUMOTOS",fontWeight=FontWeight.ExtraBold,letterSpacing=2.sp);Text(state.access!!.nombreUsuario+" · "+state.access!!.rolCodigo,fontSize=11.sp)}},actions={IconButton(onClick={vm.reload()},enabled=!state.busy){Icon(Icons.Default.Refresh,"Actualizar")};Box{IconButton(onClick={menu=true}){Icon(Icons.Default.MoreVert,"Opciones")};DropdownMenu(menu,{menu=false}){DropdownMenuItem(text={Text("Cerrar sesión")},onClick={menu=false;vm.logout()})}}})},floatingActionButton={val permission=if(state.module==Module.INVENTORY)"FICHAS_REGISTRAR" else state.module.permission;if(vm.allowed(permission))FloatingActionButton(onClick={vm.form(createForm(state.module))},containerColor=Green,contentColor=Color.White){Icon(Icons.Default.Add,"Nuevo registro")}}){padding->
-     Column(Modifier.padding(padding).fillMaxSize()){
-      Row(Modifier.horizontalScroll(rememberScrollState()).padding(horizontal=16.dp),horizontalArrangement=Arrangement.spacedBy(8.dp)){Module.entries.filter{vm.canRead(it)}.forEach{m->FilterChip(selected=state.module==m,onClick={vm.open(m)},label={Text(m.title)},leadingIcon={Icon(icon(m),null,Modifier.size(16.dp))})}}
-      Column(Modifier.padding(horizontal=20.dp,vertical=12.dp)){
-       Text(state.module.title,fontSize=28.sp,fontWeight=FontWeight.Bold)
-       Text("${state.rows.size} registros · Información del servidor",color=Color(0xFF65736A),fontSize=12.sp)
-       Spacer(Modifier.height(12.dp));OutlinedTextField(search,{search=it},placeholder={Text("Buscar por código, chasis o descripción")},leadingIcon={Icon(Icons.Default.Search,null)},modifier=Modifier.fillMaxWidth(),singleLine=true,shape=RoundedCornerShape(16.dp))
-      }
-      if(state.busy)LinearProgressIndicator(Modifier.fillMaxWidth())
-      state.error?.let{Notice(it,true)};state.message?.let{Notice(it,false)}
-      val rows=state.rows.filter{it.toString().contains(search,true)}
-      if(rows.isEmpty()&&!state.busy)Column(Modifier.fillMaxWidth().padding(32.dp),horizontalAlignment=Alignment.CenterHorizontally){Icon(icon(state.module),null,Modifier.size(48.dp),tint=Green);Spacer(Modifier.height(12.dp));Text(if(search.isEmpty())"Todavía no hay registros" else "Sin coincidencias",fontWeight=FontWeight.Bold);Text("Actualiza o registra información con tu cuenta autorizada.",fontSize=12.sp)}
-      LazyColumn(contentPadding=PaddingValues(start=20.dp,end=20.dp,bottom=100.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){items(rows){row->RecordCard(state.module,row,vm){detail=row}}}
-     }
-    }
-    detail?.let{row->AlertDialog(onDismissRequest={detail=null},title={Text("Detalle del registro")},text={Column(Modifier.verticalScroll(rememberScrollState())){row.forEach{(k,v)->Text(k.replace('_',' '),fontSize=11.sp,color=Green);Text(v.jsonPrimitive.contentOrNull?:"Sin información",fontSize=14.sp);Spacer(Modifier.height(9.dp))}}},confirmButton={TextButton(onClick={detail=null}){Text("Cerrar")}})}
-   }
+   if(state.access==null)Login(state,vm)else Workspace(state,vm)
    state.form?.let{form->FormDialog(form,state.busy,state.error,{vm.form(null)},vm::submit)}
-   state.history?.let { events ->
-    AlertDialog(
-     onDismissRequest=vm::closeHistory,
-     title={Text("Historial de cambios")},
-     text={
-      Column(Modifier.verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(12.dp)){
-       if(events.isEmpty())Text("Sin eventos registrados")
-       events.forEach { event ->
-        Card {
-         Column(Modifier.padding(12.dp)){
-          event.forEach { (key,value) ->
-           Text(key.replace('_',' ')+": "+(value.jsonPrimitive.contentOrNull?:"—"),fontSize=12.sp)
-          }
-         }
-        }
-       }
-      }
-     },
-     confirmButton={TextButton(onClick=vm::closeHistory){Text("Cerrar")}}
-    )
-   }
   }
  }
 }
-@Composable private fun Notice(message:String,error:Boolean){Surface(Modifier.fillMaxWidth().padding(horizontal=20.dp,vertical=4.dp),shape=RoundedCornerShape(12.dp),color=if(error)Color(0xFFFEE2E2)else Color(0xFFDCFCE7)){Text(message,Modifier.padding(12.dp),fontSize=13.sp,color=if(error)Color(0xFF991B1B)else Green)}}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable private fun Workspace(state:UiState,vm:LogisticsViewModel){
+ val drawer=rememberDrawerState(DrawerValue.Closed);val scope=rememberCoroutineScope();var confirmLogout by remember{mutableStateOf(false)}
+ ModalNavigationDrawer(drawerState=drawer,drawerContent={ModalDrawerSheet(modifier=Modifier.widthIn(max=310.dp),drawerContainerColor=Color.White){
+  Brand(Modifier.fillMaxWidth().height(96.dp));Column(Modifier.padding(24.dp)){Text(state.access!!.nombreUsuario,fontWeight=FontWeight.Bold);Spacer(Modifier.height(6.dp));Text(roleLabel(state.access.rolCodigo),color=Blue,fontSize=12.sp)}
+  HorizontalDivider();Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(12.dp)){
+   NavigationDrawerItem(label={Text("Inicio")},icon={Icon(Icons.Default.Home,null)},selected=state.module==null,onClick={if(!state.busy){vm.open(null);scope.launch{drawer.close()}}})
+   Text("OPERACIONES",Modifier.padding(16.dp),fontSize=10.sp,color=Muted,letterSpacing=1.sp)
+   Module.entries.filter{vm.canRead(it)}.forEach{m->NavigationDrawerItem(label={Text(m.title)},icon={Icon(icon(m),null)},selected=state.module==m,onClick={if(!state.busy){vm.open(m);scope.launch{drawer.close()}}})}
+  };HorizontalDivider();TextButton(onClick={scope.launch{drawer.close()};confirmLogout=true},enabled=!state.busy,modifier=Modifier.padding(16.dp)){Icon(Icons.Default.Logout,null);Spacer(Modifier.width(12.dp));Text("Cerrar sesión")}
+ }}){
+  Scaffold(containerColor=MaterialTheme.colorScheme.background,topBar={TopAppBar(title={Column{Text(state.module?.title?:"Inicio",fontSize=18.sp,fontWeight=FontWeight.SemiBold);Text("INDUMOTOS",fontSize=10.sp,letterSpacing=2.sp,color=Muted)}},navigationIcon={IconButton(onClick={scope.launch{drawer.open()}}){Icon(Icons.Default.Menu,"Abrir menú de navegación")}},colors=TopAppBarDefaults.topAppBarColors(containerColor=Color.White))},floatingActionButton={
+   val m=state.module;val permission=if(m==Module.INVENTORY)"FICHAS_REGISTRAR" else m?.permission
+   if(m!=null&&m!=Module.PERMISSIONS&&permission!=null&&vm.allowed(permission))ExtendedFloatingActionButton(onClick={vm.form(createForm(m))},expanded=true,icon={Icon(Icons.Default.Add,null)},text={Text(if(m==Module.INVENTORY||m==Module.FICHAS)"Nueva ficha"else if(m==Module.ARRIVALS)"Nueva llegada"else"Nueva cuenta")},containerColor=Yellow,contentColor=Ink)
+  }){padding->
+   Column(Modifier.padding(padding).fillMaxSize()){
+    if(state.busy)LinearProgressIndicator(Modifier.fillMaxWidth(),color=Blue)
+    state.error?.let{Notice(it,true)};state.message?.let{Notice(it,false)}
+    when(state.module){null->Home(state,vm);Module.INVENTORY->Inventory(state,vm);else->QueryScreen(state,vm)}
+   }
+  }
+ }
+ if(confirmLogout)AlertDialog(onDismissRequest={if(!state.busy)confirmLogout=false},title={Text("Cerrar sesión")},text={Text("Se revocará el acceso de esta sesión en el servidor. Necesitas conexión para confirmarlo.")},confirmButton={TextButton(onClick={confirmLogout=false;vm.logout()},enabled=!state.busy){Text("Cerrar sesión")}},dismissButton={TextButton(onClick={confirmLogout=false}){Text("Cancelar")}})
+ if(state.module==Module.INVENTORY)state.detail?.let{DetailDialog(it,vm::closeDetail)}
+}
+
+@Composable private fun Home(state:UiState,vm:LogisticsViewModel){
+ LazyColumn(contentPadding=PaddingValues(24.dp),verticalArrangement=Arrangement.spacedBy(16.dp)){
+  item{Brand(Modifier.fillMaxWidth().height(128.dp))}
+  item{Text("Gestión de motocicletas",fontSize=25.sp,fontWeight=FontWeight.Bold);Spacer(Modifier.height(10.dp));Text("Bienvenido, ${state.access!!.nombreUsuario}",fontSize=16.sp);Text(roleLabel(state.access.rolCodigo),color=Blue,fontSize=13.sp);Spacer(Modifier.height(12.dp));Text("Selecciona una operación. Las opciones disponibles corresponden a los permisos de tu cuenta.",fontSize=13.sp,color=Muted,lineHeight=20.sp)}
+  items(Module.entries.filter{vm.canRead(it)}){m->OutlinedCard(onClick={vm.open(m)},modifier=Modifier.fillMaxWidth(),colors=CardDefaults.outlinedCardColors(containerColor=Color.White)){
+   Row(Modifier.padding(20.dp),verticalAlignment=Alignment.CenterVertically){Surface(color=Color(0xFFF6F3CD),shape=RoundedCornerShape(10.dp)){Icon(icon(m),null,tint=Ink,modifier=Modifier.padding(12.dp))};Spacer(Modifier.width(16.dp));Column(Modifier.weight(1f)){Text(m.title,fontWeight=FontWeight.SemiBold);Spacer(Modifier.height(5.dp));Text(m.description,color=Muted,fontSize=12.sp)};Icon(Icons.Default.ChevronRight,null,tint=Muted)}
+  }}
+  if(Module.entries.none{vm.canRead(it)})item{Text("Tu cuenta no tiene apartados habilitados. Solicita al administrador que revise tus permisos.",color=Muted)}
+ }
+}
+
 @Composable private fun Login(state:UiState,vm:LogisticsViewModel){
- var server by remember{mutableStateOf("http://127.0.0.1:8088")};var user by remember{mutableStateOf("")};var password by remember{mutableStateOf("")};var visible by remember{mutableStateOf(false)}
- Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(28.dp),verticalArrangement=Arrangement.Center){
-  Surface(shape=RoundedCornerShape(22.dp),color=Green,modifier=Modifier.size(64.dp)){Box(contentAlignment=Alignment.Center){Icon(Icons.Default.TwoWheeler,null,tint=Color.White,modifier=Modifier.size(40.dp))}}
-  Spacer(Modifier.height(24.dp));Text("Tu operación,\nen movimiento.",fontSize=35.sp,lineHeight=40.sp,fontWeight=FontWeight.ExtraBold,color=Color(0xFF173E2A));Spacer(Modifier.height(8.dp));Text("INDUMOTOS · Logística y trazabilidad",color=Color(0xFF65736A));Spacer(Modifier.height(30.dp))
-  OutlinedTextField(user,{user=it},label={Text("Usuario")},singleLine=true,modifier=Modifier.fillMaxWidth());Spacer(Modifier.height(12.dp))
-  OutlinedTextField(password,{password=it},label={Text("Contraseña")},singleLine=true,visualTransformation=if(visible)VisualTransformation.None else PasswordVisualTransformation(),trailingIcon={IconButton(onClick={visible=!visible}){Icon(if(visible)Icons.Default.VisibilityOff else Icons.Default.Visibility,"Mostrar contraseña")}},modifier=Modifier.fillMaxWidth())
-  Spacer(Modifier.height(12.dp));OutlinedTextField(server,{server=it},label={Text("Dirección del servidor")},supportingText={Text("Emulador: 10.0.2.2 · Celular: IP de tu computadora")},singleLine=true,modifier=Modifier.fillMaxWidth());state.error?.let{Text(it,color=MaterialTheme.colorScheme.error)};Spacer(Modifier.height(18.dp))
-  Button(onClick={vm.login(server,user,password)},enabled=!state.busy&&user.isNotBlank()&&password.isNotBlank(),modifier=Modifier.fillMaxWidth().height(54.dp)){if(state.busy)CircularProgressIndicator(Modifier.size(22.dp),color=Color.White)else Text("Ingresar",fontSize=16.sp)}
-  Spacer(Modifier.height(20.dp));Text("Acceso protegido. Cada operación respeta los permisos de tu cuenta.",fontSize=12.sp,color=Color(0xFF65736A))
+ var server by remember{mutableStateOf("http://127.0.0.1:8089")};var user by remember{mutableStateOf("")};var password by remember{mutableStateOf("")};var visible by remember{mutableStateOf(false)};var settings by remember{mutableStateOf(false)}
+ Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).imePadding().padding(28.dp),verticalArrangement=Arrangement.Center){
+  Brand(Modifier.fillMaxWidth().height(130.dp));Spacer(Modifier.height(30.dp));Text("Iniciar sesión",fontSize=28.sp,fontWeight=FontWeight.Bold);Spacer(Modifier.height(8.dp));Text("Gestión de inventario y recepción de motocicletas",color=Muted,fontSize=13.sp,lineHeight=20.sp);Spacer(Modifier.height(28.dp))
+  OutlinedTextField(user,{user=it},label={Text("Usuario")},singleLine=true,enabled=!state.busy,modifier=Modifier.fillMaxWidth());Spacer(Modifier.height(14.dp))
+  OutlinedTextField(password,{password=it},label={Text("Contraseña")},singleLine=true,enabled=!state.busy,visualTransformation=if(visible)VisualTransformation.None else PasswordVisualTransformation(),trailingIcon={IconButton(onClick={visible=!visible}){Icon(if(visible)Icons.Default.VisibilityOff else Icons.Default.Visibility,if(visible)"Ocultar contraseña"else"Mostrar contraseña")}},modifier=Modifier.fillMaxWidth())
+  Spacer(Modifier.height(12.dp));state.error?.let{Notice(it,true)};state.message?.let{Notice(it,false)}
+  Button(onClick={vm.login(server,user,password);password=""},enabled=!state.busy&&user.isNotBlank()&&password.isNotBlank(),modifier=Modifier.fillMaxWidth().height(52.dp),colors=ButtonDefaults.buttonColors(containerColor=Yellow,contentColor=Ink)){if(state.busy)CircularProgressIndicator(Modifier.size(22.dp),color=Ink)else Text("Ingresar",fontWeight=FontWeight.SemiBold)}
+  TextButton(onClick={settings=!settings},enabled=!state.busy){Icon(Icons.Default.Settings,null,Modifier.size(17.dp));Spacer(Modifier.width(8.dp));Text("Configuración de conexión",fontSize=12.sp)}
+  if(settings){OutlinedTextField(server,{server=it},label={Text("Servidor del proyecto")},supportingText={Text("USB: 127.0.0.1:8089 con ADB Reverse. Emulador: 10.0.2.2:8089. Usa HTTPS fuera del entorno local.")},singleLine=true,modifier=Modifier.fillMaxWidth(),keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Uri))}
+  Spacer(Modifier.height(20.dp));Text("Acceso exclusivo para personal autorizado. Si necesitas una cuenta, comunícate con el administrador.",fontSize=11.sp,color=Muted,lineHeight=18.sp)
  }
 }
-@Composable private fun RecordCard(module:Module,row:JsonObject,vm:LogisticsViewModel,detail:()->Unit){
- val idKey=when(module){Module.INVENTORY->"id_motocicleta";Module.ARRIVALS->"id_llegada";Module.LOCATIONS->"id_ubicacion";Module.REQUESTS->"id_solicitud";Module.MOVEMENTS->"id_movimiento";Module.ISSUES->"id_inconsistencia";Module.USERS->"id_usuario"};val id=row.text(idKey)
- val title=when(module){Module.INVENTORY->row.text("marca")+" "+row.text("modelo");Module.ARRIVALS->"Guía "+row.text("numero_guia");Module.LOCATIONS->row.text("nombre");Module.REQUESTS->"Solicitud #$id";Module.MOVEMENTS->row.text("chasis_completo");Module.ISSUES->row.text("descripcion");Module.USERS->row.text("nombre_completo")}
- val subtitle=when(module){Module.INVENTORY->row.text("chasis_completo")+" · "+row.text("color");Module.ARRIVALS->row.text("cantidad_recibida")+" unidades recibidas";Module.LOCATIONS->row.text("codigo")+" · "+row.text("tipo");Module.REQUESTS->row.text("destino")+" · "+row.text("cantidad")+" unidades";Module.MOVEMENTS->row.text("origen").ifBlank{"Sin ubicación previa"}+" → "+row.text("destino");Module.ISSUES->row.text("chasis_completo");Module.USERS->row.text("nombre_usuario")+" · "+row.text("rol")}
- Card(onClick=detail,colors=CardDefaults.cardColors(containerColor=Color.White),modifier=Modifier.fillMaxWidth()){
-  Column(Modifier.padding(16.dp)){Row(verticalAlignment=Alignment.CenterVertically){Icon(icon(module),null,tint=Green,modifier=Modifier.size(24.dp));Spacer(Modifier.width(10.dp));Text(title,fontWeight=FontWeight.Bold,modifier=Modifier.weight(1f));Text("#$id",fontSize=12.sp,color=Color.Gray)};Spacer(Modifier.height(8.dp));Text(subtitle,fontSize=13.sp,color=Color(0xFF526158))
-   val status=row.text("estado").ifBlank{row.text("disponibilidad")};if(status.isNotBlank()){Spacer(Modifier.height(9.dp));Surface(color=Color(0xFFE8F3EB),shape=RoundedCornerShape(6.dp)){Text(status.replace('_',' '),Modifier.padding(6.dp),fontSize=10.sp,color=Green)}}
-   if(module==Module.INVENTORY){Text("Ubicación: "+row.text("ubicacion").ifBlank{"No informada"},fontSize=12.sp);if(vm.allowed("DISPONIBILIDAD_GESTIONAR"))TextButton(onClick={vm.form(Form("Disponibilidad de #$id","mobile/inventario/$id/disponibilidad",listOf(Field("estado","Disponibilidad",options=listOf("NO_DISPONIBLE","DISPONIBLE")),Field("nota","Motivo"))))}){Text("Actualizar disponibilidad")}}
-   if(module==Module.REQUESTS&&vm.allowed("SOLICITUDES_ATENDER")){
-    val states=when(status){"PENDIENTE"->listOf("EN_PREPARACION","RECHAZADA","ANULADA");"EN_PREPARACION"->listOf("ATENDIDA","ANULADA");else->emptyList()}
-    if(states.isNotEmpty())TextButton(onClick={vm.form(Form("Avance de solicitud #$id","mobile/solicitudes/$id/estado",listOf(Field("estado","Nuevo estado",options=states),Field("nota","Motivo o detalle"))))}){Text("Actualizar avance")}
-    if(status=="EN_PREPARACION")TextButton(onClick={vm.form(Form("Asignar unidad a #$id","mobile/solicitudes/$id/unidades",listOf(Field("motocicletaId","ID de motocicleta",true))))}){Text("Asignar motocicleta")}
-   }
-   if(module==Module.ISSUES&&vm.allowed("INCONSISTENCIAS_RESOLVER")&&status!="RESUELTA"){
-    TextButton(onClick={vm.form(Form("Seguimiento #$id","mobile/inconsistencias/$id/estado",listOf(Field("estado","Nuevo estado",options=if(status=="ABIERTA")listOf("EN_REVISION")else listOf("RESUELTA")),Field("nota","Acción o corrección realizada"))))}){Text("Registrar seguimiento")}
-    if(status=="EN_REVISION")TextButton(onClick={vm.form(Form("Corregir ficha y resolver #$id","mobile/inconsistencias/$id/correccion",ModelFields+listOf(Field("chasis","Chasis correcto"),Field("motor","Motor correcto"),Field("dua","DUA"),Field("item","Ítem DUA"),Field("nota","Justificación de la corrección"))))}){Text("Corregir datos de la ficha")}
-   }
-   if(module in listOf(Module.INVENTORY,Module.REQUESTS,Module.ISSUES))TextButton(onClick={vm.history(id)}){Text("Ver historial")}
-   if(module==Module.USERS&&vm.allowed("PERMISOS_ASIGNAR")){TextButton(onClick={vm.form(Form("Cambiar rol #$id","usuarios/$id/rol",listOf(Field("rolCodigo","Rol",options=Roles)),"PUT"))}){Text("Cambiar rol")};TextButton(onClick={vm.form(Form("Permiso individual #$id","usuarios/$id/permisos",listOf(Field("permisoCodigo","Código del permiso"),Field("decision","Decisión",options=listOf("PERMITIR","DENEGAR"))),"PUT"))}){Text("Asignar permiso")}}
+
+@Composable private fun Inventory(state:UiState,vm:LogisticsViewModel){
+ var chasis by remember{mutableStateOf("")};var marca by remember{mutableStateOf("")};var modelo by remember{mutableStateOf("")};var color by remember{mutableStateOf("")};var filters by remember{mutableStateOf(false)}
+ LazyColumn(contentPadding=PaddingValues(start=20.dp,end=20.dp,top=20.dp,bottom=110.dp),verticalArrangement=Arrangement.spacedBy(14.dp)){
+  item{Text("Consulta de inventario",fontSize=22.sp,fontWeight=FontWeight.Bold);Text("Busca por chasis completo o últimos cuatro dígitos.",fontSize=12.sp,color=Muted);Spacer(Modifier.height(16.dp));OutlinedTextField(chasis,{chasis=it},label={Text("Chasis")},singleLine=true,modifier=Modifier.fillMaxWidth(),leadingIcon={Icon(Icons.Default.Search,null)})
+   TextButton(onClick={filters=!filters}){Text(if(filters)"Ocultar filtros"else"Filtrar por marca, modelo y color")}
+   if(filters){listOf(Triple("Marca",marca,{s:String->marca=s}),Triple("Modelo",modelo,{s:String->modelo=s}),Triple("Color",color,{s:String->color=s})).forEach{(label,value,change)->OutlinedTextField(value,change,label={Text(label)},singleLine=true,modifier=Modifier.fillMaxWidth().padding(bottom=10.dp))}}
+   Row(horizontalArrangement=Arrangement.spacedBy(10.dp)){Button(onClick={vm.search(InventoryFilter(chasis,marca,modelo,color))},enabled=!state.busy){Text("Buscar")};OutlinedButton(onClick={chasis="";marca="";modelo="";color="";vm.search(InventoryFilter())},enabled=!state.busy){Text("Limpiar")}}
+   Spacer(Modifier.height(16.dp));Text("${state.total} unidades encontradas",fontSize=12.sp,color=Muted)
   }
+  if(state.rows.isEmpty()&&!state.busy&&state.error==null)item{EmptyState("Sin coincidencias","No hay unidades que coincidan con esta consulta.")}
+  items(state.rows,key={it.text("id")}){row->OutlinedCard(onClick={vm.inventoryDetail(row.text("id"))},modifier=Modifier.fillMaxWidth(),colors=CardDefaults.outlinedCardColors(containerColor=Color.White)){
+   Column(Modifier.padding(18.dp)){Row(verticalAlignment=Alignment.CenterVertically){Icon(Icons.Default.TwoWheeler,null,tint=Blue);Spacer(Modifier.width(10.dp));Text(row.text("marca")+" "+row.text("modelo"),fontWeight=FontWeight.SemiBold,modifier=Modifier.weight(1f));Text("#"+row.text("id"),fontSize=11.sp,color=Muted)};Spacer(Modifier.height(10.dp));Text("Chasis: "+row.text("chasisVista"),fontSize=13.sp);Text("Color: "+row.text("color"),fontSize=12.sp,color=Muted);Spacer(Modifier.height(6.dp));Text("Ver ficha completa →",fontSize=12.sp,color=Blue)}
+  }}
+  if(state.pages>0)item{Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween,verticalAlignment=Alignment.CenterVertically){OutlinedButton(onClick={vm.page(state.page-1)},enabled=!state.busy&&state.page>0){Text("Anterior")};Text("${state.page+1} / ${state.pages}",fontSize=12.sp);OutlinedButton(onClick={vm.page(state.page+1)},enabled=!state.busy&&state.page+1<state.pages){Text("Siguiente")}}}
  }
+}
+
+@Composable private fun QueryScreen(state:UiState,vm:LogisticsViewModel){
+ val module=state.module!!;var id by remember(module){mutableStateOf("")}
+ LazyColumn(contentPadding=PaddingValues(start=20.dp,end=20.dp,top=24.dp,bottom=110.dp),verticalArrangement=Arrangement.spacedBy(18.dp)){
+  item{Text(module.title,fontSize=24.sp,fontWeight=FontWeight.Bold);Spacer(Modifier.height(8.dp));Text(module.description,fontSize=13.sp,color=Muted,lineHeight=20.sp)}
+  if(module==Module.USERS)item{EmptyState("Cuentas individuales","Usa Nueva cuenta para registrar un trabajador y asignarle su rol. Para consultar accesos, abre Roles y permisos.")}
+  val consult=if(module==Module.PERMISSIONS)vm.allowed("PERMISOS_ASIGNAR")else vm.allowed("INVENTARIO_CONSULTAR")
+  if(module!=Module.USERS&&consult)item{
+   OutlinedCard(colors=CardDefaults.outlinedCardColors(containerColor=Color.White)){Column(Modifier.padding(20.dp)){
+    Text(if(module==Module.ARRIVALS)"Consultar recepción"else if(module==Module.PERMISSIONS)"Consultar cuenta"else"Consultar ficha",fontWeight=FontWeight.SemiBold)
+    Spacer(Modifier.height(12.dp));OutlinedTextField(id,{id=it},label={Text(if(module==Module.ARRIVALS)"ID de llegada"else if(module==Module.PERMISSIONS)"ID de usuario"else"ID de motocicleta")},singleLine=true,modifier=Modifier.fillMaxWidth(),keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Number));Spacer(Modifier.height(12.dp));Button(onClick={vm.query(id)},enabled=!state.busy&&Rules.positive(id)){Text("Consultar")}
+   }}
+  }
+  state.detail?.let{record->
+   if(module==Module.PERMISSIONS)item{PermissionDetail(record,vm)}
+   else item{RecordDetail(record)}
+  }
+  if(module!=Module.USERS&&state.detail==null)item{EmptyState(if(consult)"Consulta por identificador"else"Registro autorizado",if(consult)"Ingresa el identificador asignado por el servidor al guardar el registro."else"Tu cuenta puede registrar información. La consulta requiere el permiso de inventario.")}
+ }
+}
+
+@Composable private fun PermissionDetail(record:JsonObject,vm:LogisticsViewModel){
+ val accountId=record.text("usuarioId");var selectedRole by remember(record){mutableStateOf(record.text("rolCodigo"))};var code by remember(record){mutableStateOf(PermissionLabels.keys.first())};var decision by remember(record){mutableStateOf("DENEGAR")}
+ Column(verticalArrangement=Arrangement.spacedBy(16.dp)){
+  OutlinedCard(colors=CardDefaults.outlinedCardColors(containerColor=Color.White)){Column(Modifier.padding(20.dp)){
+   Text(record.text("nombreUsuario"),fontSize=19.sp,fontWeight=FontWeight.Bold);Text("#"+accountId+" · "+roleLabel(record.text("rolCodigo")),color=Blue,fontSize=12.sp);Spacer(Modifier.height(18.dp))
+   record["permisos"]?.jsonArray?.forEach{p->val permission=p.jsonObject;Row(Modifier.fillMaxWidth().padding(vertical=10.dp),verticalAlignment=Alignment.CenterVertically){Text(PermissionLabels[permission.text("codigo")]?:permission.text("codigo"),modifier=Modifier.weight(1f),fontSize=12.sp);Text(if(permission["permitido"]?.jsonPrimitive?.booleanOrNull==true)"Permitido"else"Denegado",color=if(permission["permitido"]?.jsonPrimitive?.booleanOrNull==true)Blue else MaterialTheme.colorScheme.error,fontSize=11.sp)};HorizontalDivider()}
+  }}
+  OutlinedCard(colors=CardDefaults.outlinedCardColors(containerColor=Color.White)){Column(Modifier.padding(20.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){
+   Text("Modificar acceso",fontWeight=FontWeight.SemiBold);OptionSelect("Rol",RoleCodes,selectedRole,{selectedRole=it},roleNames)
+   OutlinedButton(onClick={vm.form(Form("Confirmar cambio de rol de #$accountId","usuarios/$accountId/rol",listOf(Field("rolCodigo","Rol",options=listOf(selectedRole),labels=roleNames)),"PUT",sensitive=true))},enabled=selectedRole!=record.text("rolCodigo")){Text("Cambiar rol")}
+   HorizontalDivider();OptionSelect("Permiso",PermissionLabels.keys.toList(),code,{code=it},PermissionLabels);OptionSelect("Excepción",listOf("PERMITIR","DENEGAR"),decision,{decision=it},mapOf("PERMITIR" to "Permitir","DENEGAR" to "Denegar"))
+   OutlinedButton(onClick={vm.form(Form("Confirmar excepción de #$accountId","usuarios/$accountId/permisos/$code",listOf(Field("decision","Decisión",options=listOf(decision),labels=mapOf("PERMITIR" to "Permitir","DENEGAR" to "Denegar"))),"PUT",sensitive=true))}){Text("Guardar excepción")}
+   TextButton(onClick={vm.form(Form("Retirar excepción de #$accountId","usuarios/$accountId/permisos/$code",emptyList(),"DELETE",sensitive=true))}){Text("Retirar excepción seleccionada")}
+  }}
+ }
+}
+
+private val FieldLabels=mapOf("id" to "Identificador","llegadaId" to "Llegada vinculada","numeroGuia" to "Guía de remisión","fechaLlegada" to "Fecha de recepción","receptorId" to "ID de receptor","receptorUsuario" to "Recibido por","cantidadDeclarada" to "Cantidad declarada","cantidadRecibida" to "Cantidad recibida","observacion" to "Observación","marca" to "Marca","modelo" to "Modelo","color" to "Color","chasisCompleto" to "Chasis completo","numeroMotor" to "Número de motor","dua" to "DUA","itemDua" to "Ítem DUA","creadorUsuario" to "Registrado por","creadoEn" to "Fecha de registro","cantidadFichas" to "Fichas registradas","diferenciaInformativa" to "Diferencia informativa")
+@Composable private fun RecordDetail(record:JsonObject){
+ OutlinedCard(colors=CardDefaults.outlinedCardColors(containerColor=Color.White)){Column(Modifier.padding(20.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){
+  record.forEach{(key,value)->when(value){is JsonObject->{Text(if(key=="llegada")"Recepción"else key,fontWeight=FontWeight.SemiBold);RecordDetail(value)};is JsonArray->{Text("Fichas vinculadas (${value.size})",fontWeight=FontWeight.SemiBold);value.forEach{if(it is JsonObject)RecordDetail(it)}};else->{Column{Text(FieldLabels[key]?:key,color=Muted,fontSize=11.sp);Spacer(Modifier.height(4.dp));Text((value as? JsonPrimitive)?.contentOrNull?.ifBlank{"Sin información"}?:"Sin información",fontSize=13.sp)}}}}
+ }}
+}
+@Composable private fun DetailDialog(record:JsonObject,close:()->Unit){AlertDialog(onDismissRequest=close,title={Text("Ficha de motocicleta")},text={Column(Modifier.verticalScroll(rememberScrollState())){RecordDetail(record)}},confirmButton={TextButton(onClick=close){Text("Cerrar")}})}
+@Composable private fun EmptyState(title:String,copy:String){Column(Modifier.fillMaxWidth().padding(vertical=24.dp),horizontalAlignment=Alignment.CenterHorizontally){Icon(Icons.Default.Info,null,tint=Blue);Spacer(Modifier.height(12.dp));Text(title,fontWeight=FontWeight.SemiBold);Spacer(Modifier.height(8.dp));Text(copy,color=Muted,fontSize=12.sp,lineHeight=19.sp)}}
+@Composable private fun Notice(message:String,error:Boolean){Surface(Modifier.fillMaxWidth().padding(horizontal=20.dp,vertical=6.dp),shape=RoundedCornerShape(8.dp),color=if(error)Color(0xFFFFEDEA)else Color(0xFFEAF0F7)){Text(message,Modifier.padding(14.dp),fontSize=12.sp,lineHeight=19.sp,color=if(error)Color(0xFF9E2B23)else Blue)}}
+@Composable private fun OptionSelect(label:String,options:List<String>,value:String,change:(String)->Unit,labels:Map<String,String> = emptyMap()){
+ var expanded by remember{mutableStateOf(false)};Column{Text(label,fontSize=12.sp,color=Muted);Spacer(Modifier.height(5.dp));Box{OutlinedButton(onClick={expanded=true},modifier=Modifier.fillMaxWidth()){Text(labels[value]?:value,modifier=Modifier.weight(1f));Icon(Icons.Default.ExpandMore,null)};DropdownMenu(expanded,{expanded=false}){options.forEach{option->DropdownMenuItem(text={Text(labels[option]?:option)},onClick={change(option);expanded=false})}}}}
 }
 @Composable private fun FormDialog(form:Form,busy:Boolean,error:String?,close:()->Unit,submit:(Map<String,String>)->Unit){
- val values=remember(form){mutableStateMapOf<String,String>().apply{form.fields.forEach{put(it.key,it.options.firstOrNull().orEmpty())}}};var local by remember(form){mutableStateOf<String?>(null)}
- AlertDialog(onDismissRequest={if(!busy)close()},title={Text(form.title)},text={Column(Modifier.verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(10.dp)){
-  form.fields.forEach{f->if(f.options.isNotEmpty()){Text(f.label,fontSize=12.sp);Row(Modifier.horizontalScroll(rememberScrollState()),horizontalArrangement=Arrangement.spacedBy(6.dp)){f.options.forEach{o->FilterChip(values[f.key]==o,{values[f.key]=o},label={Text(f.labels[o]?:o.replace('_',' '))})}}}else OutlinedTextField(values[f.key].orEmpty(),{values[f.key]=it},label={Text(f.label)},modifier=Modifier.fillMaxWidth(),visualTransformation=if(f.secret)PasswordVisualTransformation()else VisualTransformation.None,keyboardOptions=KeyboardOptions(keyboardType=if(f.numeric)KeyboardType.Number else KeyboardType.Text),singleLine=f.numeric||f.secret)}
+ val values=remember(form){mutableStateMapOf<String,String>().apply{form.fields.forEach{put(it.key,it.options.firstOrNull().orEmpty())}}};var local by remember(form){mutableStateOf<String?>(null)};var confirmed by remember(form){mutableStateOf(false)}
+ AlertDialog(onDismissRequest={if(!busy)close()},title={Text(form.title,fontSize=20.sp)},text={Column(Modifier.verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(12.dp)){
+  if(form.sensitive){Text("Este cambio modifica el acceso de la cuenta. Revisa el identificador y la operación antes de confirmar.",fontSize=12.sp);Row(verticalAlignment=Alignment.CenterVertically){Checkbox(confirmed,{confirmed=it},enabled=!busy);Text("Confirmo el cambio de acceso",fontSize=12.sp)}}
+  form.fields.forEach{f->if(f.options.isNotEmpty())OptionSelect(f.label,f.options,values[f.key].orEmpty(),{if(!busy)values[f.key]=it},f.labels)else OutlinedTextField(values[f.key].orEmpty(),{if(it.length<=f.maxLength)values[f.key]=it},label={Text(f.label)},enabled=!busy,modifier=Modifier.fillMaxWidth(),visualTransformation=if(f.secret)PasswordVisualTransformation()else VisualTransformation.None,keyboardOptions=KeyboardOptions(keyboardType=if(f.numeric)KeyboardType.Number else if(f.secret)KeyboardType.Password else KeyboardType.Text),singleLine=f.key!="observacion")}
   (local?:error)?.let{Text(it,color=MaterialTheme.colorScheme.error,fontSize=12.sp)}
- }},confirmButton={Button(onClick={local=if(form.fields.any{values[it.key].isNullOrBlank()})"Completa todos los campos"else null;if(local==null)submit(values.toMap())},enabled=!busy){Text(if(busy)"Guardando…"else"Guardar")}},dismissButton={TextButton(onClick=close,enabled=!busy){Text("Cancelar")}})
+ }},confirmButton={TextButton(onClick={local=if(form.fields.any{it.required&&values[it.key].isNullOrBlank()})"Completa los campos obligatorios"else null;if(local==null)submit(values.toMap())},enabled=!busy&&(!form.sensitive||confirmed)){Text(if(busy)"Guardando…"else if(form.sensitive)"Confirmar"else"Guardar")}},dismissButton={TextButton(onClick=close,enabled=!busy){Text("Cancelar")}})
 }

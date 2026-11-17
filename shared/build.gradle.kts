@@ -73,3 +73,5 @@ kotlin {
 dependencies {
     androidRuntimeClasspath(libs.compose.uiTooling)
 }
+
+compose.resources { packageOfResClass = "pe.indumotos.mobile.resources" }

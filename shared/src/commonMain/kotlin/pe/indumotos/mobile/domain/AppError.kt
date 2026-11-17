@@ -15,6 +15,6 @@ fun AppError.message():String=when(this){
  AppError.Forbidden->"Tu cuenta no tiene permiso para esta operación."
  is AppError.Conflict->detail
  AppError.Network->"No hay conexión con el servidor. Comprueba la red y vuelve a intentar."
- is AppError.Server->"El servidor no pudo completar la operación ($status)."
+ is AppError.Server->if(status==404)"No se encontró el registro solicitado." else "El servidor no pudo completar la operación ($status)."
 }
 class AppException(val error:AppError):Exception(error.message())
