@@ -68,6 +68,11 @@ class OperationsViewModel(private val repo: OperationsRepository, private val lo
         OperationRules.validate(body)
         val saved=repo.createRequest(body)
         mutable.update { it.copy(selected=saved, events=emptyList(), line=null, message="Solicitud #${saved.id} creada y confirmada por el servidor.") }
+        try { refresh(saved.id) }
+        catch(e: CancellationException) { throw e }
+        catch(e: AppException) {
+            mutable.update { it.copy(expired=e.error==AppError.Unauthorized,error="La solicitud #${saved.id} ya fue creada. No repitas el envío; actualiza el detalle para consultar su historial.") }
+        }
     }
     fun advance(status: String, reason: String) = work(true) {
         val r=requireNotNull(mutable.value.selected)

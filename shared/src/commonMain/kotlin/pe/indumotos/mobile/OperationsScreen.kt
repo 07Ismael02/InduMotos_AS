@@ -38,11 +38,14 @@ private fun Access.permits(code: String) = permisos.any { it.codigo==code && it.
     LaunchedEffect(state.expired) { if(state.expired) expired() }
     LaunchedEffect(state.selected?.id) { if(state.selected!=null) creating=false }
     Column(Modifier.fillMaxSize()) {
-        OperationMessages(state)
+        if(state.selected!=null) Surface(tonalElevation=2.dp) {
+            OutlinedButton(onClick={vm.list(state.page)},enabled=!state.busy,modifier=Modifier.fillMaxWidth().padding(horizontal=20.dp,vertical=8.dp).heightIn(min=48.dp)) { Text("← Volver a solicitudes") }
+        }
         LazyColumn(contentPadding=PaddingValues(20.dp),verticalArrangement=Arrangement.spacedBy(14.dp)) {
             val selected=state.selected
             if(selected==null) {
                 item {
+                    OperationMessages(state)
                     Text("Solicitudes de ensamblaje",fontSize=24.sp,fontWeight=FontWeight.Bold)
                     Text("Solicita modelos y cantidades; consulta su atención y los chasis vinculados.",fontSize=13.sp)
                     Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
@@ -69,17 +72,18 @@ private fun Access.permits(code: String) = permisos.any { it.codigo==code && it.
                 } }
             } else {
                 item {
-                    TextButton(onClick={vm.list(state.page)},enabled=!state.busy){Text("← Volver a solicitudes")}
+                    OperationMessages(state)
                     Text("Solicitud #${selected.id}",fontSize=25.sp,fontWeight=FontWeight.Bold)
                     Text(statusLabel(selected.estado),color=MaterialTheme.colorScheme.secondary)
                     Text("Solicitante: ${selected.solicitante}\nDestino: #${selected.destinoId}\nCreada: ${selected.creadaEn}",fontSize=12.sp)
                     selected.observacion?.takeIf{it.isNotBlank()}?.let{Text(it)}
                     OutlinedButton(onClick={vm.select(selected.id)},enabled=!state.busy){Text("Actualizar detalle")}
                     if(account.permits(ADVANCE_REQUESTS)) OperationRules.transitions(selected.estado).forEach { next ->
-                        Button(onClick={action=next},enabled=!state.busy,modifier=Modifier.fillMaxWidth()){Text("Cambiar a ${statusLabel(next)}")}
+                        if(next=="RECHAZADA") OutlinedButton(onClick={action=next},enabled=!state.busy,colors=ButtonDefaults.outlinedButtonColors(contentColor=MaterialTheme.colorScheme.error),modifier=Modifier.fillMaxWidth()){Text("Rechazar solicitud")}
+                        else Button(onClick={action=next},enabled=!state.busy,modifier=Modifier.fillMaxWidth()){Text(if(next=="EN_PREPARACION")"Iniciar preparación" else "Marcar como atendida")}
                     }
                     if(account.permits(CANCEL_REQUESTS)&&selected.estado=="PENDIENTE")
-                        OutlinedButton(onClick={action="ANULADA"},enabled=!state.busy,modifier=Modifier.fillMaxWidth()){Text("Anular con motivo")}
+                        OutlinedButton(onClick={action="ANULADA"},enabled=!state.busy,colors=ButtonDefaults.outlinedButtonColors(contentColor=MaterialTheme.colorScheme.error),modifier=Modifier.fillMaxWidth()){Text("Anular con motivo")}
                     Text("Líneas solicitadas",fontWeight=FontWeight.SemiBold,modifier=Modifier.padding(top=14.dp))
                 }
                 items(selected.lineas,key={it.id}){ line ->
@@ -150,8 +154,8 @@ private data class DraftLine(val key: Int,val brand: String="",val model: String
                 key(line.key) {
                     HorizontalDivider();Text("Línea ${index+1}",fontWeight=FontWeight.SemiBold)
                     CatalogPicker("Marca",line.brand,catalogOptions(catalog,"marca"),busy) { lines[index]=line.copy(brand=it,model="",color="") }
-                    CatalogPicker("Modelo",line.model,catalogOptions(catalog,"modelo",line.brand),busy) { lines[index]=line.copy(model=it,color="") }
-                    CatalogPicker("Color",line.color,catalogOptions(catalog,"color",line.brand,line.model),busy) { lines[index]=line.copy(color=it) }
+                    key(line.brand) { CatalogPicker("Modelo",line.model,catalogOptions(catalog,"modelo",line.brand),busy||line.brand.isBlank()) { lines[index]=line.copy(model=it,color="") } }
+                    key(line.brand,line.model) { CatalogPicker("Color",line.color,catalogOptions(catalog,"color",line.brand,line.model),busy||line.brand.isBlank()||line.model.isBlank()) { lines[index]=line.copy(color=it) } }
                     OutlinedTextField(line.quantity,{lines[index]=line.copy(quantity=it)},label={Text("Cantidad")},singleLine=true,enabled=!busy,keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Number))
                     if(lines.size>1)TextButton(onClick={lines.removeAt(index)},enabled=!busy){Text("Quitar línea ${index+1}")}
                 }
@@ -173,7 +177,12 @@ private data class DraftLine(val key: Int,val brand: String="",val model: String
     Column {
         if(manual) OutlinedTextField(value,{if(it.length<=120)change(it)},label={Text(label)},singleLine=true,enabled=!busy,modifier=Modifier.fillMaxWidth())
         else Box {
-            OutlinedButton(onClick={expanded=true},enabled=!busy,modifier=Modifier.fillMaxWidth()) { Text("$label: ${value.ifBlank { "Seleccionar" }}") }
+            OutlinedCard(onClick={expanded=true},enabled=!busy,modifier=Modifier.fillMaxWidth()) {
+                Row(Modifier.fillMaxWidth().padding(16.dp),horizontalArrangement=Arrangement.SpaceBetween) {
+                    Column(Modifier.weight(1f)) { Text(label,fontSize=12.sp);Text(value.ifBlank { "Seleccionar" }) }
+                    Text("▾")
+                }
+            }
             DropdownMenu(expanded&&!busy,{expanded=false},modifier=Modifier.heightIn(max=280.dp)) {
                 options.forEach { option -> DropdownMenuItem(text={Text(option)},onClick={change(option);expanded=false}) }
                 if(options.isEmpty()) DropdownMenuItem(text={Text("Sin opciones registradas")},onClick={},enabled=false)
@@ -206,13 +215,14 @@ private data class DraftLine(val key: Int,val brand: String="",val model: String
     DisposableEffect(account.usuarioId) { onDispose { vm.reset() } }
     LaunchedEffect(account.usuarioId){vm.reset()}
     LaunchedEffect(state.expired){if(state.expired)expired()}
+    LaunchedEffect(state.movements.lastOrNull()?.id) { destination=null;confirm=false }
     Column(Modifier.fillMaxSize()) {
         OperationMessages(state)
         LazyColumn(contentPadding=PaddingValues(20.dp),verticalArrangement=Arrangement.spacedBy(14.dp)) {
             item {
                 Text("Traslado de motocicletas",fontSize=24.sp,fontWeight=FontWeight.Bold)
                 Text("Consulta el recorrido antes de trasladar a una tienda o despacho activo.",fontSize=13.sp)
-                OutlinedTextField(motorcycle,{motorcycle=it},label={Text("ID de motocicleta")},enabled=!state.busy,singleLine=true,modifier=Modifier.fillMaxWidth(),keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Number))
+                OutlinedTextField(motorcycle,{motorcycle=it;loadedId=null;destination=null;confirm=false},label={Text("ID de motocicleta")},enabled=!state.busy,singleLine=true,modifier=Modifier.fillMaxWidth(),keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Number))
                 Button(onClick={loadedId=motorcycle.toLongOrNull();destination=null;vm.movements(loadedId?:0)},enabled=!state.busy&&Rules.positive(motorcycle)){Text("Consultar recorrido")}
             }
             if(loadedId!=null&&state.movements.isNotEmpty())item{
@@ -222,7 +232,7 @@ private data class DraftLine(val key: Int,val brand: String="",val model: String
                 Text("Moto #$loadedId · Destino #${current.destinoId}",fontSize=12.sp)
                 if(account.permits(TRANSFER_UNITS)){
                     SitePicker(state.sites.filter{it.tipo in listOf("TIENDA","DESPACHO")&&it.id!=current.destinoId},destination,{destination=it},state.busy)
-                    Button(onClick={confirm=true},enabled=!state.busy&&destination!=null){Text("Confirmar traslado")}
+                    Button(onClick={confirm=true},enabled=!state.busy&&destination!=null&&destination?.id!=current.destinoId){Text("Confirmar traslado")}
                 }
             }
             if(loadedId!=null&&state.movements.isEmpty()&&!state.busy&&state.error==null)item{Text("Sin movimientos. Registra primero la ubicación inicial desde la ficha de inventario.")}

@@ -42,3 +42,13 @@ Sedes iniciales/destinos y transiciones de estado ya son seleccionables; chasis 
 Continuación manual: crear solicitud con dos líneas, verificar ID y estado Pendiente; pasar a preparación; asociar una unidad compatible sin duplicarla; comprobar rechazo o atención y su historial; registrar traslado de una unidad con ubicación inicial; anular otra solicitud pendiente con motivo. Conservar evidencias y contrastar los IDs con la API. HU-27 requiere aceptación de la regla de negocio; no declarar todo el Sprint cerrado con estas pantallas solamente.
 
 Verificación de esta mejora: BUILD SUCCESSFUL; 15 pruebas Android Host aprobadas. Instalación automática bloqueada por política de ejecución; todavía no hay evidencia visual de los selectores en Samsung. El APK anterior permanece instalado.
+
+## Corte de usabilidad y validación manual — 2026-11-19T17:04:34-05:00
+
+Diez capturas originales preservadas en `evidencias/sprint2/manual-samsung`. Demuestran creación multilínea, preparación, asociación, atención, traslado y anulación; SQL confirma #5 ATENDIDA y #8 ANULADA. Correcciones: regreso fijo sobre los mensajes, botón de navegación con tamaño mínimo 48 dp; solo avance como acción primaria; rechazo/anulación en contorno y color de error; selectores con apariencia de campo, modelo deshabilitado sin marca y color sin modelo; reinicio de selectores dependientes; carga de historial tras creación sin repetir POST si falla su consulta; limpieza de destino al cambiar recorrido y bloqueo de traslado al mismo destino.
+
+BUILD SUCCESSFUL y 15 pruebas Android Host aprobadas. Firma SHA256 sin cambios. Nuevo APK actualizado en Samsung con `install -r Success`, sin borrar datos. Validación visual de estas correcciones aún pendiente.
+
+Excel original actualizado en Drive, verificado por SHA256 tras descarga: 12 To Do, 31 Doing, 7 Done. Solo cambiaron CORTE REAL y REGISTRO REAL; respaldo previo en Drive. No se convierten planes históricos en ejecución.
+
+Para cierre: validar estas correcciones en teléfono y errores de formulario; completar revisión de permisos/escenarios negativos de las operaciones nuevas (el 403 global de API no acredita cada pantalla); aceptar regla de HU-27; adjuntar/validar UML, Figma, web y ER exigidos por las tareas del equipo; revisión/DoD y aceptación antes de merge a main. El avance móvil no acredita por sí solo todo el Sprint.
