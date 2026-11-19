@@ -1,6 +1,22 @@
 # Continuidad del aplicativo — 19/11/2026
 
-## Último trabajo real
+## Bloque actual en la nueva PC
+
+Base clonada: main `3d9334a`, limpia. Trabajo en `feature/login-identidad`, sin modificar main ni la rama de Roberto. Drive accesible: revisión real y matriz por HU en [REVISION-2026-11-19.md](REVISION-2026-11-19.md). HU-27 ya tiene 4 puntos en el plan de noviembre; la regla de corte sigue pendiente.
+
+Implementado en código: colores claros/oscuros según el sistema en login y pantallas existentes, marca tipográfica adaptada al tema conservando el bitmap original, icono IM vectorial adaptativo con alternativa API 24/25, barras Android según tema conservando `decorView.post`, teclado de contraseña y eliminación del selector técnico. La URL Android llega desde BuildConfig, propiedad Gradle `indumotos.backendUrl` o variable `INDUMOTOS_BACKEND_URL`; por defecto se conserva loopback 8089. No cambia el contrato HTTP, las cuentas ni los permisos. Vinculado a HU-26, criterio de interfaz móvil (`DOD y DOR!C70`) y pedidos explícitos de identidad/conexión.
+
+El script `Compilar-Android.ps1` permite indicar JavaHome/AndroidSdk/BackendUrl y verifica firma antes de copiar a un nombre de entrega único. Ya no impone la ruta Zulu de otra PC ni sobrescribe el APK histórico.
+
+Verificación del bloque: `:androidApp:assembleDebug :shared:testAndroidHostTest` **BUILD SUCCESSFUL**, 8 pruebas sin errores/fallos/omisiones (3 RulesTest, 5 ApiErrorMapperTest). Gradle 9.1 y SDK 36 preparados con las versiones del proyecto. Un error de importación URI del script Gradle fue corregido antes del build exitoso. `help -Pindumotos.backendUrl=http://example.com --offline` rechazó la URL con el mensaje esperado; el BuildConfig generado conserva loopback 8089. Sintaxis PowerShell comprobada; no se repitió todo el script de entrega después del build.
+
+APK verificado con apksigner y aapt: `pe.indumotos.asapp`, versión conservada `0.1.0-sprint1` / code 1, 22 641 741 bytes, SHA-256 `8382BCF66E4EDBD8296BF9483011926CE04D5800D27F0C7F47BBD49812B62380`. Certificado nuevo `ef933ea44b732c71c06f5f7d897b0af0ef7b13942dc8ec4c744eee4b6402be9c`; Samsung instalado `23c1a0373560f28c3d2b64103e50a0dff54bb955fd75b20ac40d52253e33b0f0`. **Firmas distintas: no se intentó reemplazar ni desinstalar la app del Samsung.** Hace falta la clave anterior por transferencia privada para actualizarla.
+
+Instalación nueva en AVD temporal API 37: Success; arranque frío `Status: ok`, 2046 ms; buffer crash vacío. Inspección visual real de login claro/oscuro, barras, icono y teclado en [evidencias/login-2026-11-19](evidencias/login-2026-11-19). Selector técnico ausente; botón deshabilitado con campos vacíos. No se inició sesión, crearon cuentas ni registros. No se comprobaron otras pantallas con sesión ni el teléfono con la nueva versión.
+
+Bloqueo externo: el backend correcto devuelve Repository not found y no aparece en el conector GitHub. El usuario indica que pedirá acceso y que se priorice el aplicativo. No se inventan rutas Sprint 2, datos ni reglas para simular integración. Siguiente paso: obtener el contrato actual de la base de Roberto (o OpenAPI autorizado) y las decisiones pendientes de estados/anulación; retomar las tareas T07/T08 de las seis HU de Sprint 2 en una feature propia. Para login real, configurar un backend autorizado y acceso privado de admin.indumotos. Para Samsung, resolver primero la firma.
+
+## Antecedente del equipo anterior (antes de este bloque)
 
 El incremento publicado terminó en `8fd7618`; el código que generó el APK comprobado corresponde a `3de365b`. Se subieron develop y feature/integrador-13; posteriormente se creó main con esa base y se configuró como predeterminada. El backend correcto es BACK-END-INDUMOTOS, feature/roberto-sprint1-backend, d4acdd0; no se cambió su código.
 

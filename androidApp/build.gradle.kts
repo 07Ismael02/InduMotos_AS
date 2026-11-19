@@ -1,8 +1,23 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.net.URI
 
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeCompiler)
+}
+
+// Deployment configuration, never entered by a worker in the login screen.
+val backendUrl = providers.gradleProperty("indumotos.backendUrl")
+    .orElse(providers.environmentVariable("INDUMOTOS_BACKEND_URL"))
+    .orElse("http://127.0.0.1:8089").get().trim().trimEnd('/')
+val backendUri = URI(backendUrl)
+require(backendUri.scheme in listOf("http", "https") && backendUri.host != null &&
+    backendUri.userInfo == null && backendUri.query == null && backendUri.fragment == null &&
+    backendUri.path.isNullOrEmpty()) {
+    "El backend debe ser un origen HTTP(S), sin credenciales, ruta, consulta ni fragmento"
+}
+require(backendUri.scheme == "https" || backendUri.host in listOf("127.0.0.1", "localhost", "10.0.2.2")) {
+    "HTTP solo se permite para desarrollo local; usa HTTPS para servidores remotos"
 }
 
 kotlin {
@@ -30,6 +45,7 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
         versionName = "0.1.0-sprint1"
+        buildConfigField("String", "BACKEND_URL", "\"$backendUrl\"")
     }
     packaging {
         resources {
@@ -51,5 +67,6 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }

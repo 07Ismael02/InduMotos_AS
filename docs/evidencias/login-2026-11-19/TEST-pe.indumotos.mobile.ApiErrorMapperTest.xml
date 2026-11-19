@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="pe.indumotos.mobile.ApiErrorMapperTest" tests="5" skipped="0" failures="0" errors="0" timestamp="2026-11-19T14:35:12.516Z" hostname="DESKTOP-LBFHJ5C" time="0.035">
+  <properties/>
+  <testcase name="forbiddenDoesNotMeanExpiredSession" classname="pe.indumotos.mobile.ApiErrorMapperTest" time="0.012"/>
+  <testcase name="unauthorizedMeansSessionExpired" classname="pe.indumotos.mobile.ApiErrorMapperTest" time="0.0"/>
+  <testcase name="validationPreservesFieldErrors" classname="pe.indumotos.mobile.ApiErrorMapperTest" time="0.014"/>
+  <testcase name="conflictsPreserveBusinessMessage" classname="pe.indumotos.mobile.ApiErrorMapperTest" time="0.0"/>
+  <testcase name="serverErrorDoesNotExposeInternalMessage" classname="pe.indumotos.mobile.ApiErrorMapperTest" time="0.006"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -2,7 +2,13 @@
 
 **Estado: pendiente de implementación/integración y comprobación.** La solicitud del usuario fija prioridad de entrega para hoy; este documento no afirma Sprint Planning, Daily, pruebas, Review ni cierre celebrados.
 
-## Fuentes y alcance
+## Revisión de fuentes del 19/11/2026 en esta PC
+
+Se encontró y extrajo el [plan del Sprint 2 del 08 al 12 de noviembre](https://drive.google.com/file/d/1cuTASr-QSXTDw6eHbrCDHctd_iIsBrTf/view), modificado el 12/11 a las 19:09 (Lima). Es posterior al libro de octubre citado abajo. Ver [revisión y matriz de trazabilidad](REVISION-2026-11-19.md).
+
+**Corrección de HU-27:** la hoja `G4 - FAMILIA VALENCIA`, fila 82, ya registra 4 puntos. Las condiciones exactas de anulación siguen pendientes en la bitácora del 12/11. Los estados del avance también siguen sujetos a validación. Las seis tareas Android T07 y pruebas T08 figuran en el plan; los prototipos registrados no acreditan una integración implementada. El contrato remoto actual no pudo contrastarse: acceso al backend bloqueado en esta PC.
+
+## Fuentes y alcance anteriores (antecedente)
 
 Fuente más reciente consultada: [Ing SW1 G2, épicas/HU, revisión 29/10](https://drive.google.com/file/d/1QS8WveG1IuCraO6FeTW5GrLiUMklg81O/view), bloque «SPRINT 2 · Solicitudes, ensamblaje y movimientos». Ese libro distribuye 27 HU en cinco sprints propuestos; no reemplazarlo por el escenario antiguo de tres iteraciones sin explicar la diferencia. [Plan anterior de tres iteraciones](https://drive.google.com/file/d/1qVrCCCsXBtTuXYttMXf31suUVWzUwrKv/view) es antecedente, no el único alcance vigente.
 
@@ -13,7 +19,7 @@ Fuente más reciente consultada: [Ing SW1 G2, épicas/HU, revisión 29/10](https
 | HU-07 | Registrar avance y resultado de solicitud | Consultar y aplicar transiciones acordadas con motivo/actor; rechazar acciones inválidas o sin permiso | Pendiente; no inventar máquina de estados aprobada |
 | HU-08 | Asociar motocicletas concretas al ensamblaje | Vincular chasis existentes a una solicitud válida y comprobar la asociación persistida | Pendiente |
 | HU-09 | Registrar traslado a tienda o despacho | Registrar origen/destino y unidad identificada; confirmar ubicación e historial acordado sin perder el registro anterior | Pendiente |
-| HU-27 | Anular solicitud enviada por error o innecesaria | Conservar solicitud, motivo y autorización; impedir anulación fuera de la regla acordada | Incluida en el bloque del Excel; puntuación y regla si el trabajo empezó siguen pendientes |
+| HU-27 | Anular solicitud enviada por error o innecesaria | Conservar solicitud, motivo y autorización; impedir anulación fuera de la regla acordada | 4 puntos en el libro de noviembre; regla si el trabajo empezó y contrato siguen pendientes |
 
 ## Decisiones operativas que no se deben inventar
 

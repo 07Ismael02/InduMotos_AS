@@ -6,7 +6,7 @@
 
 Completar un incremento Android del **Sprint 2 durante el 19/11/2026**, con solicitudes de ensamblaje, unidades asociadas, ubicación y traslados conectados al backend real, preservando el acceso e inventario del Sprint 1. La fecha es una prioridad del usuario, no evidencia de finalización. Primero leer [el plan y criterios del Sprint 2](docs/SPRINT2.md) y [el contexto de continuidad](docs/CONTINUIDAD.md).
 
-**El último trabajo pendiente es corregir el login y la identidad visual**: icono diminuto, bloque negro del logo en pantalla clara, ausencia de tema oscuro y selector técnico de servidor visible al usuario. No están corregidos en el APK publicado como antecedente.
+**Bloque actual, 19/11/2026:** mejoras de login, temas, icono y configuración de entorno implementadas en `feature/login-identidad`. Compilación y 8 pruebas aprobadas; login claro/oscuro, teclado e icono comprobados en emulador API 37. No se actualizó el Samsung: la firma Debug nueva no coincide con la instalada. No confundir esta validación visual con autenticación real ni con cierre de HU-26. Se revisó Drive y se encontró planificación de noviembre posterior al libro citado originalmente: [fuentes, evidencia y estado por HU](docs/REVISION-2026-11-19.md). El backend actual no es accesible desde esta PC; el usuario está gestionando acceso y prioriza continuar el aplicativo.
 
 ## Repositorios correctos y ramas
 
@@ -14,7 +14,7 @@ Completar un incremento Android del **Sprint 2 durante el 19/11/2026**, con soli
 |---|---|
 | [InduMotos_AS](https://github.com/07Ismael02/InduMotos_AS) / `main` | Rama predeterminada y base funcional conservada. Código del incremento inicial en `8fd7618`; las actualizaciones posteriores de continuidad son documentación. No desarrollar funciones directamente aquí. |
 | `feature/integrador-13` | Primera integración móvil; HEAD histórico `8fd76182132c38d75c7fc7f313849bfcda31a7b4`. El nombre no significa que una práctica S13 esté aprobada. |
-| `feature/login-identidad` | Rama creada para la mejora visual y de conexión; no había cambios funcionales terminados al preparar esta continuidad. Revisar su HEAD remoto y git status antes de retomar. |
+| `feature/login-identidad` | Mejoras locales del 19/11: temas, marca, icono y conexión por compilación. Ver CONTINUIDAD; no fusionada a main. |
 | `develop` | Base técnica antigua `1c900da`; **no usarla como base actual** sin integrar de manera explícita los cambios necesarios. |
 | `docs/continuidad-sprint2` | Actualización documental del 19/11/2026. No implementa el Sprint 2. |
 | [BACK-END-INDUMOTOS](https://github.com/Akatosh4019/BACK-END-INDUMOTOS) / `feature/roberto-sprint1-backend` | Backend confirmado por el usuario. Último HEAD remoto observado el 19/11: `d4acdd0641de470b3777ac0910fb7e76b04ad610`. También existe `feature/hu-01-busqueda-chasis`; no se observó main/develop. Volver a consultar porque el equipo sigue trabajando. |
@@ -30,10 +30,10 @@ Completar un incremento Android del **Sprint 2 durante el 19/11/2026**, con soli
 | Inventario, filtros y paginación | Implementados contra GET motocicletas. En teléfono se comprobó consulta vacía, no un catálogo completo. |
 | Alta/consulta de llegada y ficha; cuentas y roles/excepciones | Implementadas en el móvil contra las rutas del Sprint 1; recorrido de escritura y otros roles **pendientes de validación**. |
 | Bug IND-AS-001 al iniciar en Samsung | Corregido en `3de365b`: configurar barras desde decorView.post después de setContent; nuevo arranque frío comprobado. |
-| Suites automatizadas | No ejecutadas en esta integración móvil. No confundir con pruebas históricas del backend o de PharmaMobile. |
+| Suites automatizadas | 19/11: 8 pruebas Android Host aprobadas (RulesTest: 3; ApiErrorMapperTest: 5). No cubren autenticación contra servidor ni Sprint 2. |
 | Offline, SQLDelight, refresh token | No implementados en esta app. No presentar el offline de PharmaMobile como propio. |
 | iOS | Target de origen existente; no compilado ni firmado en Windows. |
-| Sprint 2 | Pendiente. El backend inspeccionado no ofrece todavía sus endpoints logísticos. |
+| Sprint 2 | Pendiente. La base histórica inspeccionada no ofrecía endpoints logísticos; acceso al backend actual bloqueado desde esta PC. |
 
 Evidencia y contrato inicial: [INTEGRACION-SPRINT1.md](docs/INTEGRACION-SPRINT1.md). Trazabilidad del APK del 17/11: [build-sprint1.json](docs/build-sprint1.json). Capturas reales: [docs/evidencias](docs/evidencias). No repetir una verificación aprobada sin cambio o motivo técnico, pero una función nueva sí requiere comprobación pertinente.
 
@@ -53,7 +53,7 @@ El backend usa BCrypt (coste 12) y JWT Bearer de 900 segundos, perfil auth/me y 
 4. Preparar PostgreSQL local o un backend de desarrollo acordado; inspeccionar compose.yaml, application.yml y variables del backend antes de iniciarlo. No crear un volumen ni lanzar migraciones sobre una base ajena sin identificarla. No usar down -v, clean o reset para resolver fallos.
 5. Obtener/configurar **privadamente** DB_URL, DB_USER, DB_PASSWORD, ADMIN_USERNAME, ADMIN_PASSWORD, JWT_SECRET_BASE64, PORT y SERVER_ADDRESS. Contraseñas, .env y el archivo local del equipo anterior no están en Git. Una nueva PC con una base nueva no contiene los datos del equipo anterior: requerirá restauración segura o datos de prueba expresamente acordados.
 6. Ajustar JAVA_HOME y sdk.dir a esa PC. `scripts/Compilar-Android.ps1` y `Iniciar-Backend.ps1` contienen rutas de la PC original; revisarlas antes de usarlos. Alternativa: wrapper Gradle desde la raíz y Maven/JDK del entorno para el backend. No instalar herramientas ni ejecutar pruebas indiscriminadamente.
-7. Para un teléfono autorizado: `adb devices -l`, después `adb -s <serial-real> reverse tcp:8089 tcp:8089`. El puerto debe coincidir con el backend. En la versión actual el login usa localhost:8089 por defecto; 10.0.2.2 sirve solo al emulador. No abrir puertos de la red universitaria ni exponer PostgreSQL.
+7. Para un teléfono autorizado: `adb devices -l`, después `adb -s <serial-real> reverse tcp:8089 tcp:8089`. El puerto debe coincidir con el backend. Android obtiene la URL de `-Pindumotos.backendUrl` o `INDUMOTOS_BACKEND_URL`; predeterminado `http://127.0.0.1:8089` para ADB Reverse. `http://10.0.2.2:8089` es exclusivo del emulador. No existe selector técnico en el login. Se acepta HTTP solo para esas direcciones locales y localhost; los demás servidores requieren HTTPS. No abrir puertos de la red universitaria ni exponer PostgreSQL.
 8. Antes de instalar, comprobar applicationId, versión y **firma**. La clave Debug de otra PC será distinta: transferir la clave anterior de forma privada o acordar una instalación/perfil aislado. No desinstalar ni borrar datos ante conflicto. No cambiar applicationId o firma a escondidas.
 
 Comandos iniciales, desde la carpeta de trabajo elegida (no contienen secretos):
