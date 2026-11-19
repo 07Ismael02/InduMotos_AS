@@ -10,7 +10,9 @@
   "backendUrl": "http://127.0.0.1:8089",
   "adbReverse": "tcp:8089 tcp:8090",
   "dispositivo": "Samsung SM-S948U1 Android 17 API 37",
-  "instalacion": "Actualización de búsqueda generada; pendiente de instalación y validación visual porque ADB no detecta el Samsung.",
+  "instalacion": "ADB install -r Success en Samsung RFGL11XYCTD; firma coincidente verificada contra APK instalado. Sin desinstalar ni limpiar datos. Login manual y revisión visual pendientes.",
   "rutaLocal": "C:\\Users\\Ismael Logacho\\Documents\\PharmaMobil\\proyecto-final-dam\\InduMotos-Sprint2\\androidApp\\build\\outputs\\apk\\debug\\androidApp-debug.apk",
-  "pruebasAndroidHost": 15
+  "pruebasAndroidHost": 15,
+  "fechaInstalacion": "2026-11-19T17:46:16-05:00",
+  "commitCodigo": "b7730cc0e58aaf4d09c978fa5c6399f640ab4a97"
 }

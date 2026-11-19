@@ -62,3 +62,11 @@ Traslados consulta recientes y busca por chasis; una tarjeta de motocicleta resu
 Llegadas: nuevo GET /api/v1/llegadas?guia=...&limite=20, resultados recientes por fecha/ID descendente, búsqueda literal sin comodines SQL, máximo 50 y guía de hasta 120 caracteres. Misma autorización INVENTARIO_CONSULTAR. Interfaz por guía/lista; las fichas nuevas seleccionan recepción por guía (hasta 20 recientes) en vez de escribir llegadaId. No hay migraciones ni escrituras de negocio en esta corrección. Selección de recepciones antiguas para alta de ficha sigue limitada a las 20 recientes; la consulta de llegadas sí permite buscar por guía.
 
 Validación: 65 pruebas backend (incluidas 2 nuevas para límites/normalización), empaquetado correcto; salud 200; listado 200, búsqueda por guía 200 y límite 51 rechazado con 400. Evidencia en consulta-llegadas.json. Android compilado y 15 pruebas aprobadas. No se instalaron cambios en el teléfono: ADB vacío; pendientes instalación segura, prueba visual y captura de copia de chasis/listas. No atribuir esta nueva UI a las capturas del APK anterior.
+
+## Recuperación de servicios e instalación — 2026-11-19T17:46:16-05:00
+
+Los commits de código móvil b7730cc y backend e0ab459 coinciden con sus ramas remotas. Se recuperaron Docker Desktop y el contenedor PostgreSQL existente (healthy), sin recrear volumen ni base. Backend local iniciado con el JAR ya verificado; Flyway desactivado en este arranque sobre el esquema existente. GET /api/health devuelve 200. USB 8089 → 8090 restablecido.
+
+Se compararon las firmas SHA256 de APK instalado y nuevo: coinciden. Hash del APK nuevo coincide con build.json. Actualización `adb install -r`: Success, sin borrar datos. El Samsung abre el login; el usuario completa la autenticación manualmente. No se marcan como ejecutados los recorridos visuales de la nueva búsqueda/copia de chasis todavía.
+
+Por instrucción del usuario, desde este corte se registra trabajo únicamente en la pestaña existente SCRUM S2 19-11-2026 del mismo Excel, respetando formato y sin enlaces. Web y Figma pertenecen a otros colaboradores y no bloquean por sí solos la entrega de su parte Android. El cierre móvil requiere sus propias pruebas y aceptación; no equivale a cierre integral del equipo.
