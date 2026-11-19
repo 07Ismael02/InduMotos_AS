@@ -43,7 +43,17 @@ class RemoteRepository(private val http:HttpClient):LogisticsRepository, Locatio
 
  override suspend fun registerLocation(id: Long, destinationId: Long): LocationRecord {
      val payload = buildJsonObject { put("destinoId", destinationId) }
-     return json.decodeFromString(request("motocicletas/$id/ubicacion", payload.toString(), "POST"))
+     val response = try {
+         request("motocicletas/$id/ubicacion", payload.toString(), "POST")
+     } catch (exception: AppException) {
+         if (exception.error is AppError.Conflict) {
+             throw AppException(AppError.Conflict(
+                 "La motocicleta ya tiene ubicación. Actualiza la consulta para ver el destino guardado."
+             ))
+         }
+         throw exception
+     }
+     return json.decodeFromString(response)
  }
  override fun clearSession(){token=""}
 }

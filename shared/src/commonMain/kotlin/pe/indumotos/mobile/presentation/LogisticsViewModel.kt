@@ -29,14 +29,14 @@ class LogisticsViewModel(
      if (!allowed(READ_LOCATIONS)) return
      work {
          val current = locations.currentLocation(id)
-         val sites = if (allowed(WRITE_LOCATION)) locations.sites() else emptyList()
+         val sites = if (current == null && allowed(WRITE_LOCATION)) locations.sites() else emptyList()
          mutableLocation.value = MotorcycleLocation(current, sites)
      }
  }
  fun registerLocation(id: Long, destination: Site) {
      if (!allowed(READ_LOCATIONS) || !allowed(WRITE_LOCATION)) return
      val current = mutableLocation.value ?: return
-     if (destination !in current.destinations || destination.id == current.current?.destinoId) return
+     if (current.current != null || destination !in current.destinations) return
      work {
          val saved = locations.registerLocation(id, destination.id)
          mutableLocation.value = current.copy(current = saved)

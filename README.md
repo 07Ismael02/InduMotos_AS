@@ -4,6 +4,8 @@
 
 ## Objetivo inmediato
 
+En HU-05 se registra la ubicación inicial una sola vez. Los cambios posteriores corresponden a HU-09 (traslado a tienda o despacho).
+
 La ficha de Inventario se abre a pantalla completa. Agrupa los datos de la moto, la ubicación, el motor y la documentación, y el registro de ingreso. Consultar ubicación tiene un botón principal con icono.
 
 **HU-05:** ubicación integrada en la ficha de inventario en `codex/feature/sprint2-ubicacion`. Compilación y pruebas Android Host aprobadas. Con datos sintéticos autorizados, la API registró la ubicación y confirmó el mismo destino y responsable en una consulta posterior. Falta verificar el recorrido visual en Android.

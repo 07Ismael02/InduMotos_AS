@@ -34,10 +34,15 @@ internal fun LocationSection(
                 DetailValue("Registró", current.registrador)
                 DetailValue("Fecha", recordTimestamp(current.fecha))
             }
-            if (canRegister) {
-                val options = location.destinations.filterNot { it.id == current?.destinoId }
+            if (current != null) {
+                Text(
+                    "La ubicación inicial ya está registrada. Para mover la motocicleta, registra un traslado.",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            } else if (canRegister) {
+                val options = location.destinations
                 if (options.isEmpty()) {
-                    Text("No hay otras ubicaciones disponibles.")
+                    Text("No hay ubicaciones disponibles.")
                 } else {
                     Box {
                         OutlinedButton(onClick = { expanded = true }, enabled = !busy) {
