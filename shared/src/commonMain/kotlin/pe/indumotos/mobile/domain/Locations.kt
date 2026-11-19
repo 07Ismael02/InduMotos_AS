@@ -6,7 +6,7 @@ const val READ_LOCATIONS = "UBICACIONES_CONSULTAR"
 const val WRITE_LOCATION = "UBICACIONES_REGISTRAR"
 
 @Serializable
-data class Site(val id: Long, val codigo: String, val nombre: String)
+data class Site(val id: Long, val codigo: String, val nombre: String, val tipo: String = "")
 
 @Serializable
 data class LocationRecord(

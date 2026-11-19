@@ -6,6 +6,7 @@ import pe.indumotos.mobile.data.RemoteRepository
 import pe.indumotos.mobile.data.createHttpClient
 import pe.indumotos.mobile.domain.*
 import pe.indumotos.mobile.presentation.LogisticsViewModel
+import pe.indumotos.mobile.presentation.OperationsViewModel
 import org.koin.core.module.dsl.viewModel
 expect val platformModule:Module
 val appModule = module {
@@ -13,6 +14,8 @@ val appModule = module {
     single { RemoteRepository(get()) }
     single<LogisticsRepository> { get<RemoteRepository>() }
     single<LocationRepository> { get<RemoteRepository>() }
+    single<OperationsRepository> { get<RemoteRepository>() }
+    viewModel { OperationsViewModel(get(), get()) }
     factory { LogisticsUseCase(get()) }
     viewModel { LogisticsViewModel(get(), get(), get()) }
 }

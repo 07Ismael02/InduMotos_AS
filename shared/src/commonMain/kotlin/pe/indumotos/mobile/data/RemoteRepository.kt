@@ -8,7 +8,7 @@ import kotlinx.serialization.json.*
 import kotlinx.serialization.encodeToString
 import kotlinx.coroutines.CancellationException
 
-class RemoteRepository(private val http:HttpClient):LogisticsRepository, LocationRepository{
+class RemoteRepository(private val http:HttpClient):LogisticsRepository, LocationRepository, OperationsRepository{
  private val json=Json{ignoreUnknownKeys=true;encodeDefaults=true}
  private var base="";private var token=""
  private suspend fun request(path:String,body:String?=null,method:String="GET",params:Map<String,String> = emptyMap()):String{
@@ -55,5 +55,18 @@ class RemoteRepository(private val http:HttpClient):LogisticsRepository, Locatio
      }
      return json.decodeFromString(response)
  }
+
+ override suspend fun requests(page: Int): List<AssemblyRequest> = json.decodeFromString(request("solicitudes",params=mapOf("pagina" to page.toString(),"tamano" to "20")))
+ override suspend fun request(id: Long): AssemblyRequest = json.decodeFromString(request("solicitudes/$id"))
+ override suspend fun createRequest(body: NewRequest): AssemblyRequest = json.decodeFromString(request("solicitudes",json.encodeToString(body),"POST"))
+ override suspend fun events(id: Long): List<RequestEvent> = json.decodeFromString(request("solicitudes/$id/seguimiento"))
+ override suspend fun advance(id: Long,status: String,reason: String) { request("solicitudes/$id/seguimiento",buildJsonObject { put("estado",status);put("motivo",reason) }.toString(),"POST") }
+ override suspend fun cancel(id: Long,reason: String) { request("solicitudes/$id/anulacion",buildJsonObject { put("motivo",reason) }.toString(),"POST") }
+ override suspend fun eligible(chassis: String): List<EligibleUnit> = json.decodeFromString(request("motocicletas/elegibles",params=mapOf("chasis" to chassis)))
+ override suspend fun assigned(id: Long,line: Long): List<AssignedUnit> = json.decodeFromString(request("solicitudes/$id/lineas/$line/unidades"))
+ override suspend fun assign(id: Long,line: Long,motorcycle: Long) { request("solicitudes/$id/lineas/$line/unidades",buildJsonObject { put("motocicletaId",motorcycle) }.toString(),"POST") }
+ override suspend fun remove(id: Long,line: Long,association: Long,reason: String) { request("solicitudes/$id/lineas/$line/unidades/$association",buildJsonObject { put("motivo",reason) }.toString(),"DELETE") }
+ override suspend fun transfer(motorcycle: Long,destination: Long): TransferRecord = json.decodeFromString(request("motocicletas/$motorcycle/traslados",buildJsonObject { put("destinoId",destination) }.toString(),"POST"))
+ override suspend fun transfers(motorcycle: Long): List<TransferRecord> = json.decodeFromString(request("motocicletas/$motorcycle/ubicacion/historial"))
  override fun clearSession(){token=""}
 }

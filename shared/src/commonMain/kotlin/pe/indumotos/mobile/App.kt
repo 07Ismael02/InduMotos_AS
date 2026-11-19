@@ -29,8 +29,9 @@ private val Blue:Color @Composable get()=MaterialTheme.colorScheme.secondary
 private val Muted:Color @Composable get()=MaterialTheme.colorScheme.onSurfaceVariant
 private fun JsonObject.text(key:String)=get(key)?.jsonPrimitive?.contentOrNull.orEmpty()
 private val roleNames=RoleCodes.associateWith(::roleLabel)
-private fun icon(m:Module)=when(m){Module.INVENTORY->Icons.Default.Inventory2;Module.ARRIVALS->Icons.Default.LocalShipping;Module.FICHAS->Icons.Default.Description;Module.USERS->Icons.Default.PersonAdd;Module.PERMISSIONS->Icons.Default.AdminPanelSettings}
+private fun icon(m:Module)=when(m){Module.REQUESTS->Icons.Default.Assignment;Module.TRANSFERS->Icons.Default.LocalShipping;Module.INVENTORY->Icons.Default.Inventory2;Module.ARRIVALS->Icons.Default.LocalShipping;Module.FICHAS->Icons.Default.Description;Module.USERS->Icons.Default.PersonAdd;Module.PERMISSIONS->Icons.Default.AdminPanelSettings}
 private fun createForm(module:Module):Form=when(module){
+ Module.REQUESTS,Module.TRANSFERS->error("Operación mediante su pantalla específica")
  Module.INVENTORY,Module.FICHAS->Form("Registrar ficha de motocicleta","motocicletas",listOf(Field("llegadaId","ID de llegada",numeric=true),Field("marca","Marca"),Field("modelo","Modelo"),Field("color","Color"),Field("chasisCompleto","Chasis completo"),Field("numeroMotor","Número de motor"),Field("dua","DUA"),Field("itemDua","Ítem DUA")))
  Module.ARRIVALS->Form("Registrar llegada","llegadas",listOf(Field("numeroGuia","Número de guía"),Field("cantidadDeclarada","Cantidad declarada",numeric=true),Field("cantidadRecibida","Cantidad recibida",numeric=true),Field("observacion","Observación (opcional)",required=false,maxLength=1000)))
  Module.USERS->Form("Crear cuenta","usuarios",listOf(Field("nombreCompleto","Nombre completo",maxLength=180),Field("nombreUsuario","Usuario",maxLength=80),Field("clave","Contraseña inicial (12–100 caracteres)",secret=true,maxLength=100),Field("rolCodigo","Rol",options=RoleCodes,labels=roleNames)))
@@ -93,12 +94,12 @@ private fun createForm(module:Module):Form=when(module){
  }}){
   Scaffold(containerColor=MaterialTheme.colorScheme.background,topBar={TopAppBar(title={Column{Text(state.module?.title?:"Inicio",fontSize=18.sp,fontWeight=FontWeight.SemiBold);Text("INDUMOTOS",fontSize=10.sp,letterSpacing=2.sp,color=Muted)}},navigationIcon={IconButton(onClick={scope.launch{drawer.open()}}){Icon(Icons.Default.Menu,"Abrir menú de navegación")}},colors=TopAppBarDefaults.topAppBarColors(containerColor=MaterialTheme.colorScheme.surface))},floatingActionButton={
    val m=state.module;val permission=if(m==Module.INVENTORY)"FICHAS_REGISTRAR" else m?.permission
-   if(m!=null&&m!=Module.PERMISSIONS&&permission!=null&&vm.allowed(permission))ExtendedFloatingActionButton(onClick={vm.form(createForm(m))},expanded=true,icon={Icon(Icons.Default.Add,null)},text={Text(if(m==Module.INVENTORY||m==Module.FICHAS)"Nueva ficha"else if(m==Module.ARRIVALS)"Nueva llegada"else"Nueva cuenta")},containerColor=Yellow,contentColor=Ink)
+   if(m!=null&&m!=Module.PERMISSIONS&&m!=Module.REQUESTS&&m!=Module.TRANSFERS&&permission!=null&&vm.allowed(permission))ExtendedFloatingActionButton(onClick={vm.form(createForm(m))},expanded=true,icon={Icon(Icons.Default.Add,null)},text={Text(if(m==Module.INVENTORY||m==Module.FICHAS)"Nueva ficha"else if(m==Module.ARRIVALS)"Nueva llegada"else"Nueva cuenta")},containerColor=Yellow,contentColor=Ink)
   }){padding->
    Column(Modifier.padding(padding).fillMaxSize()){
     if(state.busy)LinearProgressIndicator(Modifier.fillMaxWidth(),color=Blue)
     state.error?.let{Notice(it,true)};state.message?.let{Notice(it,false)}
-    when(state.module){null->Home(state,vm);Module.INVENTORY->Inventory(state,vm);else->QueryScreen(state,vm)}
+    when(state.module){null->Home(state,vm);Module.INVENTORY->Inventory(state,vm);Module.REQUESTS->RequestsScreen(account,vm::expireSession);Module.TRANSFERS->TransfersScreen(account,vm::expireSession);else->QueryScreen(state,vm)}
    }
   }
  }

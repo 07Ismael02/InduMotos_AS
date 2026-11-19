@@ -46,6 +46,7 @@ class LogisticsViewModel(
  fun form(form:Form?){if(!mutable.value.busy)mutable.update{it.copy(form=form,error=null,message=null)}}
  fun submit(values:Map<String,String>){val form=mutable.value.form?:return;work{val response=save.save(form,values);val id=response?.get("id")?.jsonPrimitive?.contentOrNull;mutable.update{it.copy(form=null,message=if(id!=null)"Registro guardado con ID #$id." else "Operación confirmada por el servidor.",detail=null)};if(mutable.value.module==Module.INVENTORY)load(mutable.value.page)}}
  fun logout()=work{repo.logout();mutable.value=UiState(message="Sesión cerrada correctamente.")}
+ fun expireSession(){repo.clearSession();mutableLocation.value=null;mutable.value=UiState(error="Tu sesión venció. Inicia sesión nuevamente.")}
  fun allowed(permission:String)=state.value.access?.permisos?.any{it.codigo==permission&&it.permitido}==true
  fun canRead(module:Module)=when(module){Module.ARRIVALS->allowed("LLEGADAS_REGISTRAR")||allowed("INVENTARIO_CONSULTAR");Module.FICHAS->allowed("FICHAS_REGISTRAR")||allowed("INVENTARIO_CONSULTAR");else->allowed(module.permission)}
 }
