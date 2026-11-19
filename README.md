@@ -4,7 +4,7 @@
 
 ## Objetivo inmediato
 
-**Apariencia en Android:** abre la rueda junto al nombre de la cuenta en el menú lateral. En Ajustes puedes elegir Sistema, Claro u Oscuro. La elección se guarda en esta instalación.
+**Mi cuenta en Android:** toca tu avatar o nombre al pie del menú lateral. Desde allí abre Perfil, Apariencia o Cerrar sesión. La elección de tema se guarda en esta instalación.
 
 **API local operativa:** Sprint 2 `fbfaab5` ejecutado en Docker. Salud, login, perfil y logout verificados por HTTP. El emulador usa ADB Reverse de 8089 a 8080. Ver [arranque y credenciales locales](docs/CONTINUIDAD.md).
 

@@ -1,5 +1,7 @@
 # Continuidad del aplicativo — 19/11/2026
 
+Mi cuenta sustituye la rueda de la cabecera. El acceso con iniciales y usuario está al pie del menú lateral. Perfil muestra los datos vigentes de `GET /api/v1/auth/me` (identificador, usuario y rol). Apariencia conserva Sistema, Claro y Oscuro. Cerrar sesión conserva la confirmación existente. El backend inspeccionado no ofrece edición del perfil propio. La edición queda pendiente de contrato y campos aprobados.
+
 La rama `feature/login-identidad` añade Ajustes en la cabecera del menú de la cuenta. Sistema, Claro y Oscuro se aplican al instante a la interfaz y barras. Android conserva la preferencia local entre arranques. Build Debug y pruebas Android Host aprobados. Pendiente de comprobación visual desde la sesión del emulador tras actualizar con Run.
 
 ## Backend local en Docker
@@ -76,3 +78,5 @@ Leer README, este archivo, SPRINT2 y el backend. Inspeccionar ramas remotas actu
 - Diferenciar código terminado, dispositivo comprobado y pendientes.
 - Actualizar contrato cuando cambie la API; no sustituir endpoints reales por respuestas simuladas para aparentar integración.
 - Dejar instrucciones de arranque reproducibles y sin rutas personales obligatorias ni secretos.
+
+Verificación de Mi cuenta: assembleDebug y testAndroidHostTest aprobados. Pendiente de recorrido visual en el emulador.
