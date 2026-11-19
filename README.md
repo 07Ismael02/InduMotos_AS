@@ -4,6 +4,8 @@
 
 ## Objetivo inmediato
 
+Último commit de código de este bloque: `2d12129` en `feature/login-identidad` (local, sin push ni merge). [APK y firma](docs/build-login-20261119.json), [capturas y pruebas](docs/evidencias/login-2026-11-19/README.md). APK local ignorado por Git: `entrega/Indumotos-AS-login-20261119-debug.apk`; no instalar sobre el Samsung con la firma actual.
+
 Completar un incremento Android del **Sprint 2 durante el 19/11/2026**, con solicitudes de ensamblaje, unidades asociadas, ubicación y traslados conectados al backend real, preservando el acceso e inventario del Sprint 1. La fecha es una prioridad del usuario, no evidencia de finalización. Primero leer [el plan y criterios del Sprint 2](docs/SPRINT2.md) y [el contexto de continuidad](docs/CONTINUIDAD.md).
 
 **Bloque actual, 19/11/2026:** mejoras de login, temas, icono y configuración de entorno implementadas en `feature/login-identidad`. Compilación y 8 pruebas aprobadas; login claro/oscuro, teclado e icono comprobados en emulador API 37. No se actualizó el Samsung: la firma Debug nueva no coincide con la instalada. No confundir esta validación visual con autenticación real ni con cierre de HU-26. Se revisó Drive y se encontró planificación de noviembre posterior al libro citado originalmente: [fuentes, evidencia y estado por HU](docs/REVISION-2026-11-19.md). El backend actual no es accesible desde esta PC; el usuario está gestionando acceso y prioriza continuar el aplicativo.

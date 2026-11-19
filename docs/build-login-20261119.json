@@ -1,0 +1,23 @@
+{
+  "Fecha": "2026-11-19",
+  "ZonaHoraria": "America/Lima",
+  "Rama": "feature/login-identidad",
+  "CommitCodigo": "2d12129085773b89669f38ae2748bde4f67c4ca1",
+  "Version": "0.1.0-sprint1",
+  "VersionCode": 1,
+  "ApplicationId": "pe.indumotos.asapp",
+  "Tipo": "debug",
+  "APK": "entrega/Indumotos-AS-login-20261119-debug.apk",
+  "Bytes": 22641741,
+  "SHA256": "8382BCF66E4EDBD8296BF9483011926CE04D5800D27F0C7F47BBD49812B62380",
+  "CertificadoSHA256": "ef933ea44b732c71c06f5f7d897b0af0ef7b13942dc8ec4c744eee4b6402be9c",
+  "CertificadoSamsungInstaladoSHA256": "23c1a0373560f28c3d2b64103e50a0dff54bb955fd75b20ac40d52253e33b0f0",
+  "BackendURLCompilada": "http://127.0.0.1:8089",
+  "BackendRealVerificado": false,
+  "PruebasHost": { "ejecutadas": 8, "fallos": 0, "errores": 0, "omitidas": 0 },
+  "Emulador": { "api": 37, "instalacion": "Success", "arranqueFrio": "ok", "tiempoArranqueMs": 2046 },
+  "SamsungActualizado": false,
+  "MotivoNoActualizado": "Firma incompatible; se conservó la instalación y sus datos",
+  "Evidencias": "docs/evidencias/login-2026-11-19",
+  "Limites": "Verificación visual de login, temas, teclado e icono. Sin sesión contra backend real ni cierre del Sprint 2."
+}

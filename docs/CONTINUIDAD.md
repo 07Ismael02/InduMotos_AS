@@ -2,6 +2,8 @@
 
 ## Bloque actual en la nueva PC
 
+Código y primera actualización documental: commit `2d12129085773b89669f38ae2748bde4f67c4ca1`. Cierre documental posterior incorpora [trazabilidad del APK](build-login-20261119.json) y [explicación de evidencias](evidencias/login-2026-11-19/README.md). Commits locales; no se hizo push ni merge. main permanece en `3d9334a`.
+
 Base clonada: main `3d9334a`, limpia. Trabajo en `feature/login-identidad`, sin modificar main ni la rama de Roberto. Drive accesible: revisión real y matriz por HU en [REVISION-2026-11-19.md](REVISION-2026-11-19.md). HU-27 ya tiene 4 puntos en el plan de noviembre; la regla de corte sigue pendiente.
 
 Implementado en código: colores claros/oscuros según el sistema en login y pantallas existentes, marca tipográfica adaptada al tema conservando el bitmap original, icono IM vectorial adaptativo con alternativa API 24/25, barras Android según tema conservando `decorView.post`, teclado de contraseña y eliminación del selector técnico. La URL Android llega desde BuildConfig, propiedad Gradle `indumotos.backendUrl` o variable `INDUMOTOS_BACKEND_URL`; por defecto se conserva loopback 8089. No cambia el contrato HTTP, las cuentas ni los permisos. Vinculado a HU-26, criterio de interfaz móvil (`DOD y DOR!C70`) y pedidos explícitos de identidad/conexión.
