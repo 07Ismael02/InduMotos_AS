@@ -1,5 +1,13 @@
 # Continuidad del aplicativo — 19/11/2026
 
+## Backend local en Docker
+
+La copia `Back-sprint2-fbfaab5` del workspace se compiló con Java 21 y Maven en Docker, mediante `Dockerfile.local` y `compose.local.yaml`. El proyecto Compose `indumotos-sprint2-local` arrancó PostgreSQL con volumen nuevo y API en `127.0.0.1:8080`. Se verificaron `/api/health` (ok), login y perfil con el administrador local `admin.indumotos`, y logout HTTP 204. La contraseña inicial aleatoria está en `ADMIN_PASSWORD` del `.env` privado de la copia local. No registrar ese archivo ni tokens en Git.
+
+Emulador `emulator-5554`: se configuró `adb -s emulator-5554 reverse tcp:8089 tcp:8080`, compatible con el APK actual. Reaplicar si cambia el serial o se pierde el reenvío. La prueba de sesión se hizo por HTTP desde la PC. Falta recorrer la interfaz y validar las HU del Sprint 2 en Android.
+
+Para volver a arrancar, desde la copia local ejecutar `docker compose -p indumotos-sprint2-local -f compose.yaml -f compose.local.yaml up -d`.
+
 ## Backend localizado en esta PC
 
 Clon en `C:/Users/socis/Documents/Back`. La rama activa de Roberto estaba en `d4acdd0`; se exportó la referencia local `origin/sprint-2` (`fbfaab5`) a una carpeta separada, sin cambiar el clon. Git remoto todavía no se ha verificado con una cuenta con acceso. El código de esta referencia incluye migraciones V8–V15 y estas rutas bajo `/api/v1`:

@@ -4,6 +4,8 @@
 
 ## Objetivo inmediato
 
+**API local operativa:** Sprint 2 `fbfaab5` ejecutado en Docker. Salud, login, perfil y logout verificados por HTTP. El emulador usa ADB Reverse de 8089 a 8080. Ver [arranque y credenciales locales](docs/CONTINUIDAD.md).
+
 **Backend localizado:** el clon `C:/Users/socis/Documents/Back` contiene `origin/sprint-2` en `fbfaab5`. Ya se pueden consultar las rutas del Sprint 2 desde esa referencia local. El servidor sigue pendiente de arranque y conexión con el Samsung. Ver [continuidad](docs/CONTINUIDAD.md).
 
 Último commit de código de este bloque: `2d12129` en `feature/login-identidad` (local, sin push ni merge). [APK y firma](docs/build-login-20261119.json), [capturas y pruebas](docs/evidencias/login-2026-11-19/README.md). APK local ignorado por Git: `entrega/Indumotos-AS-login-20261119-debug.apk`; no instalar sobre el Samsung con la firma actual.
