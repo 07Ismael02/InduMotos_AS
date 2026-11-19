@@ -1,5 +1,20 @@
 # Continuidad del aplicativo — 19/11/2026
 
+## Backend localizado en esta PC
+
+Clon en `C:/Users/socis/Documents/Back`. La rama activa de Roberto estaba en `d4acdd0`; se exportó la referencia local `origin/sprint-2` (`fbfaab5`) a una carpeta separada, sin cambiar el clon. Git remoto todavía no se ha verificado con una cuenta con acceso. El código de esta referencia incluye migraciones V8–V15 y estas rutas bajo `/api/v1`:
+
+| HU | Rutas observadas en código |
+|---|---|
+| HU-05 | `/ubicaciones`, `/motocicletas/{id}/ubicacion` e historial |
+| HU-06 | `/solicitudes` y `/solicitudes/{id}` |
+| HU-07 | `/solicitudes/{id}/seguimiento` |
+| HU-08 | `/motocicletas/elegibles` y `/solicitudes/{id}/lineas/{detalle}/unidades` |
+| HU-09 | POST `/motocicletas/{id}/traslados` |
+| HU-27 | POST `/solicitudes/{id}/anulacion` |
+
+Estas rutas se comprobaron en los controladores, sin ejecutar llamadas. Docker Desktop no tenía el motor activo y `/api/health` no respondió en los puertos 8080 ni 8089. El clon no contiene `.env`. Para habilitar el login hace falta el entorno privado de desarrollo autorizado con la cuenta existente `admin.indumotos`, o la URL de una instancia ya en ejecución. Revisar DTO, permisos y reglas implementadas de HU-27 antes de integrar, y contrastarlas con las decisiones del equipo.
+
 ## Bloque actual en la nueva PC
 
 Código y primera actualización documental: commit `2d12129085773b89669f38ae2748bde4f67c4ca1`. Cierre documental posterior incorpora [trazabilidad del APK](build-login-20261119.json) y [explicación de evidencias](evidencias/login-2026-11-19/README.md). Commits locales; no se hizo push ni merge. main permanece en `3d9334a`.

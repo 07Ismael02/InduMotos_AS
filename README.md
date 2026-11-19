@@ -4,6 +4,8 @@
 
 ## Objetivo inmediato
 
+**Backend localizado:** el clon `C:/Users/socis/Documents/Back` contiene `origin/sprint-2` en `fbfaab5`. Ya se pueden consultar las rutas del Sprint 2 desde esa referencia local. El servidor sigue pendiente de arranque y conexión con el Samsung. Ver [continuidad](docs/CONTINUIDAD.md).
+
 Último commit de código de este bloque: `2d12129` en `feature/login-identidad` (local, sin push ni merge). [APK y firma](docs/build-login-20261119.json), [capturas y pruebas](docs/evidencias/login-2026-11-19/README.md). APK local ignorado por Git: `entrega/Indumotos-AS-login-20261119-debug.apk`; no instalar sobre el Samsung con la firma actual.
 
 Completar un incremento Android del **Sprint 2 durante el 19/11/2026**, con solicitudes de ensamblaje, unidades asociadas, ubicación y traslados conectados al backend real, preservando el acceso e inventario del Sprint 1. La fecha es una prioridad del usuario, no evidencia de finalización. Primero leer [el plan y criterios del Sprint 2](docs/SPRINT2.md) y [el contexto de continuidad](docs/CONTINUIDAD.md).
