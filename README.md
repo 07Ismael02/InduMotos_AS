@@ -4,6 +4,8 @@
 
 ## Objetivo inmediato
 
+**HU-05:** ubicación integrada en la ficha de inventario en `codex/feature/sprint2-ubicacion`. Compilación y pruebas Android Host aprobadas. La API local devuelve cero motos y ubicaciones. Falta verificar la escritura y la consulta posterior con registros autorizados.
+
 **Mi cuenta en Android:** toca tu avatar o nombre al pie del menú lateral. Desde allí abre Perfil, Apariencia o Cerrar sesión. La elección de tema se guarda en esta instalación.
 
 **API local operativa:** Sprint 2 `fbfaab5` ejecutado en Docker. Salud, login, perfil y logout verificados por HTTP. El emulador usa ADB Reverse de 8089 a 8080. Ver [arranque y credenciales locales](docs/CONTINUIDAD.md).

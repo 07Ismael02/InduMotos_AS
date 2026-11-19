@@ -113,7 +113,19 @@ private fun createForm(module:Module):Form=when(module){
  )
  if (showProfile) AccountProfile(account) { showProfile = false; showAccount = true }
  if(confirmLogout)AlertDialog(onDismissRequest={if(!state.busy)confirmLogout=false},title={Text("Cerrar sesión")},text={Text("Se revocará el acceso de esta sesión en el servidor. Necesitas conexión para confirmarlo.")},confirmButton={TextButton(onClick={confirmLogout=false;vm.logout()},enabled=!state.busy){Text("Cerrar sesión")}},dismissButton={TextButton(onClick={confirmLogout=false}){Text("Cancelar")}})
- if(state.module==Module.INVENTORY)state.detail?.let{DetailDialog(it,vm::closeDetail)}
+ if (state.module == Module.INVENTORY) state.detail?.let { record ->
+     val location by vm.location.collectAsState()
+     val id = record.text("id").toLongOrNull()
+     DetailDialog(record, state.busy, vm::closeDetail) {
+         if (id != null && vm.allowed(READ_LOCATIONS)) {
+             LocationSection(
+                 location, vm.allowed(WRITE_LOCATION), state.busy, state.error, state.message,
+                 onLoad = { vm.loadLocation(id) },
+                 onSave = { vm.registerLocation(id, it) }
+             )
+         }
+     }
+ }
 }
 
 @Composable private fun Home(state:UiState,vm:LogisticsViewModel){
@@ -199,7 +211,21 @@ private val FieldLabels=mapOf("id" to "Identificador","llegadaId" to "Llegada vi
   record.forEach{(key,value)->when(value){is JsonObject->{Text(if(key=="llegada")"Recepción"else key,fontWeight=FontWeight.SemiBold);RecordDetail(value)};is JsonArray->{Text("Fichas vinculadas (${value.size})",fontWeight=FontWeight.SemiBold);value.forEach{if(it is JsonObject)RecordDetail(it)}};else->{Column{Text(FieldLabels[key]?:key,color=Muted,fontSize=11.sp);Spacer(Modifier.height(4.dp));Text((value as? JsonPrimitive)?.contentOrNull?.ifBlank{"Sin información"}?:"Sin información",fontSize=13.sp)}}}}
  }}
 }
-@Composable private fun DetailDialog(record:JsonObject,close:()->Unit){AlertDialog(onDismissRequest=close,title={Text("Ficha de motocicleta")},text={Column(Modifier.verticalScroll(rememberScrollState())){RecordDetail(record)}},confirmButton={TextButton(onClick=close){Text("Cerrar")}})}
+@Composable private fun DetailDialog(
+    record: JsonObject, busy: Boolean, close: () -> Unit, content: @Composable () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = close,
+        title = { Text("Ficha de motocicleta") },
+        text = {
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                content()
+                RecordDetail(record)
+            }
+        },
+        confirmButton = { TextButton(onClick = close, enabled = !busy) { Text("Cerrar") } }
+    )
+}
 @Composable private fun EmptyState(title:String,copy:String){Column(Modifier.fillMaxWidth().padding(vertical=24.dp),horizontalAlignment=Alignment.CenterHorizontally){Icon(Icons.Default.Info,null,tint=Blue);Spacer(Modifier.height(12.dp));Text(title,fontWeight=FontWeight.SemiBold);Spacer(Modifier.height(8.dp));Text(copy,color=Muted,fontSize=12.sp,lineHeight=19.sp)}}
 @Composable private fun Notice(message:String,error:Boolean){Surface(Modifier.fillMaxWidth().padding(horizontal=20.dp,vertical=6.dp),shape=RoundedCornerShape(8.dp),color=if(error)MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.secondaryContainer){Text(message,Modifier.padding(14.dp),fontSize=12.sp,lineHeight=19.sp,color=if(error)MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onSecondaryContainer)}}
 @Composable private fun OptionSelect(label:String,options:List<String>,value:String,change:(String)->Unit,labels:Map<String,String> = emptyMap()){

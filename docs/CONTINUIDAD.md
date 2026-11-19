@@ -1,5 +1,11 @@
 # Continuidad del aplicativo — 19/11/2026
 
+## HU-05 · Ubicación en Android
+
+En `codex/feature/sprint2-ubicacion` se agregó la sección Ubicación dentro de la ficha abierta desde Inventario. Usa GET `/motocicletas/{id}/ubicacion`, GET `/ubicaciones` y POST `/motocicletas/{id}/ubicacion` con `destinoId`, bajo `/api/v1`. Muestra destino, fecha y responsable. La consulta y el registro respetan los permisos efectivos. El botón Actualizar consulta relee el servidor después de guardar.
+
+Comprobado: `assembleDebug` y `testAndroidHostTest` aprobados. La API local `fbfaab5` devolvió 0 motos y 0 ubicaciones. `admin.indumotos` tiene ambos permisos de ubicación y GET `/ubicaciones` sin sesión devolvió 401. Registro y lectura posterior desde Android pendientes de una llegada, una ficha y una ubicación autorizadas y de una cuenta con permisos de recepción/ficha para preparar esos registros. No se añadieron datos. HU-06, 07, 08, 09 y 27 pendientes en Android.
+
 Mi cuenta sustituye la rueda de la cabecera. El acceso con iniciales y usuario está al pie del menú lateral. Perfil muestra los datos vigentes de `GET /api/v1/auth/me` (identificador, usuario y rol). Apariencia conserva Sistema, Claro y Oscuro. Cerrar sesión conserva la confirmación existente. El backend inspeccionado no ofrece edición del perfil propio. La edición queda pendiente de contrato y campos aprobados.
 
 La rama `feature/login-identidad` añade Ajustes en la cabecera del menú de la cuenta. Sistema, Claro y Oscuro se aplican al instante a la interfaz y barras. Android conserva la preferencia local entre arranques. Build Debug y pruebas Android Host aprobados. Pendiente de comprobación visual desde la sesión del emulador tras actualizar con Run.

@@ -8,5 +8,12 @@ import pe.indumotos.mobile.domain.*
 import pe.indumotos.mobile.presentation.LogisticsViewModel
 import org.koin.core.module.dsl.viewModel
 expect val platformModule:Module
-val appModule=module{single{createHttpClient(get())};single<LogisticsRepository>{RemoteRepository(get())};factory{LogisticsUseCase(get())};viewModel{LogisticsViewModel(get(),get())}}
+val appModule = module {
+    single { createHttpClient(get()) }
+    single { RemoteRepository(get()) }
+    single<LogisticsRepository> { get<RemoteRepository>() }
+    single<LocationRepository> { get<RemoteRepository>() }
+    factory { LogisticsUseCase(get()) }
+    viewModel { LogisticsViewModel(get(), get(), get()) }
+}
 fun initKoin()=startKoin{modules(platformModule,appModule)}

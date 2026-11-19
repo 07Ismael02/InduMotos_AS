@@ -8,7 +8,7 @@ import kotlinx.serialization.json.*
 import kotlinx.serialization.encodeToString
 import kotlinx.coroutines.CancellationException
 
-class RemoteRepository(private val http:HttpClient):LogisticsRepository{
+class RemoteRepository(private val http:HttpClient):LogisticsRepository, LocationRepository{
  private val json=Json{ignoreUnknownKeys=true;encodeDefaults=true}
  private var base="";private var token=""
  private suspend fun request(path:String,body:String?=null,method:String="GET",params:Map<String,String> = emptyMap()):String{
@@ -35,5 +35,15 @@ class RemoteRepository(private val http:HttpClient):LogisticsRepository{
   val text=request(path,body.toString(),method);return if(text.isBlank())null else json.parseToJsonElement(text).jsonObject
  }
  override suspend fun logout(){request("auth/logout","{}","POST");clearSession()}
+ override suspend fun currentLocation(id: Long): LocationRecord? =
+     request("motocicletas/$id/ubicacion").takeIf { it.isNotBlank() }
+         ?.let { json.decodeFromString<LocationRecord?>(it) }
+
+ override suspend fun sites(): List<Site> = json.decodeFromString(request("ubicaciones"))
+
+ override suspend fun registerLocation(id: Long, destinationId: Long): LocationRecord {
+     val payload = buildJsonObject { put("destinoId", destinationId) }
+     return json.decodeFromString(request("motocicletas/$id/ubicacion", payload.toString(), "POST"))
+ }
  override fun clearSession(){token=""}
 }
