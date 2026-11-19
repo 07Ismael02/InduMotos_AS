@@ -4,6 +4,8 @@
 
 ## Objetivo inmediato
 
+**HU-05 comprobada para el recorrido principal:** Android consultó una ubicación y registró la ubicación inicial de `PRUEBA-HU05-0002`. El movimiento quedó confirmado en PostgreSQL. Se instaló en el emulador la corrección que oculta el selector cuando ya existe ubicación.
+
 En HU-05 se registra la ubicación inicial una sola vez. Los cambios posteriores corresponden a HU-09 (traslado a tienda o despacho).
 
 La ficha de Inventario se abre a pantalla completa. Agrupa los datos de la moto, la ubicación, el motor y la documentación, y el registro de ingreso. Consultar ubicación tiene un botón principal con icono.

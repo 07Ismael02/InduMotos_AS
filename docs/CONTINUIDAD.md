@@ -2,6 +2,8 @@
 
 ## HU-05 · Ubicación en Android
 
+Registro inicial comprobado desde Android con `PRUEBA-HU05-0002`: captura del usuario muestra almacén y responsable. PostgreSQL confirmó movimiento ID 2, tipo UBICACION, destino ID 1 y fecha `2026-11-19 16:04:29.616526+00`. La captura correspondía al APK anterior a `61d3694`, de ahí el selector todavía visible. Se comprobó firma e identificador y se actualizó el emulador con `adb install -r` (Success) y arranque Status ok. Falta observar la ficha corregida tras volver a iniciar sesión. HU-09 permanece pendiente.
+
 La captura del 19/11 muestra HTTP 409 al intentar registrar por segunda vez la ubicación de la moto de prueba. `GestionarUbicaciones.registrar` admite solo ubicación inicial. Se ajustó la ficha para ofrecer el registro únicamente cuando no hay ubicación y explicar que los movimientos usan un traslado. Si otra sesión registra primero, el 409 pide actualizar la consulta en español. La segunda sede sintética es ALMACEN y no es destino de HU-09, que solo permite TIENDA o DESPACHO activos. Para verificar la escritura HU-05 desde Android se necesita una ficha sin ubicación inicial.
 
 Se sustituyó el cuadro estrecho de Inventario por una ficha a pantalla completa con regreso a la misma búsqueda. La cabecera muestra marca, modelo, chasis y color. Ubicación, documentación y registro de ingreso tienen secciones propias. Consultar ubicación usa un botón principal y la actualización queda como acción secundaria. Las capturas del usuario acreditan la lectura desde Android en el diseño anterior. El rediseño requiere revisión visual después de actualizar el emulador.
