@@ -9,17 +9,19 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import pe.indumotos.mobile.domain.*
+import kotlinx.serialization.json.JsonObject
 
 data class OperationsState(
     val busy: Boolean = false, val error: String? = null, val message: String? = null,
     val expired: Boolean = false, val page: Int = 0,
+    val catalog: List<JsonObject> = emptyList(),
     val requests: List<AssemblyRequest> = emptyList(), val selected: AssemblyRequest? = null,
     val events: List<RequestEvent> = emptyList(), val sites: List<Site> = emptyList(),
     val line: RequestLine? = null, val assigned: List<AssignedUnit> = emptyList(),
     val eligible: List<EligibleUnit> = emptyList(), val movements: List<TransferRecord> = emptyList()
 )
 
-class OperationsViewModel(private val repo: OperationsRepository, private val locations: LocationRepository) : ViewModel() {
+class OperationsViewModel(private val repo: OperationsRepository, private val locations: LocationRepository, private val inventory: LogisticsRepository? = null) : ViewModel() {
     private val mutable = MutableStateFlow(OperationsState())
     val state = mutable.asStateFlow()
     private var job: Job? = null
@@ -43,6 +45,19 @@ class OperationsViewModel(private val repo: OperationsRepository, private val lo
         mutable.update { it.copy(requests = rows, page = page, selected = null, line = null, events = emptyList(), eligible = emptyList(), assigned = emptyList()) }
     }
     fun sites() = work { val rows=locations.sites(); mutable.update { it.copy(sites=rows) } }
+    fun prepareRequest() = work {
+        val sites=locations.sites()
+        mutable.update { it.copy(sites=sites, catalog=emptyList()) }
+        val source=inventory ?: return@work
+        val catalog=mutableListOf<JsonObject>()
+        var page=0
+        do {
+            val result=source.inventory(InventoryFilter(),page)
+            catalog.addAll(result.items)
+            page++
+        } while(page<result.totalPaginas)
+        mutable.update { it.copy(catalog=catalog) }
+    }
     private suspend fun refresh(id: Long) {
         val request=repo.request(id)
         val events=repo.events(id)

@@ -15,7 +15,7 @@ val appModule = module {
     single<LogisticsRepository> { get<RemoteRepository>() }
     single<LocationRepository> { get<RemoteRepository>() }
     single<OperationsRepository> { get<RemoteRepository>() }
-    viewModel { OperationsViewModel(get(), get()) }
+    viewModel { OperationsViewModel(get(), get(), get()) }
     factory { LogisticsUseCase(get()) }
     viewModel { LogisticsViewModel(get(), get(), get()) }
 }

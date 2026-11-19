@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.sp
 import org.koin.compose.viewmodel.koinViewModel
 import pe.indumotos.mobile.domain.*
 import pe.indumotos.mobile.presentation.*
+import kotlinx.serialization.json.*
 
 private fun Access.permits(code: String) = permisos.any { it.codigo==code && it.permitido }
 
@@ -46,7 +47,7 @@ private fun Access.permits(code: String) = permisos.any { it.codigo==code && it.
                     Text("Solicita modelos y cantidades; consulta su atención y los chasis vinculados.",fontSize=13.sp)
                     Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
                         OutlinedButton(onClick={vm.list(state.page)},enabled=!state.busy){Text("Actualizar")}
-                        if(account.permits(CREATE_REQUESTS)) Button(onClick={creating=true;vm.sites()},enabled=!state.busy){Text("Nueva solicitud")}
+                        if(account.permits(CREATE_REQUESTS)) Button(onClick={creating=true;vm.prepareRequest()},enabled=!state.busy){Text("Nueva solicitud")}
                     }
                 }
                 items(state.requests,key={it.id}) { request ->
@@ -125,7 +126,7 @@ private fun Access.permits(code: String) = permisos.any { it.codigo==code && it.
             }
         }
     }
-    if(creating) NewRequestDialog(state.sites,state.busy,state.error,{creating=false},vm::create)
+    if(creating) NewRequestDialog(state.sites,state.catalog,state.busy,state.error,{creating=false},vm::create)
     action?.let { next ->
         ReasonDialog("Confirmar: ${statusLabel(next)}",state.busy,next in listOf("RECHAZADA","ANULADA"),{action=null}) { reason ->
             action=null
@@ -137,19 +138,20 @@ private fun Access.permits(code: String) = permisos.any { it.codigo==code && it.
 
 private data class DraftLine(val key: Int,val brand: String="",val model: String="",val color: String="",val quantity: String="1")
 
-@Composable private fun NewRequestDialog(sites: List<Site>,busy: Boolean,error: String?,close:()->Unit,submit:(NewRequest)->Unit) {
+@Composable private fun NewRequestDialog(sites: List<Site>,catalog: List<JsonObject>,busy: Boolean,error: String?,close:()->Unit,submit:(NewRequest)->Unit) {
     val lines=remember{mutableStateListOf(DraftLine(0))};var nextKey by remember{mutableStateOf(1)}
     var destination by remember{mutableStateOf<Site?>(null)};var observation by remember{mutableStateOf("")};var local by remember{mutableStateOf<String?>(null)}
     AlertDialog(onDismissRequest={if(!busy)close()},title={Text("Nueva solicitud")},text={
         Column(Modifier.verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(10.dp)) {
             SitePicker(sites,destination,{destination=it},busy)
+            Text("Opciones del inventario. Si falta una, usa entrada manual.",fontSize=12.sp)
             if(sites.isEmpty())Text("No hay sedes disponibles. Registra una sede válida o revisa tu permiso de consulta.",fontSize=12.sp)
             lines.forEachIndexed { index,line ->
                 key(line.key) {
                     HorizontalDivider();Text("Línea ${index+1}",fontWeight=FontWeight.SemiBold)
-                    OutlinedTextField(line.brand,{lines[index]=line.copy(brand=it)},label={Text("Marca")},singleLine=true,enabled=!busy)
-                    OutlinedTextField(line.model,{lines[index]=line.copy(model=it)},label={Text("Modelo")},singleLine=true,enabled=!busy)
-                    OutlinedTextField(line.color,{lines[index]=line.copy(color=it)},label={Text("Color")},singleLine=true,enabled=!busy)
+                    CatalogPicker("Marca",line.brand,catalogOptions(catalog,"marca"),busy) { lines[index]=line.copy(brand=it,model="",color="") }
+                    CatalogPicker("Modelo",line.model,catalogOptions(catalog,"modelo",line.brand),busy) { lines[index]=line.copy(model=it,color="") }
+                    CatalogPicker("Color",line.color,catalogOptions(catalog,"color",line.brand,line.model),busy) { lines[index]=line.copy(color=it) }
                     OutlinedTextField(line.quantity,{lines[index]=line.copy(quantity=it)},label={Text("Cantidad")},singleLine=true,enabled=!busy,keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Number))
                     if(lines.size>1)TextButton(onClick={lines.removeAt(index)},enabled=!busy){Text("Quitar línea ${index+1}")}
                 }
@@ -163,6 +165,23 @@ private data class DraftLine(val key: Int,val brand: String="",val model: String
         local=runCatching{OperationRules.validate(body)}.exceptionOrNull()?.message
         if(local==null)submit(body)
     },enabled=!busy){Text(if(busy)"Enviando…"else"Crear solicitud")}},dismissButton={TextButton(onClick=close,enabled=!busy){Text("Cancelar")}})
+}
+
+@Composable private fun CatalogPicker(label: String,value: String,options: List<String>,busy: Boolean,change:(String)->Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    var manual by remember { mutableStateOf(false) }
+    Column {
+        if(manual) OutlinedTextField(value,{if(it.length<=120)change(it)},label={Text(label)},singleLine=true,enabled=!busy,modifier=Modifier.fillMaxWidth())
+        else Box {
+            OutlinedButton(onClick={expanded=true},enabled=!busy,modifier=Modifier.fillMaxWidth()) { Text("$label: ${value.ifBlank { "Seleccionar" }}") }
+            DropdownMenu(expanded&&!busy,{expanded=false},modifier=Modifier.heightIn(max=280.dp)) {
+                options.forEach { option -> DropdownMenuItem(text={Text(option)},onClick={change(option);expanded=false}) }
+                if(options.isEmpty()) DropdownMenuItem(text={Text("Sin opciones registradas")},onClick={},enabled=false)
+                DropdownMenuItem(text={Text("Ingresar otra opción…")},onClick={manual=true;expanded=false;change("")})
+            }
+        }
+        if(manual) TextButton(onClick={manual=false;change("")},enabled=!busy){Text("Elegir de la lista")}
+    }
 }
 
 @Composable private fun ReasonDialog(title: String,busy: Boolean,required: Boolean,close:()->Unit,submit:(String)->Unit) {

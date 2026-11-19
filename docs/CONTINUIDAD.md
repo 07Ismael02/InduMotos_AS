@@ -1,3 +1,5 @@
+> **Última mejora:** selectores marca/modelo/color en Nueva solicitud, basados en inventario real, con entrada manual explícita. Build y 15 pruebas aprobados; actualización del Samsung pendiente por bloqueo de ejecución. Ver informe Sprint 2.
+
 > **Corte vigente 19/11/2026:** solicitudes, unidades, seguimiento, anulación y traslados implementados en `feature/sprint2-recorrido`; 14 pruebas móviles y 58 comprobaciones HTTP/persistencia aprobadas. Validación visual nueva en Samsung pendiente. Backend real `sprint-2` (`fbfaab5`), copia de datos aislada, puerto 8090. [Estado y evidencia actuales](VALIDACION-SPRINT2-20261119.md). Las referencias de entorno anteriores que siguen abajo son antecedentes y no describen el servidor actual.
 
 # Continuidad del aplicativo — 19/11/2026

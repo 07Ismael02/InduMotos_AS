@@ -32,3 +32,13 @@ Validar las pantallas nuevas con el Samsung y capturar evidencia auténtica; ver
 ## Samsung: comprobación adicional
 
 APK Debug 0.2.0-sprint2, código 2, instalado con éxito sin limpiar datos. Login real aprobado; listado real, detalle de solicitud #3 anulada e historial consultados; formulario abierto. Capturas en `evidencias/sprint2/samsung-*.png`. La captura de login incluye el aviso Samsung Pass, no una contraseña visible. No se guardó la credencial en Samsung Pass. Trazabilidad y hashes en `evidencias/sprint2/build.json`. Quedan por ejecutar las escrituras nuevas desde Android; no confundirlas con las 58 verificaciones del servidor.
+
+## Mejora de selección solicitada el 19/11/2026
+
+Nueva solicitud ofrece selectores marca → modelo → color, derivados de todas las páginas de inventario mediante GET motocicletas autenticado. Cambiar marca limpia modelo/color y cambiar modelo limpia color. Se eliminan duplicados sin distinguir mayúsculas; se conserva la escritura del servidor. No existe catálogo maestro en el backend: se permite entrada manual explícita para solicitar variantes aún no recibidas. No se inventan marcas ni se modifica el backend ni la base.
+
+Sedes iniciales/destinos y transiciones de estado ya son seleccionables; chasis elegibles se eligen del resultado del servidor. Cantidad requiere número positivo; motivos/observaciones y nuevos identificadores siguen como entrada. Selector de motocicleta por chasis para Traslados y catálogos maestros para fichas/filtros son mejoras futuras, no verificaciones completadas en este corte.
+
+Continuación manual: crear solicitud con dos líneas, verificar ID y estado Pendiente; pasar a preparación; asociar una unidad compatible sin duplicarla; comprobar rechazo o atención y su historial; registrar traslado de una unidad con ubicación inicial; anular otra solicitud pendiente con motivo. Conservar evidencias y contrastar los IDs con la API. HU-27 requiere aceptación de la regla de negocio; no declarar todo el Sprint cerrado con estas pantallas solamente.
+
+Verificación de esta mejora: BUILD SUCCESSFUL; 15 pruebas Android Host aprobadas. Instalación automática bloqueada por política de ejecución; todavía no hay evidencia visual de los selectores en Samsung. El APK anterior permanece instalado.
