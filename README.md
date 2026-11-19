@@ -1,3 +1,5 @@
+> **Corte vigente 19/11/2026:** solicitudes, unidades, seguimiento, anulación y traslados implementados en `feature/sprint2-recorrido`; 14 pruebas móviles y 58 comprobaciones HTTP/persistencia aprobadas. Validación visual nueva en Samsung pendiente. Backend real `sprint-2` (`fbfaab5`), copia de datos aislada, puerto 8090. [Estado y evidencia actuales](docs/VALIDACION-SPRINT2-20261119.md). Las referencias de entorno anteriores que siguen abajo son antecedentes y no describen el servidor actual.
+
 # Indumotos AS — leer primero para continuar
 
 **Actualizado: 19/11/2026 (America/Lima).** Este README es el punto de entrada para el equipo y para una IA en otra PC. Describe trabajo real, decisiones del usuario y pendientes; no certifica que el Sprint 1 o el Sprint 2 estén cerrados.

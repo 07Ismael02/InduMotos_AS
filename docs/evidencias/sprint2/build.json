@@ -1,0 +1,15 @@
+{
+  "fecha": "2026-11-19T16:19:28.738970-05:00",
+  "rama": "feature/sprint2-recorrido",
+  "applicationId": "pe.indumotos.asapp",
+  "versionCode": 2,
+  "versionName": "0.2.0-sprint2",
+  "tipo": "Debug",
+  "sha256": "83f567c7394f4869e87f26b5b1f266bd4d736506aac8ae9ad8ca653e982cc245",
+  "certificadoSha256": "23c1a0373560f28c3d2b64103e50a0dff54bb955fd75b20ac40d52253e33b0f0",
+  "backendUrl": "http://127.0.0.1:8089",
+  "adbReverse": "tcp:8089 tcp:8090",
+  "dispositivo": "Samsung SM-S948U1 Android 17 API 37",
+  "instalacion": "Success; paquete no encontrado previamente en usuario 0; sin desinstalar ni limpiar datos",
+  "rutaLocal": "C:\\Users\\Ismael Logacho\\Documents\\PharmaMobil\\proyecto-final-dam\\InduMotos-Sprint2\\androidApp\\build\\outputs\\apk\\debug\\androidApp-debug.apk"
+}

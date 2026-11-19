@@ -1,0 +1,502 @@
+{
+  "inicio": "2026-11-19T16:12:32-05:00",
+  "baseUrl": "http://127.0.0.1:8090",
+  "baseDatos": "indumotos_s2_verificacion",
+  "datosSinteticos": "ACADEMICO-S2-20261119161232",
+  "casos": [
+    {
+      "fecha": "2026-11-19T16:12:32-05:00",
+      "caso": "Base aislada y Flyway V1–V15 aplicadas",
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:32-05:00",
+      "caso": "Salud",
+      "metodo": "GET",
+      "ruta": "/api/health",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:32-05:00",
+      "caso": "Solicitudes sin token",
+      "metodo": "GET",
+      "ruta": "/api/v1/solicitudes",
+      "esperado": 401,
+      "obtenido": 401,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:33-05:00",
+      "caso": "Login administrador existente",
+      "metodo": "POST",
+      "ruta": "/api/v1/auth/login",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:33-05:00",
+      "caso": "Perfil vigente",
+      "metodo": "GET",
+      "ruta": "/api/v1/auth/me",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:33-05:00",
+      "caso": "Administrador sin permiso de recepción",
+      "metodo": "POST",
+      "ruta": "/api/v1/llegadas",
+      "esperado": 403,
+      "obtenido": 403,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:33-05:00",
+      "caso": "Crear sede académica ALMACEN",
+      "metodo": "POST",
+      "ruta": "/api/v1/ubicaciones",
+      "esperado": 201,
+      "obtenido": 201,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:33-05:00",
+      "caso": "Crear sede académica TIENDA",
+      "metodo": "POST",
+      "ruta": "/api/v1/ubicaciones",
+      "esperado": 201,
+      "obtenido": 201,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:33-05:00",
+      "caso": "Ubicación inicial moto 1",
+      "metodo": "POST",
+      "ruta": "/api/v1/motocicletas/1/ubicacion",
+      "esperado": 201,
+      "obtenido": 201,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:33-05:00",
+      "caso": "Ubicación inicial moto 2",
+      "metodo": "POST",
+      "ruta": "/api/v1/motocicletas/2/ubicacion",
+      "esperado": 201,
+      "obtenido": 201,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Ubicación inicial moto 3",
+      "metodo": "POST",
+      "ruta": "/api/v1/motocicletas/3/ubicacion",
+      "esperado": 201,
+      "obtenido": 201,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Cantidad cero rechazada",
+      "metodo": "POST",
+      "ruta": "/api/v1/solicitudes",
+      "esperado": 400,
+      "obtenido": 400,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Solicitud con dos líneas",
+      "metodo": "POST",
+      "ruta": "/api/v1/solicitudes",
+      "esperado": 201,
+      "obtenido": 201,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Consulta posterior de solicitud",
+      "metodo": "GET",
+      "ruta": "/api/v1/solicitudes/1",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Cabecera y dos líneas persistidas",
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Asignación antes de preparar rechazada",
+      "metodo": "POST",
+      "ruta": "/api/v1/solicitudes/1/lineas/1/unidades",
+      "esperado": 409,
+      "obtenido": 409,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Cambio a preparación",
+      "metodo": "POST",
+      "ruta": "/api/v1/solicitudes/1/seguimiento",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Búsqueda real de chasis elegible",
+      "metodo": "GET",
+      "ruta": "/api/v1/motocicletas/elegibles?chasis=ACADEMICO-S2-20261119161232",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Candidato presente antes de asignar",
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Asignar chasis a línea",
+      "metodo": "POST",
+      "ruta": "/api/v1/solicitudes/1/lineas/1/unidades",
+      "esperado": 201,
+      "obtenido": 201,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Cupo/duplicado bloqueado",
+      "metodo": "POST",
+      "ruta": "/api/v1/solicitudes/1/lineas/1/unidades",
+      "esperado": 409,
+      "obtenido": 409,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Leer asignaciones",
+      "metodo": "GET",
+      "ruta": "/api/v1/solicitudes/1/lineas/1/unidades",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Consulta de unidad asignada",
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Búsqueda real de chasis elegible",
+      "metodo": "GET",
+      "ruta": "/api/v1/motocicletas/elegibles?chasis=ACADEMICO-S2-20261119161232",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Candidato presente antes de asignar",
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Asignar chasis a línea",
+      "metodo": "POST",
+      "ruta": "/api/v1/solicitudes/1/lineas/2/unidades",
+      "esperado": 201,
+      "obtenido": 201,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Cupo/duplicado bloqueado",
+      "metodo": "POST",
+      "ruta": "/api/v1/solicitudes/1/lineas/2/unidades",
+      "esperado": 409,
+      "obtenido": 409,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Leer asignaciones",
+      "metodo": "GET",
+      "ruta": "/api/v1/solicitudes/1/lineas/2/unidades",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Consulta de unidad asignada",
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Retiro sin motivo rechazado",
+      "metodo": "DELETE",
+      "ruta": "/api/v1/solicitudes/1/lineas/1/unidades/1",
+      "esperado": 400,
+      "obtenido": 400,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Retiro con motivo",
+      "metodo": "DELETE",
+      "ruta": "/api/v1/solicitudes/1/lineas/1/unidades/1",
+      "esperado": 204,
+      "obtenido": 204,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Reasignación después del retiro",
+      "metodo": "POST",
+      "ruta": "/api/v1/solicitudes/1/lineas/1/unidades",
+      "esperado": 201,
+      "obtenido": 201,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Confirmar atención",
+      "metodo": "POST",
+      "ruta": "/api/v1/solicitudes/1/seguimiento",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Retroceso de estado bloqueado",
+      "metodo": "POST",
+      "ruta": "/api/v1/solicitudes/1/seguimiento",
+      "esperado": 409,
+      "obtenido": 409,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Traslado a tienda",
+      "metodo": "POST",
+      "ruta": "/api/v1/motocicletas/1/traslados",
+      "esperado": 201,
+      "obtenido": 201,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Traslado al mismo destino bloqueado",
+      "metodo": "POST",
+      "ruta": "/api/v1/motocicletas/1/traslados",
+      "esperado": 409,
+      "obtenido": 409,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Ubicación final",
+      "metodo": "GET",
+      "ruta": "/api/v1/motocicletas/1/ubicacion",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Destino final y responsable",
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Historial conserva origen y destino",
+      "metodo": "GET",
+      "ruta": "/api/v1/motocicletas/1/ubicacion/historial",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Historial de ubicación inicial y traslado",
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Solicitud para comprobar liberación por rechazo",
+      "metodo": "POST",
+      "ruta": "/api/v1/solicitudes",
+      "esperado": 201,
+      "obtenido": 201,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Preparar segunda solicitud",
+      "metodo": "POST",
+      "ruta": "/api/v1/solicitudes/2/seguimiento",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Asignación exclusiva entre solicitudes",
+      "metodo": "POST",
+      "ruta": "/api/v1/solicitudes/2/lineas/3/unidades",
+      "esperado": 409,
+      "obtenido": 409,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Asignar tercera moto de prueba",
+      "metodo": "POST",
+      "ruta": "/api/v1/solicitudes/2/lineas/3/unidades",
+      "esperado": 201,
+      "obtenido": 201,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Rechazar con motivo",
+      "metodo": "POST",
+      "ruta": "/api/v1/solicitudes/2/seguimiento",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Unidades después del rechazo",
+      "metodo": "GET",
+      "ruta": "/api/v1/solicitudes/2/lineas/3/unidades",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Rechazo libera asignaciones",
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Solicitud para anulación",
+      "metodo": "POST",
+      "ruta": "/api/v1/solicitudes",
+      "esperado": 201,
+      "obtenido": 201,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Anulación sin motivo rechazada",
+      "metodo": "POST",
+      "ruta": "/api/v1/solicitudes/3/anulacion",
+      "esperado": 400,
+      "obtenido": 400,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Anulación pendiente con motivo",
+      "metodo": "POST",
+      "ruta": "/api/v1/solicitudes/3/anulacion",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Doble anulación bloqueada",
+      "metodo": "POST",
+      "ruta": "/api/v1/solicitudes/3/anulacion",
+      "esperado": 409,
+      "obtenido": 409,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Leer solicitud anulada",
+      "metodo": "GET",
+      "ruta": "/api/v1/solicitudes/3",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Solicitud anulada se conserva",
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Historial de anulación",
+      "metodo": "GET",
+      "ruta": "/api/v1/solicitudes/3/seguimiento",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:34-05:00",
+      "caso": "Motivo y actor de anulación conservados",
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:35-05:00",
+      "caso": "Persistencia comprobada en PostgreSQL",
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:35-05:00",
+      "caso": "Logout revoca sesión",
+      "metodo": "POST",
+      "ruta": "/api/v1/auth/logout",
+      "esperado": 204,
+      "obtenido": 204,
+      "aprobado": true
+    },
+    {
+      "fecha": "2026-11-19T16:12:35-05:00",
+      "caso": "Token revocado rechazado",
+      "metodo": "GET",
+      "ruta": "/api/v1/auth/me",
+      "esperado": 401,
+      "obtenido": 401,
+      "aprobado": true
+    }
+  ],
+  "rol": "ADMIN",
+  "fixture": {
+    "llegada": 1,
+    "motos": [
+      1,
+      2,
+      3
+    ],
+    "sedes": [
+      1,
+      2
+    ]
+  },
+  "solicitudPrincipal": 1,
+  "comprobacionBD": {
+    "solicitudes": "3",
+    "movimientosMoto": "2"
+  },
+  "resultado": "APROBADO",
+  "fin": "2026-11-19T16:12:35-05:00"
+}
