@@ -1,6 +1,9 @@
 package pe.indumotos.mobile
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -20,17 +23,16 @@ internal fun LocationSection(
 ) {
     var expanded by remember { mutableStateOf(false) }
     var selection by remember(location) { mutableStateOf<Site?>(null) }
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text("Ubicación", style = MaterialTheme.typography.titleMedium)
+    DetailGroup("Ubicación") {
         if (busy) LinearProgressIndicator(Modifier.fillMaxWidth())
         error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
         message?.let { Text(it) }
         if (location != null) {
             val current = location.current
-            Text(current?.destinoNombre ?: "Sin ubicación registrada")
+            Text(current?.destinoNombre ?: "Sin ubicación registrada", style = MaterialTheme.typography.titleSmall)
             if (current != null) {
-                Text("Registró: ${current.registrador}")
-                Text("Fecha: ${current.fecha}")
+                DetailValue("Registró", current.registrador)
+                DetailValue("Fecha", recordTimestamp(current.fecha))
             }
             if (canRegister) {
                 val options = location.destinations.filterNot { it.id == current?.destinoId }
@@ -56,8 +58,18 @@ internal fun LocationSection(
                 }
             }
         }
-        TextButton(onClick = onLoad, enabled = !busy) {
-            Text(if (location == null) "Consultar ubicación" else "Actualizar consulta")
+        if (location == null) {
+            Button(onClick = onLoad, enabled = !busy, modifier = Modifier.fillMaxWidth()) {
+                Icon(Icons.Default.LocationOn, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text("Consultar ubicación")
+            }
+        } else {
+            OutlinedButton(onClick = onLoad, enabled = !busy, modifier = Modifier.fillMaxWidth()) {
+                Icon(Icons.Default.Refresh, contentDescription = null)
+                Spacer(Modifier.width(8.dp))
+                Text("Actualizar ubicación consultada")
+            }
         }
     }
 }

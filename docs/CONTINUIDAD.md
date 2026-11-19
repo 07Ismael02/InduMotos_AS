@@ -2,6 +2,8 @@
 
 ## HU-05 · Ubicación en Android
 
+Se sustituyó el cuadro estrecho de Inventario por una ficha a pantalla completa con regreso a la misma búsqueda. La cabecera muestra marca, modelo, chasis y color. Ubicación, documentación y registro de ingreso tienen secciones propias. Consultar ubicación usa un botón principal y la actualización queda como acción secundaria. Las capturas del usuario acreditan la lectura desde Android en el diseño anterior. El rediseño requiere revisión visual después de actualizar el emulador.
+
 Tras la autorización del usuario, se cargaron en la base local la llegada sintética `PRUEBA-HU05-GUIA` y la ficha `PRUEBA-HU05-0001` mediante una transacción SQL. Se creó `PRUEBA-HU05` (Almacén de prueba HU-05) por la API. Para la moto ID 1, GET ubicación devolvió HTTP 200 con cuerpo vacío, POST devolvió HTTP 201 y el GET posterior devolvió destino ID 1, responsable `admin.indumotos` y fecha `2026-11-19T15:44:19.909958Z`. Este resultado verifica registro y lectura posterior por HTTP. Para la prueba visual, abrir esa ficha desde el emulador. Para repetir el registro desde la interfaz hará falta otra ubicación sintética autorizada.
 
 En `codex/feature/sprint2-ubicacion` se agregó la sección Ubicación dentro de la ficha abierta desde Inventario. Usa GET `/motocicletas/{id}/ubicacion`, GET `/ubicaciones` y POST `/motocicletas/{id}/ubicacion` con `destinoId`, bajo `/api/v1`. Muestra destino, fecha y responsable. La consulta y el registro respetan los permisos efectivos. El botón Actualizar consulta relee el servidor después de guardar.
