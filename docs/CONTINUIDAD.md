@@ -1,5 +1,7 @@
 # Continuidad del aplicativo — 19/11/2026
 
+La rama `feature/login-identidad` añade Ajustes en la cabecera del menú de la cuenta. Sistema, Claro y Oscuro se aplican al instante a la interfaz y barras. Android conserva la preferencia local entre arranques. Build Debug y pruebas Android Host aprobados. Pendiente de comprobación visual desde la sesión del emulador tras actualizar con Run.
+
 ## Backend local en Docker
 
 La copia `Back-sprint2-fbfaab5` del workspace se compiló con Java 21 y Maven en Docker, mediante `Dockerfile.local` y `compose.local.yaml`. El proyecto Compose `indumotos-sprint2-local` arrancó PostgreSQL con volumen nuevo y API en `127.0.0.1:8080`. Se verificaron `/api/health` (ok), login y perfil con el administrador local `admin.indumotos`, y logout HTTP 204. La contraseña inicial aleatoria está en `ADMIN_PASSWORD` del `.env` privado de la copia local. No registrar ese archivo ni tokens en Git.

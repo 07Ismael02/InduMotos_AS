@@ -4,6 +4,8 @@
 
 ## Objetivo inmediato
 
+**Apariencia en Android:** abre la rueda junto al nombre de la cuenta en el menú lateral. En Ajustes puedes elegir Sistema, Claro u Oscuro. La elección se guarda en esta instalación.
+
 **API local operativa:** Sprint 2 `fbfaab5` ejecutado en Docker. Salud, login, perfil y logout verificados por HTTP. El emulador usa ADB Reverse de 8089 a 8080. Ver [arranque y credenciales locales](docs/CONTINUIDAD.md).
 
 **Backend localizado:** el clon `C:/Users/socis/Documents/Back` contiene `origin/sprint-2` en `fbfaab5`. Ya se pueden consultar las rutas del Sprint 2 desde esa referencia local. El servidor sigue pendiente de arranque y conexión con el Samsung. Ver [continuidad](docs/CONTINUIDAD.md).

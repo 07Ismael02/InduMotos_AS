@@ -49,21 +49,47 @@ private fun createForm(module:Module):Form=when(module){
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Composable fun App(backendUrl:String="http://127.0.0.1:8089"){
+@Composable fun App(
+    backendUrl: String = "http://127.0.0.1:8089",
+    initialTheme: Appearance = Appearance.SYSTEM,
+    onAppearanceChanged: (Appearance) -> Unit = {},
+    onDarkTheme: (Boolean) -> Unit = {}
+){
  val vm:LogisticsViewModel=koinViewModel();val state by vm.state.collectAsState()
- IndumotosTheme{
+ var appearance by remember { mutableStateOf(initialTheme) }
+ val darkTheme = when (appearance) {
+     Appearance.SYSTEM -> isSystemInDarkTheme()
+     Appearance.LIGHT -> false
+     Appearance.DARK -> true
+ }
+ LaunchedEffect(darkTheme) { onDarkTheme(darkTheme) }
+ IndumotosTheme(darkTheme = darkTheme){
   Surface(Modifier.fillMaxSize(),color=MaterialTheme.colorScheme.background){
-   if(state.access==null)Login(state,vm,backendUrl)else Workspace(state,vm)
+   if(state.access==null)Login(state,vm,backendUrl)else Workspace(state,vm,appearance) {
+       appearance = it
+       onAppearanceChanged(it)
+   }
    state.form?.let{form->FormDialog(form,state.busy,state.error,{vm.form(null)},vm::submit)}
   }
  }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Composable private fun Workspace(state:UiState,vm:LogisticsViewModel){
+@Composable private fun Workspace(state:UiState,vm:LogisticsViewModel,appearance: Appearance,onAppearanceChanged: (Appearance) -> Unit){
+ var showSettings by remember { mutableStateOf(false) }
  val drawer=rememberDrawerState(DrawerValue.Closed);val scope=rememberCoroutineScope();var confirmLogout by remember{mutableStateOf(false)}
  ModalNavigationDrawer(drawerState=drawer,drawerContent={ModalDrawerSheet(modifier=Modifier.widthIn(max=310.dp),drawerContainerColor=MaterialTheme.colorScheme.surface){
-  Brand(Modifier.fillMaxWidth().height(96.dp));Column(Modifier.padding(24.dp)){Text(state.access!!.nombreUsuario,fontWeight=FontWeight.Bold);Spacer(Modifier.height(6.dp));Text(roleLabel(state.access.rolCodigo),color=Blue,fontSize=12.sp)}
+  Brand(Modifier.fillMaxWidth().height(96.dp))
+  Row(Modifier.fillMaxWidth().padding(24.dp), verticalAlignment = Alignment.CenterVertically) {
+      Column(Modifier.weight(1f)) {
+          Text(state.access!!.nombreUsuario, fontWeight = FontWeight.Bold)
+          Spacer(Modifier.height(6.dp))
+          Text(roleLabel(state.access.rolCodigo), color = Blue, fontSize = 12.sp)
+      }
+      IconButton(onClick = { showSettings = true }) {
+          Icon(Icons.Default.Settings, contentDescription = "Ajustes")
+      }
+  }
   HorizontalDivider();Column(Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(12.dp)){
    NavigationDrawerItem(label={Text("Inicio")},icon={Icon(Icons.Default.Home,null)},selected=state.module==null,onClick={if(!state.busy){vm.open(null);scope.launch{drawer.close()}}})
    Text("OPERACIONES",Modifier.padding(16.dp),fontSize=10.sp,color=Muted,letterSpacing=1.sp)
@@ -81,6 +107,7 @@ private fun createForm(module:Module):Form=when(module){
    }
   }
  }
+ if (showSettings) AppearanceSettings(appearance, onAppearanceChanged) { showSettings = false }
  if(confirmLogout)AlertDialog(onDismissRequest={if(!state.busy)confirmLogout=false},title={Text("Cerrar sesión")},text={Text("Se revocará el acceso de esta sesión en el servidor. Necesitas conexión para confirmarlo.")},confirmButton={TextButton(onClick={confirmLogout=false;vm.logout()},enabled=!state.busy){Text("Cerrar sesión")}},dismissButton={TextButton(onClick={confirmLogout=false}){Text("Cancelar")}})
  if(state.module==Module.INVENTORY)state.detail?.let{DetailDialog(it,vm::closeDetail)}
 }
