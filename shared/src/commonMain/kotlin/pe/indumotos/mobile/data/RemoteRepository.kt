@@ -26,6 +26,7 @@ class RemoteRepository(private val http:HttpClient):LogisticsRepository, Locatio
   val auth=json.decodeFromString<LoginResponse>(request("auth/login",json.encodeToString(LoginRequest(user.trim(),password)),"POST"));token=auth.accessToken
   try{return json.decodeFromString<Access>(request("auth/me"))}catch(e:CancellationException){token="";throw e}catch(e:Exception){token="";throw e}
  }
+ override suspend fun arrivals(guide:String):List<JsonObject> = json.decodeFromString(request("llegadas",params=mapOf("guia" to guide.trim(),"limite" to "20")))
  override suspend fun inventory(filter:InventoryFilter,page:Int):InventoryPage = json.decodeFromString(request("motocicletas",params=mapOf("chasis" to filter.chasis,"marca" to filter.marca,"modelo" to filter.modelo,"color" to filter.color,"pagina" to page.toString(),"tamano" to "20").filterValues{it.isNotBlank()}))
  override suspend fun detail(module:Module,id:Long):JsonObject{
   val path=when(module){Module.ARRIVALS->"llegadas/$id/detalle";Module.PERMISSIONS->"usuarios/$id/permisos";else->"motocicletas/$id"}

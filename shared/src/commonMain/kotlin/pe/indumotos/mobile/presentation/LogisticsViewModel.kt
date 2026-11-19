@@ -18,7 +18,9 @@ class LogisticsViewModel(
  private val mutable=MutableStateFlow(UiState());val state=mutable.asStateFlow()
  private fun work(block:suspend()->Unit){if(mutable.value.busy)return;mutable.update{it.copy(busy=true,error=null,message=null)};viewModelScope.launch{try{block()}catch(e:CancellationException){throw e}catch(e:AppException){if(e.error==AppError.Unauthorized){repo.clearSession();mutable.value=UiState(error=if(mutable.value.access==null)"Usuario o contraseña incorrectos, o cuenta inactiva." else "Tu sesión venció. Inicia sesión nuevamente.")}else mutable.update{it.copy(error=e.message)}}catch(e:Exception){mutable.update{it.copy(error=e.message?:"No se pudo completar la operación")}}finally{mutable.update{it.copy(busy=false)}}}}
  fun login(url:String,user:String,password:String)=work{val a=repo.login(url,user,password);mutable.value=UiState(access=a,busy=true)}
- fun open(module:Module?){if(mutable.value.busy)return;if(module!=null&&!canRead(module))return;mutable.update{it.copy(module=module,rows=emptyList(),detail=null,error=null,message=null,filter=InventoryFilter(),page=0,pages=0,total=0)};if(module==Module.INVENTORY)work{load(0)}}
+ fun open(module:Module?){if(mutable.value.busy)return;if(module!=null&&!canRead(module))return;mutable.update{it.copy(module=module,rows=emptyList(),detail=null,error=null,message=null,filter=InventoryFilter(),page=0,pages=0,total=0)};if(module==Module.INVENTORY||module==Module.FICHAS)work{loadRecent()} else if(module==Module.ARRIVALS&&allowed("INVENTARIO_CONSULTAR"))arrivals("")}
+ private suspend fun loadRecent(){val first=repo.inventory(InventoryFilter(),0);val last=if(first.totalPaginas>1)repo.inventory(InventoryFilter(),first.totalPaginas-1)else first;mutable.update{it.copy(rows=last.items.reversed(),page=last.pagina,pages=last.totalPaginas,total=last.totalElementos)}}
+ fun arrivals(guide:String)=work{val rows=repo.arrivals(guide);mutable.update{it.copy(rows=rows,detail=null)}}
  private suspend fun load(page:Int){val result=repo.inventory(mutable.value.filter,page);mutable.update{it.copy(rows=result.items,page=result.pagina,pages=result.totalPaginas,total=result.totalElementos)}}
  fun search(filter:InventoryFilter)=work{val chasis=filter.chasis.trim();require(chasis.isBlank()||chasis.length>=4){"Ingresa el chasis completo o los últimos cuatro dígitos"};require(chasis.length!=4||chasis.all{it.isDigit()}){"El chasis corto debe tener cuatro dígitos"};mutable.update{it.copy(filter=filter,rows=emptyList(),detail=null,page=0,pages=0,total=0)};load(0)}
  fun page(page:Int){if(page<0||page>=mutable.value.pages)return;work{load(page)}}
@@ -43,8 +45,18 @@ class LogisticsViewModel(
          mutable.update { it.copy(message = "Ubicación registrada.") }
      }
  }
- fun form(form:Form?){if(!mutable.value.busy)mutable.update{it.copy(form=form,error=null,message=null)}}
- fun submit(values:Map<String,String>){val form=mutable.value.form?:return;work{val response=save.save(form,values);val id=response?.get("id")?.jsonPrimitive?.contentOrNull;mutable.update{it.copy(form=null,message=if(id!=null)"Registro guardado con ID #$id." else "Operación confirmada por el servidor.",detail=null)};if(mutable.value.module==Module.INVENTORY)load(mutable.value.page)}}
+ fun form(form:Form?){
+  if(mutable.value.busy)return
+  if(form!=null&&form.fields.any{it.key=="llegadaId"}) {
+   work {
+    val rows=repo.arrivals("")
+    require(rows.isNotEmpty()){ "No hay recepciones disponibles. Registra primero una llegada con una cuenta autorizada." }
+    val labels=rows.associate{it["id"]!!.jsonPrimitive.content to ("Guía "+it["numeroGuia"]!!.jsonPrimitive.content+" · "+it["fechaLlegada"]!!.jsonPrimitive.content)}
+    mutable.update{it.copy(form=form.copy(fields=form.fields.map{f->if(f.key=="llegadaId")f.copy(label="Recepción / guía",options=labels.keys.toList(),labels=labels)else f}))}
+   }
+  } else mutable.update{it.copy(form=form,error=null,message=null)}
+ }
+ fun submit(values:Map<String,String>){val form=mutable.value.form?:return;work{val response=save.save(form,values);val id=response?.get("id")?.jsonPrimitive?.contentOrNull;mutable.update{it.copy(form=null,message=if(id!=null)"Registro guardado con ID #$id." else "Operación confirmada por el servidor.",detail=null)};if(mutable.value.module in listOf(Module.INVENTORY,Module.FICHAS))loadRecent() else if(mutable.value.module==Module.ARRIVALS&&allowed("INVENTARIO_CONSULTAR")){val rows=repo.arrivals("");mutable.update{it.copy(rows=rows)}}}}
  fun logout()=work{repo.logout();mutable.value=UiState(message="Sesión cerrada correctamente.")}
  fun expireSession(){repo.clearSession();mutableLocation.value=null;mutable.value=UiState(error="Tu sesión venció. Inicia sesión nuevamente.")}
  fun allowed(permission:String)=state.value.access?.permisos?.any{it.codigo==permission&&it.permitido}==true

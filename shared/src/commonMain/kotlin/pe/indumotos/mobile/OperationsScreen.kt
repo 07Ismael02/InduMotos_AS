@@ -84,19 +84,20 @@ private fun Access.permits(code: String) = permisos.any { it.codigo==code && it.
                     }
                     if(account.permits(CANCEL_REQUESTS)&&selected.estado=="PENDIENTE")
                         OutlinedButton(onClick={action="ANULADA"},enabled=!state.busy,colors=ButtonDefaults.outlinedButtonColors(contentColor=MaterialTheme.colorScheme.error),modifier=Modifier.fillMaxWidth()){Text("Anular con motivo")}
-                    Text("Líneas solicitadas",fontWeight=FontWeight.SemiBold,modifier=Modifier.padding(top=14.dp))
+                    Text("Modelos solicitados",fontWeight=FontWeight.SemiBold,modifier=Modifier.padding(top=14.dp))
                 }
                 items(selected.lineas,key={it.id}){ line ->
                     OutlinedCard(Modifier.fillMaxWidth()) { Column(Modifier.padding(16.dp)) {
                         Text("${line.marca} ${line.modelo} · ${line.color}",fontWeight=FontWeight.SemiBold)
-                        Text("Cantidad: ${line.cantidad} · Línea #${line.id}")
-                        OutlinedButton(onClick={vm.line(line)},enabled=!state.busy){Text("Ver unidades de esta línea")}
+                        Text("Cantidad solicitada: ${line.cantidad}")
+                        OutlinedButton(onClick={vm.line(line)},enabled=!state.busy){Text(if(selected.estado=="EN_PREPARACION")"Elegir motocicletas para este modelo" else "Ver motocicletas asignadas")}
                     } }
                 }
                 state.line?.let { line ->
                     item {
-                        Text("Unidades · línea #${line.id}",fontWeight=FontWeight.SemiBold)
-                        Text("${state.assigned.size} de ${line.cantidad} asignadas",fontSize=12.sp)
+                        Text("${line.marca} ${line.modelo} · ${line.color}",fontWeight=FontWeight.SemiBold)
+                        Text("${state.assigned.size} de ${line.cantidad} motocicletas asignadas",fontSize=12.sp)
+                        Text("Primero inicia la preparación. Después elige los chasis concretos que cubrirán este modelo y color.",fontSize=12.sp)
                     }
                     items(state.assigned,key={it.asociacionId}) { unit ->
                         OutlinedCard(Modifier.fillMaxWidth()){Column(Modifier.padding(14.dp)) {
@@ -114,7 +115,7 @@ private fun Access.permits(code: String) = permisos.any { it.codigo==code && it.
                     items(state.eligible,key={it.motocicletaId}){unit->
                         OutlinedCard(Modifier.fillMaxWidth()){Column(Modifier.padding(14.dp)) {
                             Text(unit.chasis);Text("${unit.marca} ${unit.modelo} · ${unit.color}",fontSize=12.sp)
-                            Button(onClick={vm.assign(unit)},enabled=!state.busy&&state.assigned.size<line.cantidad){Text("Asociar a línea #${line.id}")}
+                            Button(onClick={vm.assign(unit)},enabled=!state.busy&&state.assigned.size<line.cantidad){Text("Asignar esta motocicleta")}
                         }}
                     }
                 }
@@ -213,7 +214,7 @@ private data class DraftLine(val key: Int,val brand: String="",val model: String
     var motorcycle by remember{mutableStateOf("")};var loadedId by remember{mutableStateOf<Long?>(null)}
     var destination by remember(loadedId){mutableStateOf<Site?>(null)};var confirm by remember{mutableStateOf(false)}
     DisposableEffect(account.usuarioId) { onDispose { vm.reset() } }
-    LaunchedEffect(account.usuarioId){vm.reset()}
+    LaunchedEffect(account.usuarioId){vm.reset();if(account.permits("INVENTARIO_CONSULTAR"))vm.motorcycles()}
     LaunchedEffect(state.expired){if(state.expired)expired()}
     LaunchedEffect(state.movements.lastOrNull()?.id) { destination=null;confirm=false }
     Column(Modifier.fillMaxSize()) {
@@ -222,8 +223,18 @@ private data class DraftLine(val key: Int,val brand: String="",val model: String
             item {
                 Text("Traslado de motocicletas",fontSize=24.sp,fontWeight=FontWeight.Bold)
                 Text("Consulta el recorrido antes de trasladar a una tienda o despacho activo.",fontSize=13.sp)
-                OutlinedTextField(motorcycle,{motorcycle=it;loadedId=null;destination=null;confirm=false},label={Text("ID de motocicleta")},enabled=!state.busy,singleLine=true,modifier=Modifier.fillMaxWidth(),keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Number))
-                Button(onClick={loadedId=motorcycle.toLongOrNull();destination=null;vm.movements(loadedId?:0)},enabled=!state.busy&&Rules.positive(motorcycle)){Text("Consultar recorrido")}
+                OutlinedTextField(motorcycle,{motorcycle=it;loadedId=null;destination=null;confirm=false},label={Text("Buscar por chasis completo o últimos 4 dígitos")},enabled=!state.busy,singleLine=true,modifier=Modifier.fillMaxWidth(),keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Text))
+                Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){Button(onClick={loadedId=null;vm.motorcycles(motorcycle)},enabled=!state.busy&&motorcycle.isNotBlank()){Text("Buscar motocicleta")};OutlinedButton(onClick={motorcycle="";loadedId=null;vm.motorcycles()},enabled=!state.busy){Text("Recientes")}}
+                Text("Selecciona una motocicleta para consultar su recorrido.",fontSize=12.sp)
+            }
+            items(state.motorcycles,key={it["id"]?.jsonPrimitive?.content.orEmpty()}) { row ->
+                OutlinedCard(onClick={loadedId=row["id"]?.jsonPrimitive?.longOrNull;destination=null;loadedId?.let(vm::movements)},enabled=!state.busy,modifier=Modifier.fillMaxWidth()) {
+                    Column(Modifier.padding(16.dp)) {
+                        Text("${row["marca"]?.jsonPrimitive?.content.orEmpty()} ${row["modelo"]?.jsonPrimitive?.content.orEmpty()} · ${row["color"]?.jsonPrimitive?.content.orEmpty()}",fontWeight=FontWeight.SemiBold)
+                        Text("Chasis: ${row["chasisVista"]?.jsonPrimitive?.content.orEmpty()}")
+                        Text("Consultar recorrido →")
+                    }
+                }
             }
             if(loadedId!=null&&state.movements.isNotEmpty())item{
                 // The API returns history in ascending order; the last event is current.

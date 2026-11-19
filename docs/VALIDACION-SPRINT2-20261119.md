@@ -52,3 +52,13 @@ BUILD SUCCESSFUL y 15 pruebas Android Host aprobadas. Firma SHA256 sin cambios. 
 Excel original actualizado en Drive, verificado por SHA256 tras descarga: 12 To Do, 31 Doing, 7 Done. Solo cambiaron CORTE REAL y REGISTRO REAL; respaldo previo en Drive. No se convierten planes históricos en ejecución.
 
 Para cierre: validar estas correcciones en teléfono y errores de formulario; completar revisión de permisos/escenarios negativos de las operaciones nuevas (el 403 global de API no acredita cada pantalla); aceptar regla de HU-27; adjuntar/validar UML, Figma, web y ER exigidos por las tareas del equipo; revisión/DoD y aceptación antes de merge a main. El avance móvil no acredita por sí solo todo el Sprint.
+
+## Búsqueda por datos de negocio — 2026-11-19T17:18:50-05:00
+
+Fichas ahora reutiliza la lista de inventario y su búsqueda por chasis; el detalle completo permite seleccionar/copiar el chasis y muestra confirmación de copia. La apertura de inventario/fichas carga la última página en orden inverso (un subconjunto reciente de hasta 20 unidades, no un catálogo maestro). La búsqueda conserva la paginación existente. Marcas/modelos/colores compartidos no son duplicados de unidades: el chasis distingue cada motocicleta.
+
+Traslados consulta recientes y busca por chasis; una tarjeta de motocicleta resuelve su ID internamente y abre el historial. No se exige escribir ID. Requiere permiso de inventario además de ubicación para encontrar unidades; no se ampliaron permisos. Solicitudes usa modelo/color/cantidad y acciones «Elegir motocicletas para este modelo» / «Asignar esta motocicleta» en lugar del ID de línea.
+
+Llegadas: nuevo GET /api/v1/llegadas?guia=...&limite=20, resultados recientes por fecha/ID descendente, búsqueda literal sin comodines SQL, máximo 50 y guía de hasta 120 caracteres. Misma autorización INVENTARIO_CONSULTAR. Interfaz por guía/lista; las fichas nuevas seleccionan recepción por guía (hasta 20 recientes) en vez de escribir llegadaId. No hay migraciones ni escrituras de negocio en esta corrección. Selección de recepciones antiguas para alta de ficha sigue limitada a las 20 recientes; la consulta de llegadas sí permite buscar por guía.
+
+Validación: 65 pruebas backend (incluidas 2 nuevas para límites/normalización), empaquetado correcto; salud 200; listado 200, búsqueda por guía 200 y límite 51 rechazado con 400. Evidencia en consulta-llegadas.json. Android compilado y 15 pruebas aprobadas. No se instalaron cambios en el teléfono: ADB vacío; pendientes instalación segura, prueba visual y captura de copia de chasis/listas. No atribuir esta nueva UI a las capturas del APK anterior.

@@ -6,7 +6,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.TwoWheeler
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -20,6 +23,8 @@ import kotlinx.serialization.json.contentOrNull
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MotorcycleDetail(record: JsonObject, busy: Boolean, close: () -> Unit, location: @Composable () -> Unit) {
+    val clipboard=LocalClipboardManager.current
+    var copied by remember(record) { mutableStateOf(false) }
     val title = listOfNotNull(record.value("marca"), record.value("modelo")).joinToString(" ")
     Dialog(
         onDismissRequest = close,
@@ -55,7 +60,8 @@ internal fun MotorcycleDetail(record: JsonObject, busy: Boolean, close: () -> Un
                                 Icon(Icons.Default.TwoWheeler, contentDescription = null)
                                 Text(title.ifBlank { "Motocicleta" }, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                             }
-                            DetailValue("Chasis completo", record.value("chasisCompleto"))
+                            SelectionContainer { DetailValue("Chasis completo", record.value("chasisCompleto")) }
+                            OutlinedButton(onClick={clipboard.setText(AnnotatedString(record.value("chasisCompleto").orEmpty()));copied=true},enabled=!record.value("chasisCompleto").isNullOrBlank()) { Text(if(copied)"Chasis copiado" else "Copiar chasis completo") }
                             DetailValue("Color", record.value("color"))
                         }
                     }

@@ -1,3 +1,5 @@
+> **Último incremento:** fichas/traslados por chasis y selección de unidad; llegadas por guía y recientes; copiar chasis y etiquetas de solicitud comprensibles. Build y 15 pruebas móviles / 65 backend aprobadas. Samsung desconectado: APK nuevo aún pendiente de instalación y validación visual. Ver informe vigente.
+
 > **Corte vigente 2026-11-19T17:04:34-05:00:** recorrido principal Samsung comprobado con capturas; solicitud #5 atendida, #8 anulada, traslado #5. Correcciones de usabilidad instaladas, 15 pruebas aprobadas; revisión visual nueva pendiente. Excel actualizado: 12 To Do / 31 Doing / 7 Done. [Evidencia y pendientes](docs/VALIDACION-SPRINT2-20261119.md). Los estados de PC anteriores conservados abajo son antecedentes.
 
 # Indumotos AS — leer primero para continuar

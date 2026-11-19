@@ -1,0 +1,17 @@
+[
+  {
+    "ruta": "/api/v1/llegadas",
+    "status": 200,
+    "registros": 1
+  },
+  {
+    "ruta": "/api/v1/llegadas?guia=ACADEMICO&limite=20",
+    "status": 200,
+    "registros": 1
+  },
+  {
+    "ruta": "/api/v1/llegadas?limite=51",
+    "status": 400,
+    "registros": null
+  }
+]

@@ -99,7 +99,7 @@ private fun createForm(module:Module):Form=when(module){
    Column(Modifier.padding(padding).fillMaxSize()){
     if(state.busy)LinearProgressIndicator(Modifier.fillMaxWidth(),color=Blue)
     state.error?.let{Notice(it,true)};state.message?.let{Notice(it,false)}
-    when(state.module){null->Home(state,vm);Module.INVENTORY->Inventory(state,vm);Module.REQUESTS->RequestsScreen(account,vm::expireSession);Module.TRANSFERS->TransfersScreen(account,vm::expireSession);else->QueryScreen(state,vm)}
+    when(state.module){null->Home(state,vm);Module.INVENTORY,Module.FICHAS->Inventory(state,vm);Module.REQUESTS->RequestsScreen(account,vm::expireSession);Module.TRANSFERS->TransfersScreen(account,vm::expireSession);else->QueryScreen(state,vm)}
    }
   }
  }
@@ -114,7 +114,7 @@ private fun createForm(module:Module):Form=when(module){
  )
  if (showProfile) AccountProfile(account) { showProfile = false; showAccount = true }
  if(confirmLogout)AlertDialog(onDismissRequest={if(!state.busy)confirmLogout=false},title={Text("Cerrar sesión")},text={Text("Se revocará el acceso de esta sesión en el servidor. Necesitas conexión para confirmarlo.")},confirmButton={TextButton(onClick={confirmLogout=false;vm.logout()},enabled=!state.busy){Text("Cerrar sesión")}},dismissButton={TextButton(onClick={confirmLogout=false}){Text("Cancelar")}})
- if (state.module == Module.INVENTORY) state.detail?.let { record ->
+ if (state.module in listOf(Module.INVENTORY,Module.FICHAS)) state.detail?.let { record ->
      val location by vm.location.collectAsState()
      val id = record.text("id").toLongOrNull()
      MotorcycleDetail(record, state.busy, vm::closeDetail) {
@@ -155,13 +155,14 @@ private fun createForm(module:Module):Form=when(module){
 @Composable private fun Inventory(state:UiState,vm:LogisticsViewModel){
  var chasis by remember{mutableStateOf("")};var marca by remember{mutableStateOf("")};var modelo by remember{mutableStateOf("")};var color by remember{mutableStateOf("")};var filters by remember{mutableStateOf(false)}
  LazyColumn(contentPadding=PaddingValues(start=20.dp,end=20.dp,top=20.dp,bottom=110.dp),verticalArrangement=Arrangement.spacedBy(14.dp)){
-  item{Text("Consulta de inventario",fontSize=22.sp,fontWeight=FontWeight.Bold);Text("Busca por chasis completo o últimos cuatro dígitos.",fontSize=12.sp,color=Muted);Spacer(Modifier.height(16.dp));OutlinedTextField(chasis,{chasis=it},label={Text("Chasis")},singleLine=true,modifier=Modifier.fillMaxWidth(),leadingIcon={Icon(Icons.Default.Search,null)})
+  item{Text(if(state.module==Module.FICHAS)"Fichas de motocicletas" else "Consulta de inventario",fontSize=22.sp,fontWeight=FontWeight.Bold);Text("Busca por chasis completo o últimos cuatro dígitos.",fontSize=12.sp,color=Muted);Spacer(Modifier.height(16.dp));OutlinedTextField(chasis,{chasis=it},label={Text("Chasis")},singleLine=true,modifier=Modifier.fillMaxWidth(),leadingIcon={Icon(Icons.Default.Search,null)})
    TextButton(onClick={filters=!filters}){Text(if(filters)"Ocultar filtros"else"Filtrar por marca, modelo y color")}
    if(filters){listOf(Triple("Marca",marca,{s:String->marca=s}),Triple("Modelo",modelo,{s:String->modelo=s}),Triple("Color",color,{s:String->color=s})).forEach{(label,value,change)->OutlinedTextField(value,change,label={Text(label)},singleLine=true,modifier=Modifier.fillMaxWidth().padding(bottom=10.dp))}}
    Row(horizontalArrangement=Arrangement.spacedBy(10.dp)){Button(onClick={vm.search(InventoryFilter(chasis,marca,modelo,color))},enabled=!state.busy){Text("Buscar")};OutlinedButton(onClick={chasis="";marca="";modelo="";color="";vm.search(InventoryFilter())},enabled=!state.busy){Text("Limpiar")}}
    Spacer(Modifier.height(16.dp));Text("${state.total} unidades encontradas",fontSize=12.sp,color=Muted)
   }
   if(state.rows.isEmpty()&&!state.busy&&state.error==null)item{EmptyState("Sin coincidencias","No hay unidades que coincidan con esta consulta.")}
+  item{Text("Motocicletas · selecciona una para ver su ficha",fontWeight=FontWeight.SemiBold)}
   items(state.rows,key={it.text("id")}){row->OutlinedCard(onClick={vm.inventoryDetail(row.text("id"))},modifier=Modifier.fillMaxWidth(),colors=CardDefaults.outlinedCardColors(containerColor=MaterialTheme.colorScheme.surface)){
    Column(Modifier.padding(18.dp)){Row(verticalAlignment=Alignment.CenterVertically){Icon(Icons.Default.TwoWheeler,null,tint=Blue);Spacer(Modifier.width(10.dp));Text(row.text("marca")+" "+row.text("modelo"),fontWeight=FontWeight.SemiBold,modifier=Modifier.weight(1f));Text("#"+row.text("id"),fontSize=11.sp,color=Muted)};Spacer(Modifier.height(10.dp));Text("Chasis: "+row.text("chasisVista"),fontSize=13.sp);Text("Color: "+row.text("color"),fontSize=12.sp,color=Muted);Spacer(Modifier.height(6.dp));Text("Ver ficha completa →",fontSize=12.sp,color=Blue)}
   }}
@@ -174,18 +175,26 @@ private fun createForm(module:Module):Form=when(module){
  LazyColumn(contentPadding=PaddingValues(start=20.dp,end=20.dp,top=24.dp,bottom=110.dp),verticalArrangement=Arrangement.spacedBy(18.dp)){
   item{Text(module.title,fontSize=24.sp,fontWeight=FontWeight.Bold);Spacer(Modifier.height(8.dp));Text(module.description,fontSize=13.sp,color=Muted,lineHeight=20.sp)}
   if(module==Module.USERS)item{EmptyState("Cuentas individuales","Usa Nueva cuenta para registrar un trabajador y asignarle su rol. Para consultar accesos, abre Roles y permisos.")}
+  if(module==Module.ARRIVALS) {
+   if(vm.allowed("INVENTARIO_CONSULTAR")) {
+    item{OutlinedTextField(id,{id=it},label={Text("Número de guía")},singleLine=true,modifier=Modifier.fillMaxWidth());Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){Button(onClick={vm.arrivals(id)},enabled=!state.busy){Text("Buscar guía")};OutlinedButton(onClick={id="";vm.arrivals("")},enabled=!state.busy){Text("Recientes")}};Text("Recepciones recientes · máximo 20 coincidencias",fontSize=12.sp)}
+    items(state.rows,key={it.text("id")}){row->OutlinedCard(onClick={vm.query(row.text("id"))},modifier=Modifier.fillMaxWidth()){Column(Modifier.padding(16.dp)){Text("Guía ${row.text("numeroGuia")}",fontWeight=FontWeight.SemiBold);Text("Recibidas: ${row.text("cantidadRecibida")} · ${row.text("fechaLlegada")}");Text("Ver recepción →")}}}
+    state.detail?.let{record->item{RecordDetail(record)}}
+    if(state.rows.isEmpty()&&!state.busy)item{EmptyState("Sin recepciones","Busca por número de guía o registra una recepción con una cuenta autorizada.")}
+   } else item{EmptyState("Registro de recepción","Tu cuenta puede registrar llegadas. La consulta requiere permiso de inventario.")}
+  }
   val consult=if(module==Module.PERMISSIONS)vm.allowed("PERMISOS_ASIGNAR")else vm.allowed("INVENTARIO_CONSULTAR")
-  if(module!=Module.USERS&&consult)item{
+  if(module!=Module.USERS&&module!=Module.ARRIVALS&&consult)item{
    OutlinedCard(colors=CardDefaults.outlinedCardColors(containerColor=MaterialTheme.colorScheme.surface)){Column(Modifier.padding(20.dp)){
     Text(if(module==Module.ARRIVALS)"Consultar recepción"else if(module==Module.PERMISSIONS)"Consultar cuenta"else"Consultar ficha",fontWeight=FontWeight.SemiBold)
     Spacer(Modifier.height(12.dp));OutlinedTextField(id,{id=it},label={Text(if(module==Module.ARRIVALS)"ID de llegada"else if(module==Module.PERMISSIONS)"ID de usuario"else"ID de motocicleta")},singleLine=true,modifier=Modifier.fillMaxWidth(),keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Number));Spacer(Modifier.height(12.dp));Button(onClick={vm.query(id)},enabled=!state.busy&&Rules.positive(id)){Text("Consultar")}
    }}
   }
-  state.detail?.let{record->
+  state.detail?.takeIf{module!=Module.ARRIVALS}?.let{record->
    if(module==Module.PERMISSIONS)item{PermissionDetail(record,vm)}
    else item{RecordDetail(record)}
   }
-  if(module!=Module.USERS&&state.detail==null)item{EmptyState(if(consult)"Consulta por identificador"else"Registro autorizado",if(consult)"Ingresa el identificador asignado por el servidor al guardar el registro."else"Tu cuenta puede registrar información. La consulta requiere el permiso de inventario.")}
+  if(module!=Module.USERS&&module!=Module.ARRIVALS&&state.detail==null)item{EmptyState(if(consult)"Consulta por identificador"else"Registro autorizado",if(consult)"Ingresa el identificador asignado por el servidor al guardar el registro."else"Tu cuenta puede registrar información. La consulta requiere el permiso de inventario.")}
  }
 }
 

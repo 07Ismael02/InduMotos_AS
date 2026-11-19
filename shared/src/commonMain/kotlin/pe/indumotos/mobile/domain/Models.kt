@@ -18,6 +18,7 @@ enum class Module(val title:String,val permission:String,val description:String)
  PERMISSIONS("Roles y permisos","PERMISOS_ASIGNAR","Consultar y administrar accesos")
 }
 interface LogisticsRepository{
+ suspend fun arrivals(guide:String):List<JsonObject> = error("Consulta de llegadas no disponible")
  suspend fun login(baseUrl:String,user:String,password:String):Access
  suspend fun inventory(filter:InventoryFilter,page:Int):InventoryPage
  suspend fun detail(module:Module,id:Long):JsonObject

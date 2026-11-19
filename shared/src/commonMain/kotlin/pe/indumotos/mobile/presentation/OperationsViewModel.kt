@@ -15,6 +15,7 @@ data class OperationsState(
     val busy: Boolean = false, val error: String? = null, val message: String? = null,
     val expired: Boolean = false, val page: Int = 0,
     val catalog: List<JsonObject> = emptyList(),
+    val motorcycles: List<JsonObject> = emptyList(),
     val requests: List<AssemblyRequest> = emptyList(), val selected: AssemblyRequest? = null,
     val events: List<RequestEvent> = emptyList(), val sites: List<Site> = emptyList(),
     val line: RequestLine? = null, val assigned: List<AssignedUnit> = emptyList(),
@@ -109,6 +110,12 @@ class OperationsViewModel(private val repo: OperationsRepository, private val lo
         repo.remove(r.id,line.id,unit.asociacionId,reason.trim())
         val rows=repo.assigned(r.id,line.id)
         mutable.update { it.copy(assigned=rows,eligible=emptyList(),message="Asignación retirada; el motivo queda registrado.") }
+    }
+    fun motorcycles(chassis: String="") = work {
+        val source=inventory ?: error("Consulta de inventario no disponible")
+        val first=source.inventory(InventoryFilter(chasis=chassis.trim()),0)
+        val rows=if(chassis.isBlank()&&first.totalPaginas>1)source.inventory(InventoryFilter(),first.totalPaginas-1).items.reversed() else first.items.reversed()
+        mutable.update { it.copy(motorcycles=rows,movements=emptyList()) }
     }
     fun movements(motorcycle: Long) = work {
         require(motorcycle>0) { "Indica un ID de motocicleta válido." }
