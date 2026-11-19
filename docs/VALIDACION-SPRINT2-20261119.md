@@ -70,3 +70,7 @@ Los commits de código móvil b7730cc y backend e0ab459 coinciden con sus ramas 
 Se compararon las firmas SHA256 de APK instalado y nuevo: coinciden. Hash del APK nuevo coincide con build.json. Actualización `adb install -r`: Success, sin borrar datos. El Samsung abre el login; el usuario completa la autenticación manualmente. No se marcan como ejecutados los recorridos visuales de la nueva búsqueda/copia de chasis todavía.
 
 Por instrucción del usuario, desde este corte se registra trabajo únicamente en la pestaña existente SCRUM S2 19-11-2026 del mismo Excel, respetando formato y sin enlaces. Web y Figma pertenecen a otros colaboradores y no bloquean por sí solos la entrega de su parte Android. El cierre móvil requiere sus propias pruebas y aceptación; no equivale a cierre integral del equipo.
+
+## Revisión física final del incremento — 2026-11-19T17:53:20-05:00
+
+Consultas de fichas/traslados/llegadas, copia y pegado real de chasis, secuencia de selectores, error por formulario incompleto, logout y login incorrecto/correcto comprobados. 17 capturas en evidencias/sprint2/validacion-final; cinco checks de selectores aprobados. No se repitieron compilaciones ni escrituras ya comprobadas. No se amplió el rol admin. Pendientes específicos documentados en el README de estas evidencias.
