@@ -24,6 +24,8 @@ Después de reconectar USB o reiniciar ADB: `adb -s RFGL11XYCTD reverse tcp:8089
 
 ## Pendiente
 
+Actualización posterior: el usuario confirmó ver marcas, modelos y colores en Catálogo desde el Samsung. Consulta remota observada por el usuario; los demás recorridos y la corrección posterior de selectores no quedan aprobados por ese resultado.
+
 - Login y consultas desde Samsung: esperando intervención manual. Salud del PC y túnel creado no prueban por sí solos la conexión desde la app.
 - Solo existe ADMIN. Recepción, fichas y operación por otros roles requieren cuentas individuales autorizadas por el usuario; no ampliar ADMIN ni inventar cuentas.
 - Tesseract no disponible en PATH; OCR no validado. No se instalaron herramientas. El registro manual debe probarse.

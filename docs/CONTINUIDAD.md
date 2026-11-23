@@ -1,5 +1,7 @@
 # Continuidad — 23/11/2026
 
+Corrección posterior solicitada por el usuario: confirmó que Catálogo muestra marcas/modelos/colores desde el Samsung. Eso acredita la consulta de catálogo desde la app, sin cerrar los demás recorridos. El formulario administrativo ahora ofrece selección existente y «Añadir» para escribir un valor nuevo, con dependencia marca→modelo→color y limpieza de selecciones descendientes. Código 70ac04c, versión 0.2.2/código 4. Compilación aprobada y apksigner verificado con la misma firma; install -r Success y versión 0.2.2 comprobada en Samsung. Hash/ruta en build-catalogo-20261123.json. Sin cambios backend/BD. Validación manual de estos selectores pendiente; no se repitieron suites anteriores por esta corrección de interfaz.
+
 Actualización de entorno: ver ENTORNO-PARIDAD-20261123.md. Respaldo V15 restaurado y copia aislada migrada V23; original permanece V15. Backend HTTP 200 en 127.0.0.1:8090. Samsung autorizado, APK 0.2.1 actualizado con firma compatible y túnel 8089→8090. Login manual pendiente; solo cuenta ADMIN existente, OCR sin Tesseract disponible. Esto actualiza la preparación descrita más abajo, sin acreditar los recorridos funcionales.
 
 Repositorio móvil: 07Ismael02/InduMotos_AS. Directorio de trabajo: C:/Users/Ismael Logacho/Documents/PharmaMobil/proyecto-final-dam/InduMotos-Sprint2. Rama: feature/sprint2-paridad-web, desde 42445cb. Main no se modifica.

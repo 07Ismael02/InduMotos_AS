@@ -1,0 +1,15 @@
+{
+  "fecha": "2026-11-23T18:16:31-05:00",
+  "versionName": "0.2.2-sprint2",
+  "versionCode": 4,
+  "applicationId": "pe.indumotos.asapp",
+  "commitCodigo": "70ac04c",
+  "sha256": "e5f9884c7b90f5feed65203114f54329b88c5015595e8c2a3b789c6c7b6aacfe",
+  "bytes": 22985805,
+  "certificadoSha256": "23c1a0373560f28c3d2b64103e50a0dff54bb955fd75b20ac40d52253e33b0f0",
+  "tipo": "Debug",
+  "compilacion": "BUILD SUCCESSFUL",
+  "cambio": "Catalogo ADMIN: seleccionar existente o añadir texto nuevo; dependencia marca modelo color",
+  "pruebas": "No se repitieron suites anteriores; cambio de UI pendiente de validacion manual",
+  "rutaLocal": "C:\\Users\\Ismael Logacho\\Documents\\PharmaMobil\\proyecto-final-dam\\InduMotos-Sprint2\\entrega\\Indumotos-AS-0.2.2-sprint2-debug.apk"
+}

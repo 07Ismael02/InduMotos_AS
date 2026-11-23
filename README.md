@@ -1,5 +1,7 @@
 # Indumotos AS — aplicativo móvil
 
+Corrección de catálogo 0.2.2: selección de marcas/modelos/colores existentes y opción explícita para añadir texto nuevo (solo administración). Consulta de catálogo confirmada por el usuario en Samsung con 0.2.1; selectores nuevos pendientes de validación física.
+
 Entorno del 23/11: backend V23 HTTP 200 en copia aislada y APK 0.2.1 instalado en Samsung mediante actualización compatible. Login y recorridos manuales pendientes; ver [estado comprobado](docs/ENTORNO-PARIDAD-20261123.md).
 
 Actualizado el 23/11/2026. Trabajo activo en `feature/sprint2-paridad-web`; no integrado a main. Objetivo: paridad funcional con la web dentro del recorrido de Sprint 2 y sus prerrequisitos de recepción/inventario. PharmaMobile se conserva solo como referencia.
