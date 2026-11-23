@@ -16,7 +16,8 @@ import pe.indumotos.mobile.presentation.CatalogViewModel
     var brand by remember(account.usuarioId){mutableStateOf("")}
     var model by remember(account.usuarioId){mutableStateOf("")}
     var color by remember(account.usuarioId){mutableStateOf("")}
-    LaunchedEffect(account.usuarioId){vm.load()}
+    DisposableEffect(account.usuarioId){onDispose{vm.reset()}}
+    LaunchedEffect(account.usuarioId){vm.reset();vm.load()}
     LaunchedEffect(state.expired){if(state.expired)expired()}
     LazyColumn(contentPadding=PaddingValues(20.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
         item {

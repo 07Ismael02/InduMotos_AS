@@ -4,6 +4,7 @@ import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.client.call.body
+import io.ktor.client.plugins.timeout
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
 import kotlinx.serialization.json.*
@@ -14,7 +15,7 @@ class RemoteRepository(private val http:HttpClient):LogisticsRepository, Locatio
  private val json=Json{ignoreUnknownKeys=true;encodeDefaults=true}
  private var base="";private var token=""
  private suspend fun request(path:String,body:String?=null,method:String="GET",params:Map<String,String> = emptyMap()):String{
-  val response=try{http.request(base+path){this.method=HttpMethod.parse(method);contentType(ContentType.Application.Json);if(token.isNotEmpty())bearerAuth(token);params.forEach{(k,v)->parameter(k,v)};if(body!=null)setBody(body)}}catch(e:CancellationException){throw e}catch(e:Exception){throw AppException(AppError.Network)}
+  val response=try{http.request(base+path){this.method=HttpMethod.parse(method);if(path.endsWith("sugerencias-ocr"))timeout{requestTimeoutMillis=120000};contentType(ContentType.Application.Json);if(token.isNotEmpty())bearerAuth(token);params.forEach{(k,v)->parameter(k,v)};if(body!=null)setBody(body)}}catch(e:CancellationException){throw e}catch(e:Exception){throw AppException(AppError.Network)}
   return checkedText(response)
  }
  private suspend fun checkedText(response:HttpResponse):String{

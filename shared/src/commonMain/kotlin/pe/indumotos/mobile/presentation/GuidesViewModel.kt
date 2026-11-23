@@ -54,7 +54,8 @@ class GuidesViewModel(private val repo:GuideRepository,private val catalog:Catal
     fun save(draft:MotorcycleDraft)=work(true) {
         val s=mutable.value;val arrival=requireNotNull(s.selected);GuideRules.draft(draft,s.options)
         require(s.ocrReviewed){"Revisa las sugerencias OCR antes de guardar."}
-        val result=repo.saveDraft(arrival.id,draft);mutable.update{it.copy(registration=result,message="Borrador ${draft.posicion} guardado en el servidor.")}
+        val normalized=draft.copy(chasisCompleto=draft.chasisCompleto.trim(),numeroMotor=draft.numeroMotor.trim(),dua=draft.dua.trim(),itemDua=draft.itemDua.trim())
+        val result=repo.saveDraft(arrival.id,normalized);mutable.update{it.copy(registration=result,drafts=it.drafts.map{d->if(d.posicion==draft.posicion)result.borradores.firstOrNull{it.posicion==d.posicion}?:normalized else d},message="Borrador ${draft.posicion} guardado en el servidor.")}
     }
     fun finish()=work(true) {
         val s=mutable.value;require(s.ocrReviewed&&GuideRules.canFinish(requireNotNull(s.registration),s.drafts)){"Guarda todos los bloques y revisa los datos antes de finalizar."}
@@ -71,6 +72,7 @@ class GuidesViewModel(private val repo:GuideRepository,private val catalog:Catal
         // Applying a suggestion only edits an unsaved block; the user must confirm review separately.
         if(s.registration?.borradores?.any{it.posicion==position}==true)return
         edit(existing.copy(marca=o.marca,modelo=o.modelo,color=o.color,chasisCompleto=o.chasisCompleto,numeroMotor=o.numeroMotor,dua=o.dua,itemDua=o.itemDua))
+        mutable.update{it.copy(ocrReviewed=false)}
     }
     fun reviewed(value:Boolean){mutable.update{it.copy(ocrReviewed=value)}}
 }

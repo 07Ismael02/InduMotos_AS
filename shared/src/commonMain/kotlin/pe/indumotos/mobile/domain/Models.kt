@@ -14,7 +14,7 @@ enum class Module(val title:String,val permission:String,val description:String)
  TRANSFERS("Traslados",READ_LOCATIONS,"Consultar recorrido y trasladar motocicletas"),
  INVENTORY("Inventario","INVENTARIO_CONSULTAR","Buscar y filtrar motocicletas"),
  ARRIVALS("Llegadas","LLEGADAS_REGISTRAR","Registrar y consultar recepciones"),
- FICHAS("Fichas de motocicletas","FICHAS_REGISTRAR","Identificar cada unidad recibida"),
+ FICHAS("Fichas de motocicletas","FICHAS_REGISTRAR","Registrar desde guía y reanudar borradores"),
  USERS("Crear cuenta","USUARIOS_CREAR","Registrar personal autorizado"),
  PERMISSIONS("Roles y permisos","PERMISOS_ASIGNAR","Consultar y administrar accesos")
 }

@@ -42,6 +42,11 @@ class GuideWorkflowTest {
         vm.select(arrival,true);advanceUntilIdle();vm.edit(draft);vm.save(draft);advanceUntilIdle();vm.finish();runCurrent();vm.reset()
         repo.gate!!.complete(Unit);advanceUntilIdle();assertNull(vm.state.value.selected);assertNull(vm.state.value.registration)
     }
+    @Test fun newOcrSuggestionRequiresReviewAgain()=runTest {
+        val repo=Fake();val vm=GuidesViewModel(repo,repo);vm.select(arrival,true);advanceUntilIdle();vm.ocr();advanceUntilIdle()
+        vm.reviewed(true);vm.useSuggestion(0,1);assertFalse(vm.state.value.ocrReviewed)
+        vm.save(vm.state.value.drafts.first());advanceUntilIdle();assertTrue(repo.current.borradores.isEmpty())
+    }
     private inner class Fake:GuideRepository,CatalogRepository {
         var current=GuideRegistration(false,1,0,emptyList());var finishes=0;var uploads=0;var failUpload=false;var gate:CompletableDeferred<Unit>?=null
         override suspend fun arrivals(guide:String,state:String,page:Int)=ArrivalPage(listOf(arrival),0,1,1)
@@ -51,7 +56,7 @@ class GuideWorkflowTest {
         override suspend fun registration(id:Long)=current
         override suspend fun saveDraft(id:Long,draft:MotorcycleDraft):GuideRegistration{current=current.copy(borradores=listOf(draft));return current}
         override suspend fun finish(id:Long):GuideRegistration{finishes++;gate?.await();current=current.copy(terminado=true,registradas=1,borradores=emptyList());return current}
-        override suspend fun ocr(id:Long)=OcrResult(0,emptyList())
+        override suspend fun ocr(id:Long)=OcrResult(1,listOf(OcrSuggestion(1,"Honda","Wave","Rojo","CHASIS-123456789","MOTOR123456","DUA","1")))
         override suspend fun catalog()=listOf(CatalogOption("Honda","Wave","Rojo"))
         override suspend fun requestOptions()=catalog()
         override suspend fun addCatalog(option:CatalogOption)=option

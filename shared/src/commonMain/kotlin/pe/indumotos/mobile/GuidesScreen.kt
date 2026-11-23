@@ -25,7 +25,7 @@ import pe.indumotos.mobile.presentation.*
     fun can(code:String)=account.permisos.any{it.codigo==code&&it.permitido}
     val canEdit=editing&&can("FICHAS_REGISTRAR")&&can("INVENTARIO_CONSULTAR")
     var query by remember{mutableStateOf("")};var creating by remember{mutableStateOf(false)}
-    var confirmFinish by remember{mutableStateOf(false)};var confirmLeave by remember{mutableStateOf(false)}
+    var confirmReload by remember{mutableStateOf(false)};var confirmFinish by remember{mutableStateOf(false)};var confirmLeave by remember{mutableStateOf(false)}
     var page by remember(s.selected?.id){mutableStateOf(0)};var zoom by remember{mutableStateOf(false)}
     DisposableEffect(account.usuarioId,editing){onDispose{vm.reset()}}
     LaunchedEffect(account.usuarioId,editing){vm.reset();if(can("INVENTARIO_CONSULTAR"))vm.list()}
@@ -81,6 +81,9 @@ import pe.indumotos.mobile.presentation.*
             }
             LazyColumn(Modifier.weight(1f),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
                 item {
+                    if(registration!=null&&can("INVENTARIO_CONSULTAR"))OutlinedButton(onClick={
+                        if(s.drafts.any{d->registration.borradores.none{it==d}})confirmReload=true else vm.select(arrival,canEdit)
+                    },enabled=!s.busy){Text("Actualizar desde servidor")}
                     registration?.let{Text("Registradas: ${it.registradas} · Pendientes: ${it.pending} · ${if(it.terminado)"Confirmada" else "Pendiente"}")}
                     if(s.images.isEmpty()&&!s.busy)Text("Esta recepción no tiene fotos adjuntas.")
                     if(registration==null&&!s.busy&&can("INVENTARIO_CONSULTAR"))OutlinedButton(onClick={vm.select(arrival,canEdit)}){Text("Cargar detalle de guía")}
@@ -117,6 +120,7 @@ import pe.indumotos.mobile.presentation.*
     }
     if(creating)NewArrivalDialog(s.busy,s.error,pickPhotos,{creating=false},vm::register)
     if(zoom&&s.imageBytes!=null)ZoomGuide(requireNotNull(s.imageBytes)){zoom=false}
+    if(confirmReload)AlertDialog(onDismissRequest={confirmReload=false},title={Text("Recargar registro")},text={Text("Se conservarán los borradores del servidor y se descartarán los cambios locales sin guardar.")},confirmButton={TextButton(onClick={confirmReload=false;s.selected?.let{vm.select(it,canEdit)}}){Text("Recargar")}},dismissButton={TextButton(onClick={confirmReload=false}){Text("Cancelar")}})
     if(confirmFinish)AlertDialog(onDismissRequest={confirmFinish=false},title={Text("Finalizar registro")},text={Text("Se incorporarán las motocicletas guardadas y la guía quedará confirmada. Verifica los datos y las cantidades antes de continuar.")},confirmButton={Button(onClick={confirmFinish=false;vm.finish()},enabled=!s.busy){Text("Finalizar")}},dismissButton={TextButton(onClick={confirmFinish=false}){Text("Cancelar")}})
     if(confirmLeave)AlertDialog(onDismissRequest={confirmLeave=false},title={Text("Cambios sin guardar")},text={Text("Hay bloques editados que aún no están guardados en el servidor. ¿Deseas salir y descartar esos cambios locales?")},confirmButton={TextButton(onClick={confirmLeave=false;vm.list(s.query,s.filter)}){Text("Descartar y volver")}},dismissButton={TextButton(onClick={confirmLeave=false}){Text("Seguir editando")}})
 }
