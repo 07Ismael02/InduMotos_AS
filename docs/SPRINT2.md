@@ -1,3 +1,5 @@
+> **Actualización 23/11/2026:** rama feature/sprint2-paridad-web basada en la implementación existente, contrastada con web/main f2981a3 y backend/main 5b37b9b. Ver PARIDAD-WEB-SPRINT2.md y PRUEBAS-PARIDAD-SPRINT2.md. Los pendientes y entornos descritos a continuación son antecedentes del 19/11, no el estado vigente. No se declara cierre integral.
+
 > **Corte vigente 19/11/2026:** solicitudes, unidades, seguimiento, anulación y traslados implementados en `feature/sprint2-recorrido`; 14 pruebas móviles y 58 comprobaciones HTTP/persistencia aprobadas. Validación visual nueva en Samsung pendiente. Backend real `sprint-2` (`fbfaab5`), copia de datos aislada, puerto 8090. [Estado y evidencia actuales](VALIDACION-SPRINT2-20261119.md). Las referencias de entorno anteriores que siguen abajo son antecedentes y no describen el servidor actual.
 
 # Sprint 2 — plan de ejecución para el 19/11/2026

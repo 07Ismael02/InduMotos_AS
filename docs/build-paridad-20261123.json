@@ -1,0 +1,64 @@
+{
+  "fecha": "2026-11-23T17:59:24-05:00",
+  "rama": "feature/sprint2-paridad-web",
+  "commitCodigo": "58972fe20ab728903f5ac99434695e7aeaa1a06f",
+  "webReferencia": "f2981a368b2315d7278920bfe7c170dad3e4af8b",
+  "backendReferencia": "5b37b9b812c3c08e7edd4aeac67c3216e62850c7",
+  "applicationId": "pe.indumotos.asapp",
+  "versionCode": 3,
+  "versionName": "0.2.1-sprint2",
+  "tipo": "Debug",
+  "sha256": "ec331567f774bc30933643560b9abdbf5c3e164d7e995570da22f8fa01cc4491",
+  "certificadoSha256": "23c1a0373560f28c3d2b64103e50a0dff54bb955fd75b20ac40d52253e33b0f0",
+  "bytes": 22969421,
+  "rutaLocal": "C:\\Users\\Ismael Logacho\\Documents\\PharmaMobil\\proyecto-final-dam\\InduMotos-Sprint2\\entrega\\Indumotos-AS-0.2.1-sprint2-debug.apk",
+  "backendUrl": "http://127.0.0.1:8089",
+  "tests": [
+    {
+      "suite": "pe.indumotos.mobile.ApiErrorMapperTest",
+      "tests": 5,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "pe.indumotos.mobile.CatalogContractTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "pe.indumotos.mobile.CatalogOptionsTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "pe.indumotos.mobile.GuideWorkflowTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "pe.indumotos.mobile.NavigationContractTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "pe.indumotos.mobile.OperationsViewModelTest",
+      "tests": 6,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "pe.indumotos.mobile.RulesTest",
+      "tests": 3,
+      "failures": 0,
+      "errors": 0
+    }
+  ],
+  "compilacion": "BUILD SUCCESSFUL",
+  "apksigner": "verify aprobado; misma clave Debug del incremento anterior",
+  "validacionFisica": "Pendiente para este APK. No se inició backend V23 ni se instaló en Samsung en este bloque.",
+  "datos": "Sin cambios en bases, migraciones, usuarios o permisos; backend sin modificaciones propias."
+}
