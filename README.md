@@ -1,5 +1,7 @@
 # Indumotos AS — aplicativo móvil
 
+**Paridad con web incompleta:** faltan listado/búsqueda de cuentas, selección de usuarios y catálogo completo de permisos en accesos, y fichas vinculadas al detalle de llegada. [Cotejo concreto y prioridades](docs/PARIDAD-WEB-SPRINT2.md). Los demás módulos presentes siguen sujetos a validación integral por rol.
+
 Validación física 0.2.3: nueve comprobaciones de selección y Atrás aprobadas en Samsung; [informe y capturas](docs/REVISION-UX-PARIDAD-20261123.md). Observado en vertical/tema oscuro; los recorridos comerciales por rol y el diseño en otros tamaños siguen pendientes.
 
 Incremento 0.2.3: Catálogo adaptable y navegación Atrás a Inicio con doble pulsación para salir. [Cambios y pruebas pendientes de paridad](docs/REVISION-UX-PARIDAD-20261123.md). Cinco comprobaciones HTTP de salud/protección sin token ejecutadas; no acreditan todavía los recorridos por rol.

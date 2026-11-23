@@ -1,5 +1,7 @@
 # Validación manual del incremento — pendiente
 
+Actualización: APK vigente 0.2.3. Login ADMIN, catálogo/selección y navegación básica observados en Samsung; nueve comprobaciones y capturas en evidencias/paridad-20261123. Los ocho recorridos completos de esta tabla no están aprobados. Antes de concluir equivalencia, cerrar además los faltantes de implementación identificados en PARIDAD-WEB-SPRINT2.md; lo indicado abajo sobre 0.2.1 es el plan inicial.
+
 Ejecutar sobre el APK 0.2.1-sprint2 identificado por hash/certificado y API main 5b37b9b con V23 en copia aislada. No se ejecutaron estos recorridos en este bloque. Se necesitan cuentas reales autorizadas: Administración, Almacén, Inventarios y Comercial; no crear cuentas de demostración ni ampliar roles sin acuerdo. Elegir únicamente datos académicos identificados o documentos con autorización.
 
 | Caso | Procedimiento / resultado que comprobar | Evidencia pendiente |

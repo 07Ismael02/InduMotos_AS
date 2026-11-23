@@ -1,5 +1,34 @@
 # Paridad funcional móvil — 23/11/2026
 
+## Cotejo posterior al APK 0.2.3: paridad todavía incompleta
+
+Referencias main verificadas nuevamente en remoto el 23/11: web f2981a3 y backend 5b37b9b, sin cambios respecto a las copias inspeccionadas. La existencia de endpoints/pantallas no acredita su funcionamiento integral.
+
+| Función de la web | Implementación Android real | Falta o validación |
+|---|---|---|
+| Login, perfil, menú por rol y logout | Presente; JWT en memoria, perfil /auth/me, manejo 401/403 | Login ADMIN y catálogo observados; expiración, logout y otros roles pendientes |
+| Catálogo maestro | Presente; seleccionar existentes o añadir texto, dependencias, alta por API | Lectura/selección verificadas; alta, duplicados y rechazo por rol pendientes |
+| Crear cuentas | Formulario presente con rol y contraseña | Probar alta autorizada y errores; no crear usuarios sin acuerdo |
+| Listado/búsqueda/paginación de cuentas | Ausente: USERS solo muestra formulario/ayuda | Implementar GET /usuarios y selección por nombre/usuario como web |
+| Administración de accesos | Cambio de rol/excepciones presente; consulta manual por ID | Sustituir ID por listado/búsqueda. PermissionLabels solo contiene seis permisos antiguos, omite catálogo y operaciones Sprint 2. Revisar restricciones de administración según web/backend |
+| Inventario, filtros, paginación, ficha | Presente, búsqueda explícita con botón | Probar datos/edición por rol; web además busca con demora automática y tiene acceso directo a páginas |
+| Ubicación inicial e historial/traslados | Presente, repartido entre ficha y Traslados | Verificar flujo integral; web lo reúne en Ubicaciones |
+| Recepción con 1–3 fotos | Presente, selector Android y validación de archivos | Alta real y rechazo de archivos/cantidades pendientes |
+| Listas de guías y fotos | Presente con pendientes/confirmadas, búsqueda/páginas, zoom | Prueba por rol pendiente |
+| Fichas vinculadas al detalle de llegada | Ausente en nueva pantalla: GuidesState no contiene lista vinculada ni consulta /detalle | Implementar consulta y navegación a fichas, sin alterar datos |
+| Borradores y finalización | Presente; bloques de cinco, guardar/reabrir, cierre por API | Prueba completa persistencia/stock/duplicados pendiente |
+| OCR de fotos | Cliente presente con revisión humana | Tesseract no disponible en entorno local; lectura real pendiente |
+| Edición de ficha | Presente con FICHAS_EDITAR y catálogo | Probar persistencia, duplicados y rechazo por rol |
+| Solicitudes y seguimiento | Presente integrado en una pantalla; catálogo, líneas, estados, motivos, historial | Verificar todos los estados/roles; web separa Solicitudes y Seguimiento, separación visual no es ausencia de función |
+| Asignar/retirar unidades, anular/rechazar | Presente en solicitudes | Verificar compatibilidad, cupo, exclusividad, liberación y motivo; aceptación HU-27 pendiente |
+| Diseño y navegación Android | Catálogo adaptable, Atrás→Inicio/doble salida | Nueve comprobaciones físicas aprobadas; faltan otros módulos, horizontal/texto ampliado/tema claro |
+
+Prioridad: cerrar listado de cuentas y selección de accesos, completar permisos disponibles, agregar fichas vinculadas en llegadas; después ejecutar recorrido por rol y corregir defectos observados. No confundir estos faltantes de implementación con las pruebas aún pendientes de módulos presentes.
+
+Capacidad de verificación autónoma: contratos/código, build, pruebas pertinentes, API sin secretos, BD aislada y operaciones de UI por ADB. Decisiones humanas pendientes: cuentas individuales autorizadas (se rechazaron cuentas demo anteriormente), credenciales elegidas localmente y documentos autorizados de recepción. No hace falta ampliar ADMIN. Tesseract requiere resolver la dependencia del entorno antes de acreditar OCR.
+
+Ver evidencias de navegación y catálogo en evidencias/paridad-20261123 y pruebas HTTP en verificacion-http-20261123.json. No se declara paridad completa ni cierre Sprint 2.
+
 Rama móvil: feature/sprint2-paridad-web, desde 42445cb. Referencias descargadas: web main f2981a3; backend main 5b37b9b. Son instantáneas de código; que main exista no certifica cierre del Sprint. No se modifican estas referencias ni PharmaMobile.
 
 | Flujo | Diferencia y trabajo |
