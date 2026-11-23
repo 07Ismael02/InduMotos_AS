@@ -84,6 +84,13 @@ internal fun MotorcycleDetail(record: JsonObject, busy: Boolean, close: () -> Un
                         }
                         DetailValue("Registró", record.value("creadorUsuario"))
                         DetailValue("Fecha de registro", record.value("creadoEn")?.let(::recordTimestamp))
+                        (record["llegada"] as? JsonObject)?.let{arrival->
+                            DetailValue("Guía de remisión",arrival.value("numeroGuia"))
+                            DetailValue("Fecha de recepción",arrival.value("fechaLlegada")?.let(::recordTimestamp))
+                            DetailValue("Recibió",arrival.value("receptorUsuario"))
+                            DetailValue("Cantidades", "Declaradas: ${arrival.value("cantidadDeclarada")} · Recibidas: ${arrival.value("cantidadRecibida")}")
+                            DetailValue("Observación",arrival.value("observacion"))
+                        }
                     }
                 }
             }

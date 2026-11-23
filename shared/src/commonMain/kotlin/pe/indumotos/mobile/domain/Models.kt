@@ -34,4 +34,12 @@ object Rules {
 }
 fun roleLabel(code:String)=when(code){"ADMIN"->"Administración";"ALMACEN"->"Almacén";"INVENTARIOS"->"Inventarios";"COMERCIAL"->"Comercial";"FACTURACION"->"Facturación";"ENSAMBLAJE"->"Ensamblaje";else->code}
 val RoleCodes=listOf("ALMACEN","INVENTARIOS","COMERCIAL","ENSAMBLAJE","FACTURACION","ADMIN")
-val PermissionLabels=linkedMapOf("USUARIOS_CREAR" to "Crear cuentas","PERMISOS_ASIGNAR" to "Administrar permisos","LLEGADAS_REGISTRAR" to "Registrar llegadas","FICHAS_REGISTRAR" to "Registrar fichas","INVENTARIO_CONSULTAR" to "Consultar inventario")
+val PermissionLabels=linkedMapOf(
+ "USUARIOS_CREAR" to "Crear cuentas", "PERMISOS_ASIGNAR" to "Administrar permisos",
+ "LLEGADAS_REGISTRAR" to "Registrar llegadas", "FICHAS_REGISTRAR" to "Registrar fichas",
+ "FICHAS_EDITAR" to "Editar fichas", "INVENTARIO_CONSULTAR" to "Consultar inventario",
+ "CATALOGO_GESTIONAR" to "Gestionar catálogo", "UBICACIONES_CONSULTAR" to "Consultar ubicaciones",
+ "UBICACIONES_REGISTRAR" to "Registrar ubicación inicial", "TRASLADOS_REGISTRAR" to "Registrar traslados",
+ "SOLICITUDES_CREAR" to "Crear solicitudes", "SOLICITUDES_CONSULTAR" to "Consultar solicitudes",
+ "SOLICITUDES_AVANZAR" to "Actualizar solicitudes", "SOLICITUDES_ANULAR" to "Anular solicitudes",
+ "UNIDADES_ASIGNAR" to "Asignar y retirar motocicletas")

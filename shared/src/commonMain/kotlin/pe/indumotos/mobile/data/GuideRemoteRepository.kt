@@ -6,6 +6,7 @@ import pe.indumotos.mobile.domain.*
 
 class GuideRemoteRepository(private val remote:RemoteRepository):GuideRepository {
     private val json=Json{ignoreUnknownKeys=true;encodeDefaults=true}
+    override suspend fun detail(id:Long):ArrivalDetail=json.decodeFromString(remote.guideJson("llegadas/$id/detalle"))
     override suspend fun arrivals(guide:String,state:String,page:Int):ArrivalPage = json.decodeFromString(remote.guideJson("llegadas/pagina",params=mapOf("numeroGuia" to guide,"estado" to state,"pagina" to page.toString())))
     override suspend fun register(guide:String,declared:Int,received:Int,note:String,photos:List<GuidePhoto>):Arrival =
         json.decodeFromString(remote.uploadGuide(guide,declared,received,note,photos))

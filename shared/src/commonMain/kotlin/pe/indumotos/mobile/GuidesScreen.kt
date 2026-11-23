@@ -19,6 +19,7 @@ import androidx.compose.ui.window.Dialog
 import org.koin.compose.viewmodel.koinViewModel
 import pe.indumotos.mobile.domain.*
 import pe.indumotos.mobile.presentation.*
+import kotlinx.serialization.json.*
 
 @Composable fun GuidesScreen(account:Access,editing:Boolean,pickPhotos:((PhotoSelection)->Unit)->Unit,expired:()->Unit) {
     val vm:GuidesViewModel=koinViewModel();val s by vm.state.collectAsState()
@@ -27,6 +28,7 @@ import pe.indumotos.mobile.presentation.*
     var query by remember{mutableStateOf("")};var creating by remember{mutableStateOf(false)}
     var confirmReload by remember{mutableStateOf(false)};var confirmFinish by remember{mutableStateOf(false)};var confirmLeave by remember{mutableStateOf(false)}
     var page by remember(s.selected?.id){mutableStateOf(0)};var zoom by remember{mutableStateOf(false)}
+    var viewedFicha by remember(s.selected?.id){mutableStateOf<JsonObject?>(null)}
     var leaveHome by remember{mutableStateOf(false)}
     val returnHome=LocalReturnHome.current
     LocalSystemBack.current(true) {
@@ -93,9 +95,23 @@ import pe.indumotos.mobile.presentation.*
                         if(s.drafts.any{d->registration.borradores.none{it==d}})confirmReload=true else vm.select(arrival,canEdit)
                     },enabled=!s.busy){Text("Actualizar desde servidor")}
                     registration?.let{Text("Registradas: ${it.registradas} · Pendientes: ${it.pending} · ${if(it.terminado)"Confirmada" else "Pendiente"}")}
+                    s.detail?.let{detail->Text("Declaradas: ${detail.llegada.cantidadDeclarada} · Recibidas: ${detail.llegada.cantidadRecibida}")}
                     if(s.images.isEmpty()&&!s.busy)Text("Esta recepción no tiene fotos adjuntas.")
                     if(registration==null&&!s.busy&&can("INVENTARIO_CONSULTAR"))OutlinedButton(onClick={vm.select(arrival,canEdit)}){Text("Cargar detalle de guía")}
                     if(canEdit&&registration!=null&&!registration.terminado)OutlinedButton(onClick=vm::ocr,enabled=!s.busy&&s.images.isNotEmpty()){Text("Leer fotos con OCR")}
+                }
+                s.detail?.let{detail->
+                    item{Text("Fichas vinculadas · ${detail.cantidadFichas}",style=MaterialTheme.typography.titleMedium)}
+                    items(detail.fichas,key={it["id"]!!.jsonPrimitive.long}) { ficha->
+                        OutlinedCard(onClick={viewedFicha=JsonObject(ficha+("llegada" to Json.encodeToJsonElement(detail.llegada)))},modifier=Modifier.fillMaxWidth()) {
+                            Column(Modifier.padding(16.dp)) {
+                                Text("${ficha["marca"]?.jsonPrimitive?.content.orEmpty()} ${ficha["modelo"]?.jsonPrimitive?.content.orEmpty()}")
+                                Text(ficha["chasisCompleto"]?.jsonPrimitive?.content?:ficha["chasisVista"]?.jsonPrimitive?.content.orEmpty())
+                                Text("Abrir ficha y copiar chasis →")
+                            }
+                        }
+                    }
+                    if(detail.fichas.isEmpty())item{Text("Esta guía todavía no tiene motocicletas incorporadas al inventario.")}
                 }
                 if(canEdit&&registration!=null&&!registration.terminado) {
                     s.ocr?.let{result->item {
@@ -126,6 +142,7 @@ import pe.indumotos.mobile.presentation.*
             }
         }
     }
+    viewedFicha?.let{ficha->MotorcycleDetail(ficha,s.busy,{viewedFicha=null}){}}
     if(creating)NewArrivalDialog(s.busy,s.error,pickPhotos,{creating=false},vm::register)
     if(zoom&&s.imageBytes!=null)ZoomGuide(requireNotNull(s.imageBytes)){zoom=false}
     if(confirmReload)AlertDialog(onDismissRequest={confirmReload=false},title={Text("Recargar registro")},text={Text("Se conservarán los borradores del servidor y se descartarán los cambios locales sin guardar.")},confirmButton={TextButton(onClick={confirmReload=false;s.selected?.let{vm.select(it,canEdit)}}){Text("Recargar")}},dismissButton={TextButton(onClick={confirmReload=false}){Text("Cancelar")}})

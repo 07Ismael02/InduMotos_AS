@@ -12,7 +12,8 @@ class LogisticsViewModel(
     private val repo: LogisticsRepository,
     private val save: LogisticsUseCase,
     private val locations: LocationRepository,
-    private val catalog: CatalogRepository? = null
+    private val catalog: CatalogRepository? = null,
+    private val guides: GuideRepository? = null
 ):ViewModel(){
  private val mutableLocation = MutableStateFlow<MotorcycleLocation?>(null)
  val location = mutableLocation.asStateFlow()
@@ -26,7 +27,11 @@ class LogisticsViewModel(
  fun search(filter:InventoryFilter)=work{val chasis=filter.chasis.trim();require(chasis.isBlank()||chasis.length>=4){"Ingresa el chasis completo o los últimos cuatro dígitos"};require(chasis.length!=4||chasis.all{it.isDigit()}){"El chasis corto debe tener cuatro dígitos"};mutable.update{it.copy(filter=filter,rows=emptyList(),detail=null,page=0,pages=0,total=0)};load(0)}
  fun page(page:Int){if(page<0||page>=mutable.value.pages)return;work{load(page)}}
  fun query(id:String)=work{require(Rules.positive(id)){"Ingresa un ID válido"};val module=mutable.value.module?:return@work;mutable.update{it.copy(detail=null)};val result=repo.detail(module,id.toLong());mutable.update{it.copy(detail=result)}}
- fun inventoryDetail(id:String)=work{mutableLocation.value=null;val result=repo.detail(Module.FICHAS,id.toLong());mutable.update{it.copy(detail=result)}}
+ private suspend fun withArrival(record:JsonObject):JsonObject {
+  val id=record["llegadaId"]?.jsonPrimitive?.longOrNull
+  return if(id!=null&&guides!=null)JsonObject(record+("llegada" to Json.encodeToJsonElement(guides.detail(id).llegada)))else record
+ }
+ fun inventoryDetail(id:String)=work{mutableLocation.value=null;val result=withArrival(repo.detail(Module.FICHAS,id.toLong()));mutable.update{it.copy(detail=result)}}
  fun beginEdit()=work{require(allowed("FICHAS_EDITAR"));val options=requireNotNull(catalog).catalog();mutable.update{it.copy(editing=true,editOptions=options)}}
  fun cancelEdit(){if(!mutable.value.busy)mutable.update{it.copy(editing=false)}}
  fun updateMotorcycle(draft:MotorcycleDraft)=work {
@@ -35,6 +40,7 @@ class LogisticsViewModel(
   val body=buildJsonObject{put("marca",draft.marca);put("modelo",draft.modelo);put("color",draft.color);put("chasisCompleto",draft.chasisCompleto);put("numeroMotor",draft.numeroMotor);put("dua",draft.dua);put("itemDua",draft.itemDua)}
   val saved=repo.submit("motocicletas/$id",body,"PUT")
   mutable.update{it.copy(detail=saved,editing=false,message="Ficha actualizada y confirmada por el servidor.")}
+  if(saved!=null){val enriched=withArrival(saved);mutable.update{it.copy(detail=enriched)}}
  }
  fun closeDetail(){if(!mutable.value.busy){mutableLocation.value=null;mutable.update{it.copy(detail=null,error=null,message=null)}}}
  fun loadLocation(id: Long) {

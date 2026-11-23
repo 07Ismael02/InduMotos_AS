@@ -48,6 +48,7 @@ class GuideWorkflowTest {
         vm.save(vm.state.value.drafts.first());advanceUntilIdle();assertTrue(repo.current.borradores.isEmpty())
     }
     private inner class Fake:GuideRepository,CatalogRepository {
+        override suspend fun detail(id:Long)=ArrivalDetail(arrival,emptyList(),0,1)
         var current=GuideRegistration(false,1,0,emptyList());var finishes=0;var uploads=0;var failUpload=false;var gate:CompletableDeferred<Unit>?=null
         override suspend fun arrivals(guide:String,state:String,page:Int)=ArrivalPage(listOf(arrival),0,1,1)
         override suspend fun register(guide:String,declared:Int,received:Int,note:String,photos:List<GuidePhoto>):Arrival{uploads++;if(failUpload)throw AppException(AppError.Network);return arrival}

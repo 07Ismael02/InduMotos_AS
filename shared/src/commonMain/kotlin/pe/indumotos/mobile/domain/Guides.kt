@@ -1,11 +1,13 @@
 package pe.indumotos.mobile.domain
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonObject
 
 @Serializable data class Arrival(val id:Long,val numeroGuia:String,val fechaLlegada:String,
     val cantidadDeclarada:Int,val cantidadRecibida:Int,val receptorUsuario:String="",
     val observacion:String?=null,val estadoRegistro:String="PENDIENTE")
 @Serializable data class ArrivalPage(val items:List<Arrival>,val pagina:Int,val totalPaginas:Int,val totalElementos:Long)
+@Serializable data class ArrivalDetail(val llegada:Arrival,val fichas:List<JsonObject>,val cantidadFichas:Int,val diferenciaInformativa:Int)
 @Serializable data class GuideImage(val id:Long,val orden:Int,val nombreArchivo:String,val tipoMime:String,val tamano:Int)
 data class GuidePhoto(val name:String,val mime:String,val bytes:ByteArray)
 data class PhotoSelection(val photos:List<GuidePhoto> = emptyList(),val error:String?=null)
@@ -18,6 +20,7 @@ data class PhotoSelection(val photos:List<GuidePhoto> = emptyList(),val error:St
     val chasisCompleto:String="",val numeroMotor:String="",val dua:String="",val itemDua:String="")
 @Serializable data class OcrResult(val fotosAnalizadas:Int,val sugerencias:List<OcrSuggestion>)
 interface GuideRepository {
+    suspend fun detail(id:Long):ArrivalDetail
     suspend fun arrivals(guide:String,state:String,page:Int):ArrivalPage
     suspend fun register(guide:String,declared:Int,received:Int,note:String,photos:List<GuidePhoto>):Arrival
     suspend fun images(id:Long):List<GuideImage>

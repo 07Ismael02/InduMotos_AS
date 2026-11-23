@@ -8,7 +8,7 @@ import pe.indumotos.mobile.domain.*
 
 data class GuidesState(val busy:Boolean=false,val error:String?=null,val message:String?=null,val expired:Boolean=false,
     val page:ArrivalPage?=null,val query:String="",val filter:String="PENDIENTE",val selected:Arrival?=null,
-    val registration:GuideRegistration?=null,val drafts:List<MotorcycleDraft> = emptyList(),val options:List<CatalogOption> = emptyList(),
+    val registration:GuideRegistration?=null,val detail:ArrivalDetail?=null,val drafts:List<MotorcycleDraft> = emptyList(),val options:List<CatalogOption> = emptyList(),
     val images:List<GuideImage> = emptyList(),val imageIndex:Int=0,val imageBytes:ByteArray?=null,
     val ocr:OcrResult?=null,val ocrReviewed:Boolean=true)
 class GuidesViewModel(private val repo:GuideRepository,private val catalog:CatalogRepository):ViewModel() {
@@ -28,7 +28,7 @@ class GuidesViewModel(private val repo:GuideRepository,private val catalog:Catal
     }
     fun list(query:String="",filter:String="PENDIENTE",page:Int=0)=work {
         require(page>=0);val result=repo.arrivals(query.trim(),filter,page)
-        mutable.update{it.copy(page=result,query=query,filter=filter,selected=null,registration=null,drafts=emptyList(),images=emptyList(),imageBytes=null,ocr=null)}
+        mutable.update{it.copy(page=result,query=query,filter=filter,selected=null,registration=null,detail=null,drafts=emptyList(),images=emptyList(),imageBytes=null,ocr=null)}
     }
     fun register(guide:String,declared:Int,received:Int,note:String,photos:List<GuidePhoto>)=work(true) {
         GuideRules.arrival(guide,declared,received,photos);require(note.length<=1000)
@@ -37,12 +37,13 @@ class GuidesViewModel(private val repo:GuideRepository,private val catalog:Catal
         mutable.update{it.copy(selected=saved,registration=null,images=emptyList(),imageBytes=null,message="Guía ${saved.numeroGuia} registrada.")}
     }
     fun select(arrival:Arrival,editing:Boolean)=work {
-        mutable.update{it.copy(selected=arrival,registration=null,drafts=emptyList(),images=emptyList(),imageBytes=null,ocr=null)}
+        mutable.update{it.copy(selected=arrival,registration=null,detail=null,drafts=emptyList(),images=emptyList(),imageBytes=null,ocr=null)}
+        val detail=repo.detail(arrival.id)
         val registration=repo.registration(arrival.id)
         val images=repo.images(arrival.id)
         val options=if(editing)catalog.catalog() else emptyList()
         val drafts=(1..registration.pending).map{position->registration.borradores.firstOrNull{it.posicion==position}?:MotorcycleDraft(position)}
-        mutable.update{it.copy(registration=registration,drafts=drafts,images=images,options=options,imageIndex=0,ocrReviewed=true)}
+        mutable.update{it.copy(registration=registration,detail=detail,drafts=drafts,images=images,options=options,imageIndex=0,ocrReviewed=true)}
         if(images.isNotEmpty()){val bytes=repo.image(arrival.id,images.first().id);mutable.update{it.copy(imageBytes=bytes)}}
     }
     fun image(index:Int)=work {
@@ -61,6 +62,7 @@ class GuidesViewModel(private val repo:GuideRepository,private val catalog:Catal
         val s=mutable.value;require(s.ocrReviewed&&GuideRules.canFinish(requireNotNull(s.registration),s.drafts)){"Guarda todos los bloques y revisa los datos antes de finalizar."}
         val result=repo.finish(requireNotNull(s.selected).id)
         mutable.update{it.copy(registration=result,drafts=emptyList(),selected=it.selected?.copy(estadoRegistro="CONFIRMADA"),message="Registro finalizado. La guía queda confirmada.")}
+        val detail=repo.detail(requireNotNull(s.selected).id);mutable.update{it.copy(detail=detail)}
     }
     fun ocr()=work {
         val suggestions=repo.ocr(requireNotNull(mutable.value.selected).id)
