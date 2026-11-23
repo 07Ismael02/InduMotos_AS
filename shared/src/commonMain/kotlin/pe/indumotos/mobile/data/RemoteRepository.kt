@@ -3,6 +3,8 @@ import pe.indumotos.mobile.domain.*
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import io.ktor.client.call.body
+import io.ktor.client.request.forms.*
 import io.ktor.http.*
 import kotlinx.serialization.json.*
 import kotlinx.serialization.encodeToString
@@ -13,6 +15,9 @@ class RemoteRepository(private val http:HttpClient):LogisticsRepository, Locatio
  private var base="";private var token=""
  private suspend fun request(path:String,body:String?=null,method:String="GET",params:Map<String,String> = emptyMap()):String{
   val response=try{http.request(base+path){this.method=HttpMethod.parse(method);contentType(ContentType.Application.Json);if(token.isNotEmpty())bearerAuth(token);params.forEach{(k,v)->parameter(k,v)};if(body!=null)setBody(body)}}catch(e:CancellationException){throw e}catch(e:Exception){throw AppException(AppError.Network)}
+  return checkedText(response)
+ }
+ private suspend fun checkedText(response:HttpResponse):String{
   val text=response.bodyAsText()
   if(response.status.value !in 200..299){
    if(response.status.value==401)token=""
@@ -20,6 +25,19 @@ class RemoteRepository(private val http:HttpClient):LogisticsRepository, Locatio
    val fields=runCatching{json.parseToJsonElement(text).jsonObject["errores"]?.jsonObject?.mapValues{it.value.jsonPrimitive.content}}.getOrNull().orEmpty()
    throw AppException(apiError(response.status.value,message,fields))
   };return text
+ }
+ internal suspend fun guideJson(path:String,body:String?=null,method:String="GET",params:Map<String,String> = emptyMap()):String=request(path,body,method,params)
+ internal suspend fun guideBytes(path:String):ByteArray {
+  val response=try{http.get(base+path){bearerAuth(token)}}catch(e:CancellationException){throw e}catch(e:Exception){throw AppException(AppError.Network)}
+  if(response.status.value !in 200..299)checkedText(response)
+  return response.body()
+ }
+ internal suspend fun uploadGuide(guide:String,declared:Int,received:Int,note:String,photos:List<GuidePhoto>):String {
+  val response=try{http.submitFormWithBinaryData(url=base+"llegadas/con-guia",formData=formData {
+   append("numeroGuia",guide);append("cantidadDeclarada",declared.toString());append("cantidadRecibida",received.toString());append("observacion",note)
+   photos.forEachIndexed { i,photo->append("imagenes",photo.bytes,Headers.build { append(HttpHeaders.ContentType,photo.mime);append(HttpHeaders.ContentDisposition,"filename=guia-${i+1}."+if(photo.mime=="image/png")"png" else "jpg") }) }
+  }){bearerAuth(token)}}catch(e:CancellationException){throw e}catch(e:Exception){throw AppException(AppError.Network)}
+  return checkedText(response)
  }
  override suspend fun login(baseUrl:String,user:String,password:String):Access{
   require(Rules.server(baseUrl)){"Ingresa una dirección HTTP o HTTPS"};base=baseUrl.trim().trimEnd('/')+"/api/v1/";token=""

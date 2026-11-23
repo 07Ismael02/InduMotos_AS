@@ -52,6 +52,7 @@ private fun createForm(module:Module):Form=when(module){
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable fun App(
     backendUrl: String = "http://127.0.0.1:8089",
+    pickGuidePhotos: ((PhotoSelection)->Unit)->Unit = { it(PhotoSelection(error="Selección de fotos no disponible en esta plataforma.")) },
     initialTheme: Appearance = Appearance.SYSTEM,
     onAppearanceChanged: (Appearance) -> Unit = {},
     onDarkTheme: (Boolean) -> Unit = {}
@@ -66,7 +67,7 @@ private fun createForm(module:Module):Form=when(module){
  LaunchedEffect(darkTheme) { onDarkTheme(darkTheme) }
  IndumotosTheme(darkTheme = darkTheme){
   Surface(Modifier.fillMaxSize(),color=MaterialTheme.colorScheme.background){
-   if(state.access==null)Login(state,vm,backendUrl)else Workspace(state,vm,appearance) {
+   if(state.access==null)Login(state,vm,backendUrl)else Workspace(state,vm,appearance,pickGuidePhotos) {
        appearance = it
        onAppearanceChanged(it)
    }
@@ -76,7 +77,7 @@ private fun createForm(module:Module):Form=when(module){
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Composable private fun Workspace(state:UiState,vm:LogisticsViewModel,appearance: Appearance,onAppearanceChanged: (Appearance) -> Unit){
+@Composable private fun Workspace(state:UiState,vm:LogisticsViewModel,appearance: Appearance,pickGuidePhotos: ((PhotoSelection)->Unit)->Unit,onAppearanceChanged: (Appearance) -> Unit){
  var showSettings by remember { mutableStateOf(false) }
  var showAccount by remember { mutableStateOf(false) }
  var showProfile by remember { mutableStateOf(false) }
@@ -94,12 +95,13 @@ private fun createForm(module:Module):Form=when(module){
  }}){
   Scaffold(containerColor=MaterialTheme.colorScheme.background,topBar={TopAppBar(title={Column{Text(state.module?.title?:"Inicio",fontSize=18.sp,fontWeight=FontWeight.SemiBold);Text("INDUMOTOS",fontSize=10.sp,letterSpacing=2.sp,color=Muted)}},navigationIcon={IconButton(onClick={scope.launch{drawer.open()}}){Icon(Icons.Default.Menu,"Abrir menú de navegación")}},colors=TopAppBarDefaults.topAppBarColors(containerColor=MaterialTheme.colorScheme.surface))},floatingActionButton={
    val m=state.module;val permission=if(m==Module.INVENTORY)"FICHAS_REGISTRAR" else m?.permission
-   if(m!=null&&m!=Module.CATALOG&&m!=Module.PERMISSIONS&&m!=Module.REQUESTS&&m!=Module.TRANSFERS&&permission!=null&&vm.allowed(permission))ExtendedFloatingActionButton(onClick={vm.form(createForm(m))},expanded=true,icon={Icon(Icons.Default.Add,null)},text={Text(if(m==Module.INVENTORY||m==Module.FICHAS)"Nueva ficha"else if(m==Module.ARRIVALS)"Nueva llegada"else"Nueva cuenta")},containerColor=Yellow,contentColor=Ink)
+   if(m==Module.USERS&&vm.allowed("USUARIOS_CREAR"))ExtendedFloatingActionButton(onClick={vm.form(createForm(m))},icon={Icon(Icons.Default.Add,null)},text={Text("Nueva cuenta")})
+   if(m==Module.INVENTORY&&vm.allowed("FICHAS_REGISTRAR"))ExtendedFloatingActionButton(onClick={vm.open(Module.FICHAS)},icon={Icon(Icons.Default.Add,null)},text={Text("Registrar desde guía")})
   }){padding->
    Column(Modifier.padding(padding).fillMaxSize()){
     if(state.busy)LinearProgressIndicator(Modifier.fillMaxWidth(),color=Blue)
     state.error?.let{Notice(it,true)};state.message?.let{Notice(it,false)}
-    when(state.module){null->Home(state,vm);Module.INVENTORY,Module.FICHAS->Inventory(state,vm);Module.CATALOG->CatalogScreen(account,vm::expireSession);Module.REQUESTS->RequestsScreen(account,vm::expireSession);Module.TRANSFERS->TransfersScreen(account,vm::expireSession);else->QueryScreen(state,vm)}
+    when(state.module){null->Home(state,vm);Module.INVENTORY->Inventory(state,vm);Module.FICHAS->GuidesScreen(account,true,pickGuidePhotos,vm::expireSession);Module.ARRIVALS->GuidesScreen(account,false,pickGuidePhotos,vm::expireSession);Module.CATALOG->CatalogScreen(account,vm::expireSession);Module.REQUESTS->RequestsScreen(account,vm::expireSession);Module.TRANSFERS->TransfersScreen(account,vm::expireSession);else->QueryScreen(state,vm)}
    }
   }
  }
@@ -118,6 +120,7 @@ private fun createForm(module:Module):Form=when(module){
      val location by vm.location.collectAsState()
      val id = record.text("id").toLongOrNull()
      MotorcycleDetail(record, state.busy, vm::closeDetail) {
+         if(vm.allowed("FICHAS_EDITAR"))OutlinedButton(onClick=vm::beginEdit,enabled=!state.busy){Text("Editar ficha")}
          if (id != null && vm.allowed(READ_LOCATIONS)) {
              LocationSection(
                  location, vm.allowed(WRITE_LOCATION), state.busy, state.error, state.message,
@@ -126,6 +129,7 @@ private fun createForm(module:Module):Form=when(module){
              )
          }
      }
+     if(state.editing)EditMotorcycleDialog(record,state.editOptions,state.busy,state.error,vm::cancelEdit,vm::updateMotorcycle)
  }
 }
 

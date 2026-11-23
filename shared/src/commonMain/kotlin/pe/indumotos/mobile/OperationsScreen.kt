@@ -59,7 +59,7 @@ private fun Access.permits(code: String) = permisos.any { it.codigo==code && it.
                             Text("Solicitud #${request.id}",fontWeight=FontWeight.SemiBold)
                             Text(statusLabel(request.estado),color=MaterialTheme.colorScheme.secondary)
                             Text("${request.lineas.size} líneas · ${request.lineas.sumOf { it.cantidad }} unidades",fontSize=13.sp)
-                            Text("Por ${request.solicitante} · Destino #${request.destinoId}",fontSize=12.sp)
+                            Text("Por ${request.solicitante} · ${request.destinoNombre.ifBlank { "Destino #${request.destinoId}" }}",fontSize=12.sp)
                             Text("Ver detalle →",fontSize=12.sp)
                         }
                     }
@@ -75,7 +75,7 @@ private fun Access.permits(code: String) = permisos.any { it.codigo==code && it.
                     OperationMessages(state)
                     Text("Solicitud #${selected.id}",fontSize=25.sp,fontWeight=FontWeight.Bold)
                     Text(statusLabel(selected.estado),color=MaterialTheme.colorScheme.secondary)
-                    Text("Solicitante: ${selected.solicitante}\nDestino: #${selected.destinoId}\nCreada: ${selected.creadaEn}",fontSize=12.sp)
+                    Text("Solicitante: ${selected.solicitante}\nDestino: ${selected.destinoNombre.ifBlank { "#${selected.destinoId}" }}\nCreada: ${selected.creadaEn}",fontSize=12.sp)
                     selected.observacion?.takeIf{it.isNotBlank()}?.let{Text(it)}
                     OutlinedButton(onClick={vm.select(selected.id)},enabled=!state.busy){Text("Actualizar detalle")}
                     if(account.permits(ADVANCE_REQUESTS)) OperationRules.transitions(selected.estado).forEach { next ->

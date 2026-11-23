@@ -12,7 +12,7 @@ const val TRANSFER_UNITS = "TRASLADOS_REGISTRAR"
 @Serializable data class RequestLine(val id: Long = 0, val marca: String, val modelo: String, val color: String, val cantidad: Int)
 @Serializable data class NewRequestLine(val marca: String, val modelo: String, val color: String, val cantidad: Int)
 @Serializable data class NewRequest(val destinoId: Long, val observacion: String, val lineas: List<NewRequestLine>)
-@Serializable data class AssemblyRequest(val id: Long, val solicitante: String, val destinoId: Long, val creadaEn: String, val observacion: String? = null, val estado: String, val lineas: List<RequestLine>)
+@Serializable data class AssemblyRequest(val id: Long, val solicitante: String, val destinoId: Long, val creadaEn: String, val observacion: String? = null, val estado: String, val lineas: List<RequestLine>, val destinoNombre: String = "")
 @Serializable data class RequestEvent(val id: Long, val estado: String, val registrador: String, val fecha: String, val motivo: String? = null)
 @Serializable data class AssignedUnit(val asociacionId: Long, val motocicletaId: Long, val chasis: String, val asignador: String, val fecha: String)
 @Serializable data class EligibleUnit(val motocicletaId: Long, val chasis: String, val marca: String, val modelo: String, val color: String)
