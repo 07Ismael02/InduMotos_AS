@@ -1,0 +1,15 @@
+{
+  "fecha": "2026-11-23T18:29:02-05:00",
+  "versionName": "0.2.3-sprint2",
+  "versionCode": 5,
+  "applicationId": "pe.indumotos.asapp",
+  "commitCodigo": "dcf0a1071aa1404210b96cc6c496d30690b31785",
+  "sha256": "08f079c4bf86ea1b7f1c745cb3a0701c89a74076cf76b0da8136dee03234c61d",
+  "bytes": 23350692,
+  "tipo": "Debug",
+  "certificadoSha256": "23c1a0373560f28c3d2b64103e50a0dff54bb955fd75b20ac40d52253e33b0f0",
+  "compilacion": "BUILD SUCCESSFUL",
+  "instalacion": "adb install -r: Success; misma firma; sin limpiar datos",
+  "validacionFisica": "Pendiente del login manual para comprobar nuevo layout y navegacion",
+  "rutaLocal": "C:\\Users\\Ismael Logacho\\Documents\\PharmaMobil\\proyecto-final-dam\\InduMotos-Sprint2\\entrega\\Indumotos-AS-0.2.3-sprint2-debug.apk"
+}

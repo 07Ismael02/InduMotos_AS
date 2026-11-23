@@ -1,0 +1,36 @@
+{
+  "fecha": "2026-11-23T18:24:50-05:00",
+  "alcance": "Salud y rechazo sin token. No acredita recorridos autenticados ni equivalencia funcional completa.",
+  "casos": [
+    {
+      "ruta": "/api/health",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "ruta": "/api/v1/catalogo-motocicletas",
+      "esperado": 401,
+      "obtenido": 401,
+      "aprobado": true
+    },
+    {
+      "ruta": "/api/v1/llegadas/pagina?estado=PENDIENTE&pagina=0",
+      "esperado": 401,
+      "obtenido": 401,
+      "aprobado": true
+    },
+    {
+      "ruta": "/api/v1/motocicletas?pagina=0",
+      "esperado": 401,
+      "obtenido": 401,
+      "aprobado": true
+    },
+    {
+      "ruta": "/api/v1/solicitudes",
+      "esperado": 401,
+      "obtenido": 401,
+      "aprobado": true
+    }
+  ]
+}
