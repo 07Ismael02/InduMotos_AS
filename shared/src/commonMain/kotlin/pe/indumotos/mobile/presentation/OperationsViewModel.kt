@@ -22,7 +22,7 @@ data class OperationsState(
     val eligible: List<EligibleUnit> = emptyList(), val movements: List<TransferRecord> = emptyList()
 )
 
-class OperationsViewModel(private val repo: OperationsRepository, private val locations: LocationRepository, private val inventory: LogisticsRepository? = null) : ViewModel() {
+class OperationsViewModel(private val repo: OperationsRepository, private val locations: LocationRepository, private val inventory: LogisticsRepository? = null, private val catalog: CatalogRepository? = null) : ViewModel() {
     private val mutable = MutableStateFlow(OperationsState())
     val state = mutable.asStateFlow()
     private var job: Job? = null
@@ -49,16 +49,13 @@ class OperationsViewModel(private val repo: OperationsRepository, private val lo
     fun prepareRequest() = work {
         val sites=locations.sites()
         mutable.update { it.copy(sites=sites, catalog=emptyList()) }
-        val source=inventory ?: return@work
-        val catalog=mutableListOf<JsonObject>()
-        var page=0
-        do {
-            val result=source.inventory(InventoryFilter(),page)
-            catalog.addAll(result.items)
-            page++
-        } while(page<result.totalPaginas)
-        mutable.update { it.copy(catalog=catalog) }
+        val source=catalog ?: error("Catálogo no disponible")
+        val options=source.requestOptions().map { kotlinx.serialization.json.buildJsonObject {
+            put("marca",kotlinx.serialization.json.JsonPrimitive(it.marca));put("modelo",kotlinx.serialization.json.JsonPrimitive(it.modelo));put("color",kotlinx.serialization.json.JsonPrimitive(it.color))
+        } }
+        mutable.update { it.copy(catalog=options) }
     }
+
     private suspend fun refresh(id: Long) {
         val request=repo.request(id)
         val events=repo.events(id)

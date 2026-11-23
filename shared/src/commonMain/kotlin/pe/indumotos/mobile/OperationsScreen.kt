@@ -149,7 +149,7 @@ private data class DraftLine(val key: Int,val brand: String="",val model: String
     AlertDialog(onDismissRequest={if(!busy)close()},title={Text("Nueva solicitud")},text={
         Column(Modifier.verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(10.dp)) {
             SitePicker(sites,destination,{destination=it},busy)
-            Text("Opciones del inventario. Si falta una, usa entrada manual.",fontSize=12.sp)
+            Text("Selecciona las combinaciones del catálogo administrado por la empresa.",fontSize=12.sp)
             if(sites.isEmpty())Text("No hay sedes disponibles. Registra una sede válida o revisa tu permiso de consulta.",fontSize=12.sp)
             lines.forEachIndexed { index,line ->
                 key(line.key) {
@@ -174,10 +174,8 @@ private data class DraftLine(val key: Int,val brand: String="",val model: String
 
 @Composable private fun CatalogPicker(label: String,value: String,options: List<String>,busy: Boolean,change:(String)->Unit) {
     var expanded by remember { mutableStateOf(false) }
-    var manual by remember { mutableStateOf(false) }
     Column {
-        if(manual) OutlinedTextField(value,{if(it.length<=120)change(it)},label={Text(label)},singleLine=true,enabled=!busy,modifier=Modifier.fillMaxWidth())
-        else Box {
+        Box {
             OutlinedCard(onClick={expanded=true},enabled=!busy,modifier=Modifier.fillMaxWidth()) {
                 Row(Modifier.fillMaxWidth().padding(16.dp),horizontalArrangement=Arrangement.SpaceBetween) {
                     Column(Modifier.weight(1f)) { Text(label,fontSize=12.sp);Text(value.ifBlank { "Seleccionar" }) }
@@ -187,10 +185,8 @@ private data class DraftLine(val key: Int,val brand: String="",val model: String
             DropdownMenu(expanded&&!busy,{expanded=false},modifier=Modifier.heightIn(max=280.dp)) {
                 options.forEach { option -> DropdownMenuItem(text={Text(option)},onClick={change(option);expanded=false}) }
                 if(options.isEmpty()) DropdownMenuItem(text={Text("Sin opciones registradas")},onClick={},enabled=false)
-                DropdownMenuItem(text={Text("Ingresar otra opción…")},onClick={manual=true;expanded=false;change("")})
             }
         }
-        if(manual) TextButton(onClick={manual=false;change("")},enabled=!busy){Text("Elegir de la lista")}
     }
 }
 

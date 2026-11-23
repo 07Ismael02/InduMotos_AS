@@ -8,7 +8,7 @@ import kotlinx.serialization.json.*
 import kotlinx.serialization.encodeToString
 import kotlinx.coroutines.CancellationException
 
-class RemoteRepository(private val http:HttpClient):LogisticsRepository, LocationRepository, OperationsRepository{
+class RemoteRepository(private val http:HttpClient):LogisticsRepository, LocationRepository, OperationsRepository, CatalogRepository{
  private val json=Json{ignoreUnknownKeys=true;encodeDefaults=true}
  private var base="";private var token=""
  private suspend fun request(path:String,body:String?=null,method:String="GET",params:Map<String,String> = emptyMap()):String{
@@ -26,7 +26,7 @@ class RemoteRepository(private val http:HttpClient):LogisticsRepository, Locatio
   val auth=json.decodeFromString<LoginResponse>(request("auth/login",json.encodeToString(LoginRequest(user.trim(),password)),"POST"));token=auth.accessToken
   try{return json.decodeFromString<Access>(request("auth/me"))}catch(e:CancellationException){token="";throw e}catch(e:Exception){token="";throw e}
  }
- override suspend fun arrivals(guide:String):List<JsonObject> = json.decodeFromString(request("llegadas",params=mapOf("guia" to guide.trim(),"limite" to "20")))
+ override suspend fun arrivals(guide:String):List<JsonObject> = json.decodeFromString(request("llegadas",params=mapOf("numeroGuia" to guide.trim())))
  override suspend fun inventory(filter:InventoryFilter,page:Int):InventoryPage = json.decodeFromString(request("motocicletas",params=mapOf("chasis" to filter.chasis,"marca" to filter.marca,"modelo" to filter.modelo,"color" to filter.color,"pagina" to page.toString(),"tamano" to "20").filterValues{it.isNotBlank()}))
  override suspend fun detail(module:Module,id:Long):JsonObject{
   val path=when(module){Module.ARRIVALS->"llegadas/$id/detalle";Module.PERMISSIONS->"usuarios/$id/permisos";else->"motocicletas/$id"}
@@ -57,6 +57,9 @@ class RemoteRepository(private val http:HttpClient):LogisticsRepository, Locatio
      return json.decodeFromString(response)
  }
 
+ override suspend fun catalog():List<CatalogOption> = json.decodeFromString(request("catalogo-motocicletas"))
+ override suspend fun requestOptions():List<CatalogOption> = json.decodeFromString(request("solicitudes/opciones-motocicleta"))
+ override suspend fun addCatalog(option:CatalogOption):CatalogOption = json.decodeFromString(request("catalogo-motocicletas",json.encodeToString(option),"POST"))
  override suspend fun requests(page: Int): List<AssemblyRequest> = json.decodeFromString(request("solicitudes",params=mapOf("pagina" to page.toString(),"tamano" to "20")))
  override suspend fun request(id: Long): AssemblyRequest = json.decodeFromString(request("solicitudes/$id"))
  override suspend fun createRequest(body: NewRequest): AssemblyRequest = json.decodeFromString(request("solicitudes",json.encodeToString(body),"POST"))

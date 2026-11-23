@@ -14,8 +14,10 @@ val appModule = module {
     single { RemoteRepository(get()) }
     single<LogisticsRepository> { get<RemoteRepository>() }
     single<LocationRepository> { get<RemoteRepository>() }
+    single<CatalogRepository> { get<RemoteRepository>() }
+    viewModel { pe.indumotos.mobile.presentation.CatalogViewModel(get()) }
     single<OperationsRepository> { get<RemoteRepository>() }
-    viewModel { OperationsViewModel(get(), get(), get()) }
+    viewModel { OperationsViewModel(get(), get(), get(), get()) }
     factory { LogisticsUseCase(get()) }
     viewModel { LogisticsViewModel(get(), get(), get()) }
 }
