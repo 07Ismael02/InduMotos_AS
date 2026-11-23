@@ -27,11 +27,19 @@ import pe.indumotos.mobile.presentation.*
     var query by remember{mutableStateOf("")};var creating by remember{mutableStateOf(false)}
     var confirmReload by remember{mutableStateOf(false)};var confirmFinish by remember{mutableStateOf(false)};var confirmLeave by remember{mutableStateOf(false)}
     var page by remember(s.selected?.id){mutableStateOf(0)};var zoom by remember{mutableStateOf(false)}
+    var leaveHome by remember{mutableStateOf(false)}
+    val returnHome=LocalReturnHome.current
+    LocalSystemBack.current(true) {
+        if(!s.busy) {
+            if(s.registration?.let{r->s.drafts.any{d->r.borradores.none{it==d}}}==true){leaveHome=true;confirmLeave=true}
+            else returnHome()
+        }
+    }
     DisposableEffect(account.usuarioId,editing){onDispose{vm.reset()}}
     LaunchedEffect(account.usuarioId,editing){vm.reset();if(can("INVENTARIO_CONSULTAR"))vm.list()}
     LaunchedEffect(s.expired){if(s.expired)expired()}
     LaunchedEffect(s.selected?.id){if(s.selected!=null)creating=false}
-    fun leave(){if(s.registration?.let{r->s.drafts.any{d->r.borradores.none{it==d}}}==true)confirmLeave=true else vm.list(s.query,s.filter)}
+    fun leave(){leaveHome=false;if(s.registration?.let{r->s.drafts.any{d->r.borradores.none{it==d}}}==true)confirmLeave=true else vm.list(s.query,s.filter)}
     Column(Modifier.fillMaxSize()) {
         if(s.selected!=null)OutlinedButton(onClick={leave()},enabled=!s.busy,modifier=Modifier.fillMaxWidth().padding(horizontal=16.dp)){Text("← Volver a guías")}
         if(s.busy)LinearProgressIndicator(Modifier.fillMaxWidth())
@@ -122,7 +130,7 @@ import pe.indumotos.mobile.presentation.*
     if(zoom&&s.imageBytes!=null)ZoomGuide(requireNotNull(s.imageBytes)){zoom=false}
     if(confirmReload)AlertDialog(onDismissRequest={confirmReload=false},title={Text("Recargar registro")},text={Text("Se conservarán los borradores del servidor y se descartarán los cambios locales sin guardar.")},confirmButton={TextButton(onClick={confirmReload=false;s.selected?.let{vm.select(it,canEdit)}}){Text("Recargar")}},dismissButton={TextButton(onClick={confirmReload=false}){Text("Cancelar")}})
     if(confirmFinish)AlertDialog(onDismissRequest={confirmFinish=false},title={Text("Finalizar registro")},text={Text("Se incorporarán las motocicletas guardadas y la guía quedará confirmada. Verifica los datos y las cantidades antes de continuar.")},confirmButton={Button(onClick={confirmFinish=false;vm.finish()},enabled=!s.busy){Text("Finalizar")}},dismissButton={TextButton(onClick={confirmFinish=false}){Text("Cancelar")}})
-    if(confirmLeave)AlertDialog(onDismissRequest={confirmLeave=false},title={Text("Cambios sin guardar")},text={Text("Hay bloques editados que aún no están guardados en el servidor. ¿Deseas salir y descartar esos cambios locales?")},confirmButton={TextButton(onClick={confirmLeave=false;vm.list(s.query,s.filter)}){Text("Descartar y volver")}},dismissButton={TextButton(onClick={confirmLeave=false}){Text("Seguir editando")}})
+    if(confirmLeave)AlertDialog(onDismissRequest={confirmLeave=false},title={Text("Cambios sin guardar")},text={Text("Hay bloques editados que aún no están guardados en el servidor. ¿Deseas salir y descartar esos cambios locales?")},confirmButton={TextButton(onClick={confirmLeave=false;if(leaveHome)returnHome() else vm.list(s.query,s.filter)}){Text("Descartar y volver")}},dismissButton={TextButton(onClick={confirmLeave=false}){Text("Seguir editando")}})
 }
 
 @Composable internal fun ChoiceField(label:String,value:String,options:List<String>,enabled:Boolean,change:(String)->Unit) {

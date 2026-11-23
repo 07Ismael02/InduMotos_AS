@@ -6,6 +6,8 @@ import android.view.View
 import android.view.WindowInsetsController
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.compose.BackHandler
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
@@ -57,7 +59,10 @@ class MainActivity : ComponentActivity() {
                 pickGuidePhotos = ::selectPhotos,
                 initialTheme = appearance,
                 onAppearanceChanged = { settings.edit().putString("theme", it.name).apply() },
-                onDarkTheme = { dark -> window.decorView.post { updateSystemBars(dark) } }
+                onDarkTheme = { dark -> window.decorView.post { updateSystemBars(dark) } },
+                installSystemBack = { enabled, handler -> BackHandler(enabled,handler) },
+                onExitHint = { Toast.makeText(this,"Pulsa Atrás otra vez para salir",Toast.LENGTH_SHORT).show() },
+                onExitRequested = { finish() }
             )
         }
     }

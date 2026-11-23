@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.koin.compose.viewmodel.koinViewModel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import kotlinx.serialization.json.*
 import pe.indumotos.mobile.domain.*
 import pe.indumotos.mobile.presentation.*
@@ -55,9 +56,22 @@ private fun createForm(module:Module):Form=when(module){
     pickGuidePhotos: ((PhotoSelection)->Unit)->Unit = { it(PhotoSelection(error="Selección de fotos no disponible en esta plataforma.")) },
     initialTheme: Appearance = Appearance.SYSTEM,
     onAppearanceChanged: (Appearance) -> Unit = {},
-    onDarkTheme: (Boolean) -> Unit = {}
+    onDarkTheme: (Boolean) -> Unit = {},
+    installSystemBack: SystemBackInstaller = { _, _ -> },
+    onExitHint: () -> Unit = {},
+    onExitRequested: () -> Unit = {}
 ){
  val vm:LogisticsViewModel=koinViewModel();val state by vm.state.collectAsState()
+ var exitArmed by remember{mutableStateOf(false)}
+ LaunchedEffect(state.module,state.access?.usuarioId){exitArmed=false}
+ LaunchedEffect(exitArmed){if(exitArmed){delay(2000);exitArmed=false}}
+ installSystemBack(true) {
+     if(!state.busy) {
+         if(state.module!=null){exitArmed=false;vm.open(null)}
+         else if(exitArmed){exitArmed=false;onExitRequested()}
+         else {exitArmed=true;onExitHint()}
+     }
+ }
  var appearance by remember { mutableStateOf(initialTheme) }
  val darkTheme = when (appearance) {
      Appearance.SYSTEM -> isSystemInDarkTheme()
@@ -66,12 +80,14 @@ private fun createForm(module:Module):Form=when(module){
  }
  LaunchedEffect(darkTheme) { onDarkTheme(darkTheme) }
  IndumotosTheme(darkTheme = darkTheme){
+  CompositionLocalProvider(LocalSystemBack provides installSystemBack,LocalReturnHome provides {vm.open(null)}) {
   Surface(Modifier.fillMaxSize(),color=MaterialTheme.colorScheme.background){
    if(state.access==null)Login(state,vm,backendUrl)else Workspace(state,vm,appearance,pickGuidePhotos) {
        appearance = it
        onAppearanceChanged(it)
    }
    state.form?.let{form->FormDialog(form,state.busy,state.error,{vm.form(null)},vm::submit)}
+  }
   }
  }
 }
@@ -105,6 +121,7 @@ private fun createForm(module:Module):Form=when(module){
    }
   }
  }
+ LocalSystemBack.current(drawer.isOpen){scope.launch{drawer.close()}}
  if (showSettings) AppearanceSettings(appearance, onAppearanceChanged) { showSettings = false }
  if (showAccount) AccountMenu(
      account = account,
