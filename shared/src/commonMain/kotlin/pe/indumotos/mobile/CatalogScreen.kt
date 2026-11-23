@@ -31,9 +31,19 @@ import pe.indumotos.mobile.presentation.CatalogViewModel
         if(account.rolCodigo=="ADMIN" && account.permisos.any{it.codigo==MANAGE_CATALOG&&it.permitido}) item {
             OutlinedCard { Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(10.dp)) {
                 Text("Agregar marca, modelo y color",fontWeight=FontWeight.SemiBold)
-                OutlinedTextField(brand,{if(it.length<=120){brand=it;model=""}},label={Text("Marca")},enabled=!state.busy)
-                OutlinedTextField(model,{if(it.length<=120)model=it},label={Text("Modelo")},enabled=!state.busy)
-                OutlinedTextField(color,{if(it.length<=120)color=it},label={Text("Color")},enabled=!state.busy)
+                Text("Selecciona información existente o usa Añadir para registrar un valor nuevo.",style=MaterialTheme.typography.bodySmall)
+                CatalogValue("Marca",brand,state.options.brands(),!state.busy) {
+                    if(brand!=it){brand=it;model="";color=""}
+                }
+                key(brand) {
+                    CatalogValue("Modelo",model,state.options.models(brand),!state.busy&&brand.isNotBlank()) {
+                        if(model!=it){model=it;color=""}
+                    }
+                }
+                key(brand,model) {
+                    // En administración se puede reutilizar un color existente para una combinación nueva.
+                    CatalogValue("Color",color,state.options.map{it.color}.distinct().sorted(),!state.busy&&brand.isNotBlank()&&model.isNotBlank()) {color=it}
+                }
                 Button(onClick={vm.add(brand,model,color)},enabled=!state.busy&&listOf(brand,model,color).all{it.isNotBlank()}){Text("Agregar combinación")}
             } }
         }
@@ -44,5 +54,28 @@ import pe.indumotos.mobile.presentation.CatalogViewModel
             } }
         } }
         if(!state.busy&&state.options.isEmpty())item{Text("No hay combinaciones disponibles en el catálogo.")}
+    }
+}
+
+@Composable private fun CatalogValue(label:String,value:String,options:List<String>,enabled:Boolean,change:(String)->Unit) {
+    var expanded by remember{mutableStateOf(false)}
+    var writing by remember{mutableStateOf(false)}
+    Column(verticalArrangement=Arrangement.spacedBy(4.dp)) {
+        if(writing) {
+            OutlinedTextField(value,{if(it.length<=120)change(it)},label={Text("$label nuevo")},
+                singleLine=true,enabled=enabled,modifier=Modifier.fillMaxWidth())
+            TextButton(onClick={writing=false;change("")},enabled=enabled){Text("Elegir de la lista")}
+        } else {
+            Box {
+                OutlinedButton(onClick={expanded=true},enabled=enabled,modifier=Modifier.fillMaxWidth()) {
+                    Text("$label: ${value.ifBlank{"Seleccionar ▾"}}")
+                }
+                DropdownMenu(expanded&&enabled,onDismissRequest={expanded=false},modifier=Modifier.heightIn(max=280.dp)) {
+                    options.forEach{option->DropdownMenuItem(text={Text(option)},onClick={expanded=false;change(option)})}
+                    HorizontalDivider()
+                    DropdownMenuItem(text={Text("+ Añadir ${label.lowercase()}")},onClick={expanded=false;writing=true;change("")})
+                }
+            }
+        }
     }
 }
