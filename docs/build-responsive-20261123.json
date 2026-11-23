@@ -10,6 +10,7 @@
   "certificadoSha256": "23c1a0373560f28c3d2b64103e50a0dff54bb955fd75b20ac40d52253e33b0f0",
   "compilacion": "BUILD SUCCESSFUL",
   "instalacion": "adb install -r: Success; misma firma; sin limpiar datos",
-  "validacionFisica": "Pendiente del login manual para comprobar nuevo layout y navegacion",
-  "rutaLocal": "C:\\Users\\Ismael Logacho\\Documents\\PharmaMobil\\proyecto-final-dam\\InduMotos-Sprint2\\entrega\\Indumotos-AS-0.2.3-sprint2-debug.apk"
+  "validacionFisica": "9 comprobaciones de seleccion/navegacion aprobadas en Samsung; diseno observado en vertical/tema oscuro. Pendiente horizontal, texto ampliado, confirmaciones de cambios sin guardar y flujos por rol.",
+  "rutaLocal": "C:\\Users\\Ismael Logacho\\Documents\\PharmaMobil\\proyecto-final-dam\\InduMotos-Sprint2\\entrega\\Indumotos-AS-0.2.3-sprint2-debug.apk",
+  "evidencias": "docs/evidencias/paridad-20261123"
 }

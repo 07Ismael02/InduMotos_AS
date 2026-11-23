@@ -10,6 +10,12 @@
 
 ## Resultados comprobados y alcance
 
+Actualización 18:32 (Lima): APK 0.2.3 compilado, firma comprobada e instalado -r sin limpiar datos. Después del login manual del usuario se ejecutaron nueve comprobaciones de selección/navegación en Samsung: marca habilita modelo manteniendo color bloqueado; modelo habilita color; selección Honda/Wave/Rojo sin guardar; Atrás desde Catálogo vuelve a Inicio; menú mantiene Activity y cierra hacia Inicio; primera pulsación muestra aviso sin salir; una pulsación después del intervalo no sale; segunda dentro del intervalo sí sale. Se reabrió la app, quedando en login.
+
+Informe y capturas originales revisadas: [evidencias](evidencias/paridad-20261123/resultado-ux-023.json), [Catálogo](evidencias/paridad-20261123/catalogo-023.png), [aviso de salida](evidencias/paridad-20261123/aviso-salida-023.png). No se publicaron las capturas que contenían una notificación personal o la animación del menú. El primer intento automatizado pulsó Atrás antes de terminar de abrir el menú y no lo cerró; se observó el menú abierto y se comprobó el cierre tras esperar la animación. No se presenta ese intento como prueba de cierre aprobada.
+
+Diseño observado en vertical/tema oscuro, sin recortes en el listado y con formulario en columna. Horizontal, pantallas grandes, texto ampliado, otros temas y confirmaciones de descarte siguen pendientes; no declarar responsive universalmente verificado. No hubo escrituras en el catálogo ni operaciones comerciales.
+
 El usuario confirmó que los selectores de 0.2.2 aparecen en Samsung; su valoración detectó problemas de distribución que motivan este incremento. Eso no acredita el diseño 0.2.3 ni sus gestos hasta ejecutarlos.
 
 En `verificacion-http-20261123.json`: salud HTTP 200 y cuatro rechazos HTTP 401 sin token (catálogo, página de llegadas, inventario y solicitudes). No se usaron contraseñas ni se escribieron datos para estas comprobaciones. No confundir rechazo sin token con prueba 403 de rol autenticado.

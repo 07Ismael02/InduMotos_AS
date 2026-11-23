@@ -1,5 +1,7 @@
 # Indumotos AS — aplicativo móvil
 
+Validación física 0.2.3: nueve comprobaciones de selección y Atrás aprobadas en Samsung; [informe y capturas](docs/REVISION-UX-PARIDAD-20261123.md). Observado en vertical/tema oscuro; los recorridos comerciales por rol y el diseño en otros tamaños siguen pendientes.
+
 Incremento 0.2.3: Catálogo adaptable y navegación Atrás a Inicio con doble pulsación para salir. [Cambios y pruebas pendientes de paridad](docs/REVISION-UX-PARIDAD-20261123.md). Cinco comprobaciones HTTP de salud/protección sin token ejecutadas; no acreditan todavía los recorridos por rol.
 
 Corrección de catálogo 0.2.2: selección de marcas/modelos/colores existentes y opción explícita para añadir texto nuevo (solo administración). Consulta de catálogo confirmada por el usuario en Samsung con 0.2.1; selectores nuevos pendientes de validación física.

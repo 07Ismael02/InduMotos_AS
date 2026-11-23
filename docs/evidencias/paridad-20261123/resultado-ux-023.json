@@ -1,0 +1,45 @@
+{
+  "fecha": "2026-11-23T18:32:54-05:00",
+  "apk": "0.2.3-sprint2",
+  "dispositivo": "Samsung SM-S948U1 / RFGL11XYCTD / Android 17 API 37",
+  "alcance": "Seleccion y navegacion; no guardar combinaciones ni modificar datos",
+  "casos": [
+    {
+      "caso": "Marca Honda seleccionada habilita Modelo y mantiene Color bloqueado",
+      "aprobado": true
+    },
+    {
+      "caso": "Modelo Wave seleccionado habilita Color",
+      "aprobado": true
+    },
+    {
+      "caso": "Combinacion existente elegida sin guardar",
+      "aprobado": true
+    },
+    {
+      "caso": "Atras desde Catalogo vuelve a Inicio",
+      "aprobado": true
+    },
+    {
+      "caso": "Atras con menu abierto mantiene Activity",
+      "aprobado": true
+    },
+    {
+      "caso": "Menu cerrado conserva Inicio tras esperar animacion",
+      "aprobado": true
+    },
+    {
+      "caso": "Primera pulsacion en Inicio mantiene Activity",
+      "aprobado": true
+    },
+    {
+      "caso": "Pulsacion aislada despues de dos segundos no sale",
+      "aprobado": true
+    },
+    {
+      "caso": "Segunda pulsacion dentro de dos segundos sale",
+      "aprobado": true
+    }
+  ],
+  "observacion": "Primer intento pulso Atras antes de finalizar apertura del menu; el menu se verifico luego abierto y cerro correctamente al pulsar Atras tras esperar. No se marco ese intento como fallo funcional."
+}
