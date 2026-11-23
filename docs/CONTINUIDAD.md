@@ -1,5 +1,7 @@
 # Continuidad — 23/11/2026
 
+Actualización de entorno: ver ENTORNO-PARIDAD-20261123.md. Respaldo V15 restaurado y copia aislada migrada V23; original permanece V15. Backend HTTP 200 en 127.0.0.1:8090. Samsung autorizado, APK 0.2.1 actualizado con firma compatible y túnel 8089→8090. Login manual pendiente; solo cuenta ADMIN existente, OCR sin Tesseract disponible. Esto actualiza la preparación descrita más abajo, sin acreditar los recorridos funcionales.
+
 Repositorio móvil: 07Ismael02/InduMotos_AS. Directorio de trabajo: C:/Users/Ismael Logacho/Documents/PharmaMobil/proyecto-final-dam/InduMotos-Sprint2. Rama: feature/sprint2-paridad-web, desde 42445cb. Main no se modifica.
 
 Se contrastaron main web f2981a3 y main backend 5b37b9b. Las copias Referencia-Web-Sprint2 y Referencia-Backend-Sprint2 son fuentes de lectura, no reemplazan los repositorios del equipo. El backend correcto sigue siendo Akatosh4019/BACK-END-INDUMOTOS; no backend-DAM-final.
