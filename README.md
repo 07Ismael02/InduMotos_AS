@@ -1,4 +1,4 @@
-Trabajo vigente, 24/11/2026: **0.4.2-evolucion / código15**, rama `feature/ismael-catalogo-ventas`. [Cámara y perfil agrupado](docs/CAMARA-Y-PERFIL.md). Compilación y 62 pruebas móviles aprobadas; instalada conservando datos y firma. Docker recuperado, salud HTTPS200. Captura física con cámara pendiente de completar. [Correcciones previas de navegación y offline](docs/PERFIL-Y-NAVEGACION.md). Los apartados siguientes son antecedentes.
+Trabajo vigente, 24/11/2026: **0.4.3-evolucion / código16**, rama `feature/ismael-catalogo-ventas`. [Cámara y perfil agrupado](docs/CAMARA-Y-PERFIL.md), [manifiesto del APK](docs/build-043.json). Compilación y 62 pruebas móviles aprobadas; instalada conservando datos persistentes y firma. Docker recuperado, salud HTTPS200. Cámara: captura/retorno con miniatura comprobados en0.4.2; selector corregido y revisado en oscuro en0.4.3. La foto de prueba no se registró en el servidor. Perfil muestra módulos plegados. [Correcciones previas de navegación y offline](docs/PERFIL-Y-NAVEGACION.md). Los apartados siguientes son antecedentes.
 
 # Indumotos AS — aplicativo móvil
 

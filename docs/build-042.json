@@ -14,5 +14,5 @@
   "pruebasMoviles": 62,
   "fallos": 0,
   "instalacion": "adb install -r: Success; firma compatible y datos conservados",
-  "camaraFisica": "pendiente de tomar y confirmar la foto"
+  "camaraFisica": "Samsung: apertura, foto tomada por el responsable, retorno con miniatura1/3 y limpieza de temporal comprobados; foto sin registrar en servidor"
 }

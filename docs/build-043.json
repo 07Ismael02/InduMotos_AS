@@ -1,0 +1,18 @@
+{
+  "fecha": "2026-11-24",
+  "version": "0.4.3-evolucion",
+  "versionCode": 16,
+  "applicationId": "pe.indumotos.asapp",
+  "tipo": "debug",
+  "sourceCommit": "8223dff9eaf811ce08d8be7c2aca05523456b6b3",
+  "backendCommit": "67e54f2",
+  "backend": "https://192.168.137.1:8443",
+  "apk": "C:\\Users\\Ismael Logacho\\Documents\\PharmaMobil\\proyecto-final-dam\\InduMotos-Sprint2\\entrega\\Indumotos-AS-0.4.3-evolucion-debug.apk",
+  "bytes": 23414323,
+  "sha256": "eac83cc912cbe94f1174a50755aaa943435aef6cd931aebbb4d8f53e80d25d02",
+  "certificadoSha256": "23c1a0373560f28c3d2b64103e50a0dff54bb955fd75b20ac40d52253e33b0f0",
+  "pruebasMoviles": 62,
+  "fallos": 0,
+  "instalacion": "adb install -r: Success; misma firma y datos persistentes conservados",
+  "camaraFisica": "Captura y retorno comprobados en0.4.2. En0.4.3: selector Material3 oscuro revisado visualmente y formulario con imagen1/3 observado; prueba adicional de cancelación no ejecutada"
+}
