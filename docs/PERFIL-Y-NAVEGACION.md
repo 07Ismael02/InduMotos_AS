@@ -17,4 +17,10 @@ En el Samsung se comprobaron Perfil → Ajustes, Preferencias → Ajustes, detal
 
 Evidencias privadas conservadas fuera de Git: 041-ajustes.png, 041-perfil.png, 041-atras-solicitudes.png, 041-atras-traslados.png, 041-horizontal.png y 041-cuenta-conservada.png en tmp/sprint2-auditoria/privado-paridad del espacio de trabajo. Las capturas preceden al último ajuste de contraste; no acreditan su apariencia final.
 
+### Cierre del defecto de cuentas offline
+
+En el APK final se solicitó el desbloqueo de Android y el responsable lo completó personalmente. Se observó la sesión de consulta local, se cerró desde Ajustes y se abrió otra vez el selector: admin.indumotos permaneció visible y seleccionable. Evidencias privadas: 041-sesion-local.png y 041-cuenta-tras-salida-offline.png. Ajustes con el contraste final revisado visualmente en 041-ajustes-final.png. Queda pendiente, si se desea verificar el segundo desbloqueo físico completo, pulsar Abrir datos y volver a desbloquear; no hace falta restaurar la cuenta ni iniciar sesión online de nuevo dentro del plazo vigente.
+
+APK final y hash en build-041.json. Commits de código: 0216b95 y c48370b. No cambios de backend, migraciones ni datos de negocio en esta corrección.
+
 Pendientes del bloque anterior: práctica de fotografías propias, ventas y offline/reconexión por hotspot. La conexión Wi-Fi con servidor es online; no equivale a modo offline.

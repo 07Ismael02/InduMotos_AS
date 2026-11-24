@@ -1,0 +1,17 @@
+{
+  "fecha": "2026-11-24",
+  "version": "0.4.1-evolucion",
+  "versionCode": 14,
+  "applicationId": "pe.indumotos.asapp",
+  "tipo": "debug",
+  "sourceCommit": "c48370b3efc06218ada1875aaf10a600e1558eb1",
+  "backendCommit": "67e54f2",
+  "backend": "https://192.168.137.1:8443",
+  "apk": "C:\\Users\\Ismael Logacho\\Documents\\PharmaMobil\\proyecto-final-dam\\InduMotos-Sprint2\\entrega\\Indumotos-AS-0.4.1-evolucion-debug.apk",
+  "bytes": 23886640,
+  "sha256": "6b900e7cf8e12989acc77c542cc59d102dce0414fd611d0e000be03d0108be2b",
+  "certificadoSha256": "23c1a0373560f28c3d2b64103e50a0dff54bb955fd75b20ac40d52253e33b0f0",
+  "pruebasMoviles": 59,
+  "fallos": 0,
+  "instalacion": "adb install -r: Success; misma firma, datos conservados"
+}
