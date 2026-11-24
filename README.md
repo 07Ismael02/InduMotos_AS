@@ -1,3 +1,5 @@
+Revisión de estructura y formato (24/11/2026): [comparación completa con PharmaMobile](docs/ESTRUCTURA-DEL-PROYECTO.md). Formato Kotlin unificado; refactorización de responsabilidades todavía pendiente. El APK publicado sigue en 0.4.4.
+
 **Corte de defensa — 24/11/2026: 0.4.4-evolucion / código17.** [APK Android de demostración](entregables/android/Indumotos-AS-0.4.4-evolucion-debug.apk), [manifiesto y hash](docs/build-044.json), [estado de entrega y límites](docs/ENTREGA-DEFENSA-20261124.md). Build y 64 pruebas móviles aprobados; instalada con firma original y datos persistentes conservados. [Corrección de guías offline](docs/GUIAS-OFFLINE-044.md). El modo offline permite lecturas y borradores de guías existentes; no ofrece todas las operaciones online. Backend compatible: rama feature/ismael-catalogo-ventas, commit67e54f2; no sustituirlo por main sin resolver las migraciones incompatibles. Los apartados siguientes son antecedentes.
 
 # Indumotos AS — aplicativo móvil

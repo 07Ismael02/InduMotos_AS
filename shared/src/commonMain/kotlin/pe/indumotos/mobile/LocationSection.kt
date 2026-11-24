@@ -29,7 +29,10 @@ internal fun LocationSection(
         message?.let { Text(it) }
         if (location != null) {
             val current = location.current
-            Text(current?.destinoNombre ?: "Sin ubicación registrada", style = MaterialTheme.typography.titleSmall)
+            Text(
+                current?.destinoNombre ?: "Sin ubicación registrada",
+                style = MaterialTheme.typography.titleSmall
+            )
             if (current != null) {
                 DetailValue("Registró", current.registrador)
                 DetailValue("Fecha", recordTimestamp(current.fecha))
@@ -50,14 +53,19 @@ internal fun LocationSection(
                         }
                         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                             options.forEach { site ->
-                                DropdownMenuItem(text = { Text("${site.nombre} · ${site.codigo}") }, onClick = {
-                                    selection = site
-                                    expanded = false
-                                })
+                                DropdownMenuItem(
+                                    text = { Text("${site.nombre} · ${site.codigo}") },
+                                    onClick = {
+                                        selection = site
+                                        expanded = false
+                                    })
                             }
                         }
                     }
-                    Button(onClick = { selection?.let(onSave) }, enabled = !busy && selection != null) {
+                    Button(
+                        onClick = { selection?.let(onSave) },
+                        enabled = !busy && selection != null
+                    ) {
                         Text("Registrar ubicación")
                     }
                 }

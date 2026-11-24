@@ -9,14 +9,80 @@ const val ASSIGN_UNITS = "UNIDADES_ASIGNAR"
 const val CANCEL_REQUESTS = "SOLICITUDES_ANULAR"
 const val TRANSFER_UNITS = "TRASLADOS_REGISTRAR"
 
-@Serializable data class RequestLine(val id: Long = 0, val marca: String, val modelo: String, val color: String, val cantidad: Int)
-@Serializable data class NewRequestLine(val marca: String, val modelo: String, val color: String, val cantidad: Int)
-@Serializable data class NewRequest(val destinoId: Long, val observacion: String, val lineas: List<NewRequestLine>)
-@Serializable data class AssemblyRequest(val id: Long, val solicitante: String, val destinoId: Long, val creadaEn: String, val observacion: String? = null, val estado: String, val lineas: List<RequestLine>, val destinoNombre: String = "")
-@Serializable data class RequestEvent(val id: Long, val estado: String, val registrador: String, val fecha: String, val motivo: String? = null)
-@Serializable data class AssignedUnit(val asociacionId: Long, val motocicletaId: Long, val chasis: String, val asignador: String, val fecha: String)
-@Serializable data class EligibleUnit(val motocicletaId: Long, val chasis: String, val marca: String, val modelo: String, val color: String)
-@Serializable data class TransferRecord(val id: Long, val motocicletaId: Long, val origenId: Long? = null, val destinoId: Long, val destinoNombre: String, val tipo: String, val registrador: String, val fecha: String)
+@Serializable
+data class RequestLine(
+    val id: Long = 0,
+    val marca: String,
+    val modelo: String,
+    val color: String,
+    val cantidad: Int
+)
+
+@Serializable
+data class NewRequestLine(
+    val marca: String,
+    val modelo: String,
+    val color: String,
+    val cantidad: Int
+)
+
+@Serializable
+data class NewRequest(
+    val destinoId: Long,
+    val observacion: String,
+    val lineas: List<NewRequestLine>
+)
+
+@Serializable
+data class AssemblyRequest(
+    val id: Long,
+    val solicitante: String,
+    val destinoId: Long,
+    val creadaEn: String,
+    val observacion: String? = null,
+    val estado: String,
+    val lineas: List<RequestLine>,
+    val destinoNombre: String = ""
+)
+
+@Serializable
+data class RequestEvent(
+    val id: Long,
+    val estado: String,
+    val registrador: String,
+    val fecha: String,
+    val motivo: String? = null
+)
+
+@Serializable
+data class AssignedUnit(
+    val asociacionId: Long,
+    val motocicletaId: Long,
+    val chasis: String,
+    val asignador: String,
+    val fecha: String
+)
+
+@Serializable
+data class EligibleUnit(
+    val motocicletaId: Long,
+    val chasis: String,
+    val marca: String,
+    val modelo: String,
+    val color: String
+)
+
+@Serializable
+data class TransferRecord(
+    val id: Long,
+    val motocicletaId: Long,
+    val origenId: Long? = null,
+    val destinoId: Long,
+    val destinoNombre: String,
+    val tipo: String,
+    val registrador: String,
+    val fecha: String
+)
 
 interface OperationsRepository {
     suspend fun requests(page: Int): List<AssemblyRequest>
@@ -39,20 +105,33 @@ object OperationRules {
         "EN_PREPARACION" -> listOf("ATENDIDA", "RECHAZADA")
         else -> emptyList()
     }
+
     fun validate(request: NewRequest) {
         require(request.destinoId > 0) { "Selecciona una sede de destino." }
         require(request.lineas.isNotEmpty()) { "Agrega al menos una línea." }
         require(request.observacion.length <= 1000) { "La observación admite hasta 1000 caracteres." }
         request.lineas.forEachIndexed { i, line ->
-            require(listOf(line.marca, line.modelo, line.color).all { it.isNotBlank() && it.length <= 120 } && line.cantidad > 0) {
+            require(
+                listOf(
+                    line.marca,
+                    line.modelo,
+                    line.color
+                ).all { it.isNotBlank() && it.length <= 120 } && line.cantidad > 0) {
                 "Línea ${i + 1}: completa marca, modelo y color (máximo 120) y usa una cantidad entera positiva."
             }
         }
     }
-    fun reason(value: String) { require(value.isNotBlank() && value.length <= 1000) { "Ingresa un motivo de hasta 1000 caracteres." } }
+
+    fun reason(value: String) {
+        require(value.isNotBlank() && value.length <= 1000) { "Ingresa un motivo de hasta 1000 caracteres." }
+    }
 }
 
-fun statusLabel(value: String) = when(value) {
-    "PENDIENTE" -> "Pendiente"; "EN_PREPARACION" -> "En preparación"; "ATENDIDA" -> "Atendida"
-    "RECHAZADA" -> "Rechazada"; "ANULADA" -> "Anulada"; else -> value
+fun statusLabel(value: String) = when (value) {
+    "PENDIENTE" -> "Pendiente";
+    "EN_PREPARACION" -> "En preparación";
+    "ATENDIDA" -> "Atendida"
+    "RECHAZADA" -> "Rechazada";
+    "ANULADA" -> "Anulada";
+    else -> value
 }

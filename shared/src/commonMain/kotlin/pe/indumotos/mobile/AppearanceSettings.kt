@@ -20,23 +20,23 @@ internal fun AppearanceSettings(
     onChange: (Appearance) -> Unit,
     onClose: () -> Unit
 ) {
-    AccountPage("Preferencias",onClose) {
-            Column(Modifier.selectableGroup()) {
-                Text("Tema de la aplicación")
-                Appearance.entries.forEach { option ->
-                    val selected = appearance == option
-                    Row(
-                        Modifier.fillMaxWidth().heightIn(min = 48.dp).selectable(
-                            selected = selected,
-                            role = Role.RadioButton,
-                            onClick = { onChange(option) }
-                        ),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        RadioButton(selected = selected, onClick = null)
-                        Text(option.label, Modifier.padding(start = 12.dp))
-                    }
+    AccountPage("Preferencias", onClose) {
+        Column(Modifier.selectableGroup()) {
+            Text("Tema de la aplicación")
+            Appearance.entries.forEach { option ->
+                val selected = appearance == option
+                Row(
+                    Modifier.fillMaxWidth().heightIn(min = 48.dp).selectable(
+                        selected = selected,
+                        role = Role.RadioButton,
+                        onClick = { onChange(option) }
+                    ),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(selected = selected, onClick = null)
+                    Text(option.label, Modifier.padding(start = 12.dp))
                 }
             }
+        }
     }
 }

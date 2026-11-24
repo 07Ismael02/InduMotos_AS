@@ -1,2 +1,3 @@
 package pe.indumotos.mobile.domain
-actual fun epochMillis():Long=System.currentTimeMillis()
+
+actual fun epochMillis(): Long = System.currentTimeMillis()

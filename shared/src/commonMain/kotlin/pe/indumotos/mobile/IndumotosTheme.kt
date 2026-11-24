@@ -33,10 +33,14 @@ private val DarkColors = darkColorScheme(
 )
 
 @Composable
-fun IndumotosTheme(darkTheme:Boolean=isSystemInDarkTheme(), content:@Composable ()->Unit) {
+fun IndumotosTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
     MaterialTheme(
-        colorScheme = if(darkTheme) DarkColors else LightColors,
-        shapes = Shapes(small=RoundedCornerShape(8.dp),medium=RoundedCornerShape(12.dp),large=RoundedCornerShape(18.dp)),
+        colorScheme = if (darkTheme) DarkColors else LightColors,
+        shapes = Shapes(
+            small = RoundedCornerShape(8.dp),
+            medium = RoundedCornerShape(12.dp),
+            large = RoundedCornerShape(18.dp)
+        ),
         content = content
     )
 }

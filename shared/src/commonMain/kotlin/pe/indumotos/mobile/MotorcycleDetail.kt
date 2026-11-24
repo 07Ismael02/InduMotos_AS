@@ -22,13 +22,22 @@ import kotlinx.serialization.json.contentOrNull
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun MotorcycleDetail(record: JsonObject, busy: Boolean, close: () -> Unit, extras:@Composable ()->Unit = {}, location: @Composable () -> Unit) {
-    val clipboard=LocalClipboardManager.current
+internal fun MotorcycleDetail(
+    record: JsonObject,
+    busy: Boolean,
+    close: () -> Unit,
+    extras: @Composable () -> Unit = {},
+    location: @Composable () -> Unit
+) {
+    val clipboard = LocalClipboardManager.current
     var copied by remember(record) { mutableStateOf(false) }
     val title = listOfNotNull(record.value("marca"), record.value("modelo")).joinToString(" ")
     Dialog(
         onDismissRequest = close,
-        properties = DialogProperties(usePlatformDefaultWidth = false, dismissOnClickOutside = false)
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            dismissOnClickOutside = false
+        )
     ) {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
@@ -55,13 +64,40 @@ internal fun MotorcycleDetail(record: JsonObject, busy: Boolean, close: () -> Un
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
                     ) {
-                        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Column(
+                            Modifier.padding(20.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
                                 Icon(Icons.Default.TwoWheeler, contentDescription = null)
-                                Text(title.ifBlank { "Motocicleta" }, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                                Text(
+                                    title.ifBlank { "Motocicleta" },
+                                    style = MaterialTheme.typography.headlineSmall,
+                                    fontWeight = FontWeight.Bold
+                                )
                             }
-                            SelectionContainer { DetailValue("Chasis completo", record.value("chasisCompleto")) }
-                            OutlinedButton(onClick={clipboard.setText(AnnotatedString(record.value("chasisCompleto").orEmpty()));copied=true},enabled=!record.value("chasisCompleto").isNullOrBlank()) { Text(if(copied)"Chasis copiado" else "Copiar chasis completo") }
+                            SelectionContainer {
+                                DetailValue(
+                                    "Chasis completo",
+                                    record.value("chasisCompleto")
+                                )
+                            }
+                            OutlinedButton(
+                                onClick = {
+                                    clipboard.setText(
+                                        AnnotatedString(
+                                            record.value(
+                                                "chasisCompleto"
+                                            ).orEmpty()
+                                        )
+                                    );
+                                    copied = true
+                                },
+                                enabled = !record.value("chasisCompleto").isNullOrBlank()
+                            ) { Text(if (copied) "Chasis copiado" else "Copiar chasis completo") }
                             DetailValue("Color", record.value("color"))
                         }
                     }
@@ -71,26 +107,58 @@ internal fun MotorcycleDetail(record: JsonObject, busy: Boolean, close: () -> Un
                 item {
                     DetailGroup("Motor y documentación") {
                         DetailValue("Número de motor", record.value("numeroMotor"))
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
                             Box(Modifier.weight(2f)) { DetailValue("DUA", record.value("dua")) }
-                            Box(Modifier.weight(1f)) { DetailValue("Ítem DUA", record.value("itemDua")) }
+                            Box(Modifier.weight(1f)) {
+                                DetailValue(
+                                    "Ítem DUA",
+                                    record.value("itemDua")
+                                )
+                            }
                         }
                     }
                 }
                 item {
                     DetailGroup("Registro de ingreso") {
-                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                            Box(Modifier.weight(1f)) { DetailValue("Número de ficha", record.value("id")) }
-                            Box(Modifier.weight(1f)) { DetailValue("Llegada vinculada", record.value("llegadaId")) }
+                        Row(
+                            Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Box(Modifier.weight(1f)) {
+                                DetailValue(
+                                    "Número de ficha",
+                                    record.value("id")
+                                )
+                            }
+                            Box(Modifier.weight(1f)) {
+                                DetailValue(
+                                    "Llegada vinculada",
+                                    record.value("llegadaId")
+                                )
+                            }
                         }
                         DetailValue("Registró", record.value("creadorUsuario"))
-                        DetailValue("Fecha de registro", record.value("creadoEn")?.let(::recordTimestamp))
-                        (record["llegada"] as? JsonObject)?.let{arrival->
-                            DetailValue("Guía de remisión",arrival.value("numeroGuia"))
-                            DetailValue("Fecha de recepción",arrival.value("fechaLlegada")?.let(::recordTimestamp))
-                            DetailValue("Recibió",arrival.value("receptorUsuario"))
-                            DetailValue("Cantidades", "Declaradas: ${arrival.value("cantidadDeclarada")} · Recibidas: ${arrival.value("cantidadRecibida")}")
-                            DetailValue("Observación",arrival.value("observacion"))
+                        DetailValue(
+                            "Fecha de registro",
+                            record.value("creadoEn")?.let(::recordTimestamp)
+                        )
+                        (record["llegada"] as? JsonObject)?.let { arrival ->
+                            DetailValue("Guía de remisión", arrival.value("numeroGuia"))
+                            DetailValue(
+                                "Fecha de recepción",
+                                arrival.value("fechaLlegada")?.let(::recordTimestamp)
+                            )
+                            DetailValue("Recibió", arrival.value("receptorUsuario"))
+                            DetailValue(
+                                "Cantidades",
+                                "Declaradas: ${arrival.value("cantidadDeclarada")} · Recibidas: ${
+                                    arrival.value("cantidadRecibida")
+                                }"
+                            )
+                            DetailValue("Observación", arrival.value("observacion"))
                         }
                     }
                 }
@@ -105,8 +173,15 @@ internal fun DetailGroup(title: String, content: @Composable ColumnScope.() -> U
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.outlinedCardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
-        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+        Column(
+            Modifier.fillMaxWidth().padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text(
+                title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.SemiBold
+            )
             content()
         }
     }
@@ -115,7 +190,11 @@ internal fun DetailGroup(title: String, content: @Composable ColumnScope.() -> U
 @Composable
 internal fun DetailValue(label: String, value: String?) {
     Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
-        Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(
+            label,
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
         Text(value ?: "Sin información", style = MaterialTheme.typography.bodyMedium)
     }
 }
