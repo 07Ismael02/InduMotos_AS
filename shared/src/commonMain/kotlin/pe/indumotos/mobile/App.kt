@@ -59,9 +59,15 @@ private fun createForm(module:Module):Form=when(module){
     onDarkTheme: (Boolean) -> Unit = {},
     installSystemBack: SystemBackInstaller = { _, _ -> },
     onExitHint: () -> Unit = {},
-    onExitRequested: () -> Unit = {}
+    onExitRequested: () -> Unit = {},
+    unlockOffline: ((Boolean,String?)->Unit)->Unit = {it(false,"La consulta offline protegida no está disponible en esta plataforma.")},
+    isActive:Boolean=true
 ){
  val vm:LogisticsViewModel=koinViewModel();val state by vm.state.collectAsState()
+ val offlineStatus by vm.offlineStatus.collectAsState()
+ LaunchedEffect(isActive,state.access?.usuarioId,offlineStatus.readOnlySession){
+  if(isActive&&state.access!=null&&!offlineStatus.readOnlySession)while(true){delay(30000);vm.refreshConnection()}
+ }
  var exitArmed by remember{mutableStateOf(false)}
  LaunchedEffect(state.module,state.access?.usuarioId){exitArmed=false}
  LaunchedEffect(exitArmed){if(exitArmed){delay(2000);exitArmed=false}}
@@ -82,7 +88,7 @@ private fun createForm(module:Module):Form=when(module){
  IndumotosTheme(darkTheme = darkTheme){
   CompositionLocalProvider(LocalSystemBack provides installSystemBack,LocalReturnHome provides {vm.open(null)}) {
   Surface(Modifier.fillMaxSize(),color=MaterialTheme.colorScheme.background){
-   if(state.access==null)Login(state,vm,backendUrl)else Workspace(state,vm,appearance,pickGuidePhotos) {
+   if(state.access==null)Login(state,vm,backendUrl,unlockOffline)else Workspace(state,vm,appearance,pickGuidePhotos,offlineStatus) {
        appearance = it
        onAppearanceChanged(it)
    }
@@ -93,7 +99,7 @@ private fun createForm(module:Module):Form=when(module){
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Composable private fun Workspace(state:UiState,vm:LogisticsViewModel,appearance: Appearance,pickGuidePhotos: ((PhotoSelection)->Unit)->Unit,onAppearanceChanged: (Appearance) -> Unit){
+@Composable private fun Workspace(state:UiState,vm:LogisticsViewModel,appearance: Appearance,pickGuidePhotos: ((PhotoSelection)->Unit)->Unit,offlineStatus:OfflineStatus,onAppearanceChanged: (Appearance) -> Unit){
  var showSettings by remember { mutableStateOf(false) }
  var showAccount by remember { mutableStateOf(false) }
  var showProfile by remember { mutableStateOf(false) }
@@ -114,9 +120,10 @@ private fun createForm(module:Module):Form=when(module){
    if(m==Module.INVENTORY&&vm.allowed("FICHAS_REGISTRAR"))ExtendedFloatingActionButton(onClick={vm.open(Module.FICHAS)},icon={Icon(Icons.Default.Add,null)},text={Text("Registrar desde guía")})
   }){padding->
    Column(Modifier.padding(padding).fillMaxSize()){
+    OfflineBanner(offlineStatus,state.busy,vm.allowed("INVENTARIO_CONSULTAR"),vm::downloadOffline,vm::synchronize,vm::reconnect)
     if(state.busy)LinearProgressIndicator(Modifier.fillMaxWidth(),color=Blue)
     state.error?.let{Notice(it,true)};state.message?.let{Notice(it,false)}
-    when(state.module){null->Home(state,vm);Module.INVENTORY->Inventory(state,vm);Module.FICHAS->GuidesScreen(account,true,pickGuidePhotos,vm::expireSession);Module.ARRIVALS->GuidesScreen(account,false,pickGuidePhotos,vm::expireSession);Module.CATALOG->CatalogScreen(account,vm::expireSession);Module.USERS,Module.PERMISSIONS->UsersScreen(account,state.module==Module.PERMISSIONS,state.message,{vm.form(createForm(Module.USERS))},vm::expireSession);Module.REQUESTS->RequestsScreen(account,vm::expireSession);Module.TRANSFERS->TransfersScreen(account,vm::expireSession)}
+    when(state.module){null->Home(state,vm);Module.INVENTORY->Inventory(state,vm);Module.FICHAS->GuidesScreen(account,true,pickGuidePhotos,vm::expireSession,offlineStatus);Module.ARRIVALS->GuidesScreen(account,false,pickGuidePhotos,vm::expireSession,offlineStatus);Module.CATALOG->CatalogScreen(account,vm::expireSession,offlineStatus.offline);Module.USERS,Module.PERMISSIONS->UsersScreen(account,state.module==Module.PERMISSIONS,state.message,{vm.form(createForm(Module.USERS))},vm::expireSession);Module.REQUESTS->RequestsScreen(account,vm::expireSession);Module.TRANSFERS->TransfersScreen(account,vm::expireSession)}
    }
   }
  }
@@ -131,7 +138,7 @@ private fun createForm(module:Module):Form=when(module){
      onLogout = { showAccount = false; scope.launch { drawer.close() }; confirmLogout = true }
  )
  if (showProfile) AccountProfile(account) { showProfile = false; showAccount = true }
- if(confirmLogout)AlertDialog(onDismissRequest={if(!state.busy)confirmLogout=false},title={Text("Cerrar sesión")},text={Text("Se revocará el acceso de esta sesión en el servidor. Necesitas conexión para confirmarlo.")},confirmButton={TextButton(onClick={confirmLogout=false;vm.logout()},enabled=!state.busy){Text("Cerrar sesión")}},dismissButton={TextButton(onClick={confirmLogout=false}){Text("Cancelar")}})
+ if(confirmLogout)AlertDialog(onDismissRequest={if(!state.busy)confirmLogout=false},title={Text("Cerrar sesión")},text={Text(if(offlineStatus.offline)"Se cerrará el acceso local. Los borradores se conservan para tu próximo login; sin servidor no se confirma revocación remota." else "Se revocará el acceso de esta sesión en el servidor.")},confirmButton={TextButton(onClick={confirmLogout=false;vm.logout()},enabled=!state.busy){Text("Cerrar sesión")}},dismissButton={TextButton(onClick={confirmLogout=false}){Text("Cancelar")}})
  if (state.module in listOf(Module.INVENTORY,Module.FICHAS)) state.detail?.let { record ->
      val location by vm.location.collectAsState()
      val id = record.text("id").toLongOrNull()
@@ -160,7 +167,8 @@ private fun createForm(module:Module):Form=when(module){
  }
 }
 
-@Composable private fun Login(state:UiState,vm:LogisticsViewModel,backendUrl:String){
+@Composable private fun Login(state:UiState,vm:LogisticsViewModel,backendUrl:String,unlockOffline:((Boolean,String?)->Unit)->Unit){
+ LaunchedEffect(backendUrl){vm.findOffline(backendUrl)}
  var user by remember{mutableStateOf("")};var password by remember{mutableStateOf("")};var visible by remember{mutableStateOf(false)}
  Column(Modifier.fillMaxSize().safeDrawingPadding().verticalScroll(rememberScrollState()).imePadding().padding(horizontal=28.dp,vertical=24.dp),verticalArrangement=Arrangement.Center,horizontalAlignment=Alignment.CenterHorizontally){
   Brand(Modifier.fillMaxWidth().height(130.dp));Spacer(Modifier.height(30.dp));Text("Iniciar sesión",fontSize=28.sp,fontWeight=FontWeight.Bold);Spacer(Modifier.height(8.dp));Text("Gestión de inventario y recepción de motocicletas",color=Muted,fontSize=13.sp,lineHeight=20.sp);Spacer(Modifier.height(28.dp))
@@ -168,6 +176,10 @@ private fun createForm(module:Module):Form=when(module){
   OutlinedTextField(password,{password=it},label={Text("Contraseña")},keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Password,autoCorrectEnabled=false),singleLine=true,enabled=!state.busy,visualTransformation=if(visible)VisualTransformation.None else PasswordVisualTransformation(),trailingIcon={IconButton(onClick={visible=!visible}){Icon(if(visible)Icons.Default.VisibilityOff else Icons.Default.Visibility,if(visible)"Ocultar contraseña"else"Mostrar contraseña")}},modifier=Modifier.fillMaxWidth())
   Spacer(Modifier.height(12.dp));state.error?.let{Notice(it,true)};state.message?.let{Notice(it,false)}
   Button(onClick={vm.login(backendUrl,user,password);password=""},enabled=!state.busy&&user.isNotBlank()&&password.isNotBlank(),modifier=Modifier.fillMaxWidth().height(52.dp),colors=ButtonDefaults.buttonColors(containerColor=Yellow,contentColor=Ink)){if(state.busy)CircularProgressIndicator(Modifier.size(22.dp),color=Ink)else Text("Ingresar",fontWeight=FontWeight.SemiBold)}
+  state.offlineProfile?.let{profile->
+   TextButton(onClick={unlockOffline{ok,error->if(ok)vm.openOffline(profile)else vm.offlineError(error?:"No se desbloquearon los datos locales.")}},enabled=!state.busy){Text("Consultar sin conexión · ${profile.access.nombreUsuario}")}
+   Text("Datos descargados de esta cuenta. Requiere el bloqueo del dispositivo y no habilita operaciones del servidor.",style=MaterialTheme.typography.bodySmall,color=Muted)
+  }
   Spacer(Modifier.height(20.dp));Text("Acceso exclusivo para personal autorizado. Si necesitas una cuenta, comunícate con el administrador.",fontSize=11.sp,color=Muted,lineHeight=18.sp)
  }
 }

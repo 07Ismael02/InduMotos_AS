@@ -26,7 +26,7 @@ class RemoteRepository(private val http:HttpClient,private val offline:OfflineSe
  private suspend fun checkedText(response:HttpResponse,sentToken:String=token):String{
   val text=response.bodyAsText()
   if(response.status.value !in 200..299){
-   if(response.status.value==401&&token==sentToken)token=""
+   if(response.status.value==401&&token==sentToken){token="";store?.profile(null)}
    val message=runCatching{val o=json.parseToJsonElement(text).jsonObject;o["error"]?.jsonPrimitive?.content?:o["detail"]?.jsonPrimitive?.content}.getOrNull()
    val fields=runCatching{json.parseToJsonElement(text).jsonObject["errores"]?.jsonObject?.mapValues{it.value.jsonPrimitive.content}}.getOrNull().orEmpty()
    throw AppException(apiError(response.status.value,message,fields))
@@ -62,6 +62,7 @@ class RemoteRepository(private val http:HttpClient,private val offline:OfflineSe
  override suspend fun arrivals(guide:String):List<JsonObject> = json.decodeFromString(request("llegadas",params=mapOf("numeroGuia" to guide.trim())))
  override suspend fun inventory(filter:InventoryFilter,page:Int):InventoryPage {
   try {
+   if(offline?.status?.value?.offline==true)throw AppException(AppError.Network)
    val result=json.decodeFromString<InventoryPage>(request("motocicletas",params=mapOf("chasis" to filter.chasis,"marca" to filter.marca,"modelo" to filter.modelo,"color" to filter.color,"pagina" to page.toString(),"tamano" to "20").filterValues{it.isNotBlank()}))
    val owner=offline?.current?.owner
    if(owner!=null&&offline?.status?.value?.offline==false)result.items.forEach{row->
@@ -73,7 +74,10 @@ class RemoteRepository(private val http:HttpClient,private val offline:OfflineSe
   } catch(e:AppException) {
    if(e.error!=AppError.Network||store==null||offline==null)throw e
    val owner=offline.owner();val rows=store.all(owner,"inventory-row")
-   if(rows.isEmpty())throw e
+   if(rows.isEmpty()) {
+    val key=OfflineReads.key("motocicletas",mapOf("pagina" to "0","tamano" to "20"))
+    if(store.get(owner,"http",key)==null)throw e
+   }
    val matching=rows.map{json.parseToJsonElement(it.payload).jsonObject}.filter{row->
     fun text(key:String)=row[key]?.jsonPrimitive?.content.orEmpty()
     listOf(filter.marca to "marca",filter.modelo to "modelo",filter.color to "color").all{(value,key)->text(key).contains(value,true)}&&
@@ -89,9 +93,14 @@ class RemoteRepository(private val http:HttpClient,private val offline:OfflineSe
   return result
  }
  override suspend fun submit(path:String,body:JsonObject,method:String):JsonObject?{
-  val text=request(path,body.toString(),method);return if(text.isBlank())null else json.parseToJsonElement(text).jsonObject
+  val text=request(path,body.toString(),method);val result=if(text.isBlank())null else json.parseToJsonElement(text).jsonObject
+  if(result!=null&&method=="PUT"&&Regex("motocicletas/\\d+").matches(path)&&store!=null&&offline?.current!=null) {
+   store.put(offline.owner(),"http",OfflineReads.key(path,emptyMap()),text,epochMillis())
+   store.put(offline.owner(),"inventory-row",result["id"]!!.jsonPrimitive.content,JsonObject(result+("chasisVista" to JsonPrimitive(result["chasisCompleto"]?.jsonPrimitive?.content.orEmpty()))).toString(),epochMillis())
+  }
+  return result
  }
- override suspend fun logout(){if(offline?.readOnly()!=true)request("auth/logout","{}","POST");store?.profile(null);clearSession()}
+ override suspend fun logout(){if(offline?.status?.value?.offline!=true)request("auth/logout","{}","POST");store?.profile(null);clearSession()}
  override suspend fun currentLocation(id: Long): LocationRecord? =
      request("motocicletas/$id/ubicacion").takeIf { it.isNotBlank() }
          ?.let { json.decodeFromString<LocationRecord?>(it) }
@@ -115,7 +124,14 @@ class RemoteRepository(private val http:HttpClient,private val offline:OfflineSe
 
  override suspend fun catalog():List<CatalogOption> = json.decodeFromString(request("catalogo-motocicletas"))
  override suspend fun requestOptions():List<CatalogOption> = json.decodeFromString(request("solicitudes/opciones-motocicleta"))
- override suspend fun addCatalog(option:CatalogOption):CatalogOption = json.decodeFromString(request("catalogo-motocicletas",json.encodeToString(option),"POST"))
+ override suspend fun addCatalog(option:CatalogOption):CatalogOption {
+  val saved=json.decodeFromString<CatalogOption>(request("catalogo-motocicletas",json.encodeToString(option),"POST"))
+  if(store!=null&&offline?.current!=null) {
+   val key=OfflineReads.key("catalogo-motocicletas",emptyMap());val owner=offline.owner()
+   store.get(owner,"http",key)?.let{old->val rows=json.decodeFromString<List<CatalogOption>>(old.payload);store.put(owner,"http",key,json.encodeToString((rows+saved).distinct()),epochMillis())}
+  }
+  return saved
+ }
  override suspend fun requests(page: Int): List<AssemblyRequest> = json.decodeFromString(request("solicitudes",params=mapOf("pagina" to page.toString(),"tamano" to "20")))
  override suspend fun request(id: Long): AssemblyRequest = json.decodeFromString(request("solicitudes/$id"))
  override suspend fun createRequest(body: NewRequest): AssemblyRequest = json.decodeFromString(request("solicitudes",json.encodeToString(body),"POST"))

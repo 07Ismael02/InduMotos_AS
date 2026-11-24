@@ -21,7 +21,7 @@ import pe.indumotos.mobile.domain.*
 import pe.indumotos.mobile.presentation.*
 import kotlinx.serialization.json.*
 
-@Composable fun GuidesScreen(account:Access,editing:Boolean,pickPhotos:((PhotoSelection)->Unit)->Unit,expired:()->Unit) {
+@Composable fun GuidesScreen(account:Access,editing:Boolean,pickPhotos:((PhotoSelection)->Unit)->Unit,expired:()->Unit,offlineStatus:OfflineStatus=OfflineStatus()) {
     val vm:GuidesViewModel=koinViewModel();val s by vm.state.collectAsState()
     fun can(code:String)=account.permisos.any{it.codigo==code&&it.permitido}
     val canEdit=editing&&can("FICHAS_REGISTRAR")&&can("INVENTARIO_CONSULTAR")
@@ -29,11 +29,14 @@ import kotlinx.serialization.json.*
     var confirmReload by remember{mutableStateOf(false)};var confirmFinish by remember{mutableStateOf(false)};var confirmLeave by remember{mutableStateOf(false)}
     var page by remember(s.selected?.id){mutableStateOf(0)};var zoom by remember{mutableStateOf(false)}
     var viewedFicha by remember(s.selected?.id){mutableStateOf<JsonObject?>(null)}
+    var resolve by remember{mutableStateOf<Pair<Int,Boolean>?>(null)}
+    fun hasUnsaved()=s.drafts.any{d->listOf(d.marca,d.modelo,d.color,d.chasisCompleto,d.numeroMotor,d.dua,d.itemDua).any{it.isNotBlank()}&&s.registration?.borradores?.none{it==d}!=false&&s.local.none{it.draft==d}}
+    LaunchedEffect(offlineStatus.syncing,s.selected?.id){if(!offlineStatus.syncing)vm.refreshLocalState()}
     var leaveHome by remember{mutableStateOf(false)}
     val returnHome=LocalReturnHome.current
     LocalSystemBack.current(true) {
         if(!s.busy) {
-            if(s.registration?.let{r->s.drafts.any{d->r.borradores.none{it==d}}}==true){leaveHome=true;confirmLeave=true}
+            if(hasUnsaved()){leaveHome=true;confirmLeave=true}
             else returnHome()
         }
     }
@@ -41,7 +44,7 @@ import kotlinx.serialization.json.*
     LaunchedEffect(account.usuarioId,editing){vm.reset();if(can("INVENTARIO_CONSULTAR"))vm.list()}
     LaunchedEffect(s.expired){if(s.expired)expired()}
     LaunchedEffect(s.selected?.id){if(s.selected!=null)creating=false}
-    fun leave(){leaveHome=false;if(s.registration?.let{r->s.drafts.any{d->r.borradores.none{it==d}}}==true)confirmLeave=true else vm.list(s.query,s.filter)}
+    fun leave(){leaveHome=false;if(hasUnsaved())confirmLeave=true else vm.list(s.query,s.filter)}
     Column(Modifier.fillMaxSize()) {
         if(s.selected!=null)OutlinedButton(onClick={leave()},enabled=!s.busy,modifier=Modifier.fillMaxWidth().padding(horizontal=16.dp)){Text("← Volver a guías")}
         if(s.busy)LinearProgressIndicator(Modifier.fillMaxWidth())
@@ -52,7 +55,10 @@ import kotlinx.serialization.json.*
             item {
                 Text(if(editing)"Registrar motocicletas de una guía" else "Recepción de guías",style=MaterialTheme.typography.headlineSmall)
                 Text(if(editing)"Selecciona una guía pendiente. Guarda cada moto como borrador antes de finalizar el registro." else "Almacén registra lo recibido y adjunta las fotos de la guía.")
-                if(!editing&&can("LLEGADAS_REGISTRAR"))Button(onClick={creating=true},enabled=!s.busy){Text("Nueva llegada con fotos")}
+                if(!editing&&can("LLEGADAS_REGISTRAR")) {
+                    if(offlineStatus.offline)Text("Para registrar una llegada nueva con fotos necesitas conexión al servidor.")
+                    else Button(onClick={creating=true},enabled=!s.busy){Text("Nueva llegada con fotos")}
+                }
                 if(can("INVENTARIO_CONSULTAR")) {
                     OutlinedTextField(query,{query=it},label={Text("Número de guía")},singleLine=true,enabled=!s.busy,modifier=Modifier.fillMaxWidth())
                     Row(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
@@ -92,12 +98,22 @@ import kotlinx.serialization.json.*
             LazyColumn(Modifier.weight(1f),contentPadding=PaddingValues(16.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
                 item {
                     if(registration!=null&&can("INVENTARIO_CONSULTAR"))OutlinedButton(onClick={
-                        if(s.drafts.any{d->registration.borradores.none{it==d}})confirmReload=true else vm.select(arrival,canEdit)
+                        if(hasUnsaved())confirmReload=true else vm.select(arrival,canEdit)
                     },enabled=!s.busy){Text("Actualizar desde servidor")}
                     registration?.let{Text("Registradas: ${it.registradas} · Pendientes: ${it.pending} · ${if(it.terminado)"Confirmada" else "Pendiente"}")}
                     if(s.images.isEmpty()&&!s.busy)Text("Esta recepción no tiene fotos adjuntas.")
                     if(registration==null&&!s.busy&&can("INVENTARIO_CONSULTAR"))OutlinedButton(onClick={vm.select(arrival,canEdit)}){Text("Cargar detalle de guía")}
-                    if(canEdit&&registration!=null&&!registration.terminado)OutlinedButton(onClick=vm::ocr,enabled=!s.busy&&s.images.isNotEmpty()){Text("Leer fotos con OCR")}
+                    if(canEdit&&registration!=null&&!registration.terminado)OutlinedButton(onClick=vm::ocr,enabled=!s.busy&&!offlineStatus.offline&&s.images.isNotEmpty()){Text("Leer fotos con OCR")}
+                }
+                items(s.local.filter{it.state in listOf("CONFLICT","DENIED")},key={"local-${it.draft.posicion}"}) { local->
+                    OutlinedCard(Modifier.fillMaxWidth()) {Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
+                        Text("Borrador local ${local.draft.posicion} · requiere revisión",color=MaterialTheme.colorScheme.error)
+                        Text(local.detail?:"Revisa los cambios antes de enviar.")
+                        Text("Teléfono: ${local.draft.marca} ${local.draft.modelo} · ${local.draft.color} · ${local.draft.chasisCompleto} · ${local.draft.numeroMotor}")
+                        registration?.borradores?.firstOrNull{it.posicion==local.draft.posicion}?.let{server->Text("Servidor: ${server.marca} ${server.modelo} · ${server.color} · ${server.chasisCompleto} · ${server.numeroMotor}")}
+                        if(registration?.terminado!=true)OutlinedButton(onClick={resolve=local.draft.posicion to true},enabled=!s.busy&&!offlineStatus.offline){Text("Revisé mis datos: reenviar")}
+                        TextButton(onClick={resolve=local.draft.posicion to false},enabled=!s.busy){Text("Descartar copia local")}
+                    }}
                 }
                 s.detail?.let{detail->
                     item{Text("Fichas vinculadas · ${detail.cantidadFichas}",style=MaterialTheme.typography.titleMedium)}
@@ -118,14 +134,15 @@ import kotlinx.serialization.json.*
                         Row { Checkbox(s.ocrReviewed,vm::reviewed,enabled=!s.busy);Text("Revisé los datos contra las fotos") }
                     }}
                     items(s.drafts.drop(page*5).take(5),key={it.posicion}) { draft ->
-                        val saved=registration.borradores.any{it==draft}
+                        val local=s.local.firstOrNull{it.draft.posicion==draft.posicion}
+                        val saved=registration.borradores.any{it==draft}&&local==null
                         DraftEditor(draft,s.options,s.busy,vm::edit)
-                        Text(if(saved)"Guardado en el servidor" else "Cambios sin guardar",color=if(saved)MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error)
+                        Text(if(saved)"Confirmado en el servidor" else if(local?.draft==draft)"Guardado en el teléfono · ${if(local.state=="PENDING")"pendiente de envío" else "requiere revisión"}" else "Cambios sin guardar",color=if(saved)MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.error)
                         s.ocr?.sugerencias?.getOrNull(draft.posicion-1)?.let { suggestion ->
                             Text("OCR: ${suggestion.marca} ${suggestion.modelo} · ${suggestion.color} · ${suggestion.chasisCompleto}")
                             if(registration.borradores.none{it.posicion==draft.posicion})TextButton(onClick={vm.useSuggestion(draft.posicion-1,draft.posicion)},enabled=!s.busy){Text("Usar sugerencia y revisar")}
                         }
-                        Button(onClick={vm.save(draft)},enabled=!s.busy&&!saved&&s.ocrReviewed){Text("Guardar borrador ${draft.posicion}")}
+                        Button(onClick={vm.save(draft)},enabled=!s.busy&&!saved&&s.ocrReviewed&&!(local?.draft==draft&&local.state=="PENDING")){Text("Guardar borrador ${draft.posicion}")}
                         HorizontalDivider()
                     }
                     item {
@@ -133,7 +150,7 @@ import kotlinx.serialization.json.*
                             OutlinedButton(onClick={page--},enabled=!s.busy&&page>0){Text("5 anteriores")}
                             OutlinedButton(onClick={page++},enabled=!s.busy&&(page+1)*5<s.drafts.size){Text("5 siguientes")}
                         }
-                        Button(onClick={confirmFinish=true},enabled=!s.busy&&s.ocrReviewed&&GuideRules.canFinish(registration,s.drafts),modifier=Modifier.fillMaxWidth()){Text("Finalizar registro de la guía")}
+                        Button(onClick={confirmFinish=true},enabled=!s.busy&&!offlineStatus.offline&&s.local.isEmpty()&&s.ocrReviewed&&GuideRules.canFinish(registration,s.drafts),modifier=Modifier.fillMaxWidth()){Text("Finalizar registro de la guía")}
                         Text("Solo finalizar incorpora las fichas al inventario. No registres motos que no llegaron físicamente.")
                     }
                 } else if(registration?.terminado==true)item{Text("Registro confirmado. Esta guía está en modo consulta.")}
@@ -142,6 +159,7 @@ import kotlinx.serialization.json.*
         }
     }
     viewedFicha?.let{ficha->MotorcycleDetail(ficha,s.busy,{viewedFicha=null}){}}
+    resolve?.let{(position,keep)->AlertDialog(onDismissRequest={resolve=null},title={Text(if(keep)"Confirmar datos revisados" else "Descartar copia local")},text={Text(if(keep)"Se comparará de nuevo la versión del servidor antes de enviar tus datos del bloque $position. Si vuelve a cambiar, se conservará el conflicto." else "Se eliminará únicamente la copia del teléfono del bloque $position. El servidor no se modifica.")},confirmButton={TextButton(onClick={resolve=null;vm.resolveLocal(position,keep)},enabled=!s.busy){Text("Confirmar")}},dismissButton={TextButton(onClick={resolve=null}){Text("Cancelar")}})}
     if(creating)NewArrivalDialog(s.busy,s.error,pickPhotos,{creating=false},vm::register)
     if(zoom&&s.imageBytes!=null)ZoomGuide(requireNotNull(s.imageBytes)){zoom=false}
     if(confirmReload)AlertDialog(onDismissRequest={confirmReload=false},title={Text("Recargar registro")},text={Text("Se conservarán los borradores del servidor y se descartarán los cambios locales sin guardar.")},confirmButton={TextButton(onClick={confirmReload=false;s.selected?.let{vm.select(it,canEdit)}}){Text("Recargar")}},dismissButton={TextButton(onClick={confirmReload=false}){Text("Cancelar")}})

@@ -7,19 +7,28 @@ import kotlinx.coroutines.flow.*
 import kotlinx.serialization.json.*
 import pe.indumotos.mobile.domain.*
 
-data class UiState(val access:Access?=null,val module:Module?=null,val rows:List<JsonObject> = emptyList(),val page:Int=0,val pages:Int=0,val total:Long=0,val filter:InventoryFilter=InventoryFilter(),val busy:Boolean=false,val editing:Boolean=false,val editOptions:List<CatalogOption> = emptyList(),val error:String?=null,val message:String?=null,val form:Form?=null,val detail:JsonObject?=null)
+data class UiState(val access:Access?=null,val module:Module?=null,val rows:List<JsonObject> = emptyList(),val page:Int=0,val pages:Int=0,val total:Long=0,val filter:InventoryFilter=InventoryFilter(),val busy:Boolean=false,val editing:Boolean=false,val editOptions:List<CatalogOption> = emptyList(),val error:String?=null,val message:String?=null,val form:Form?=null,val detail:JsonObject?=null,val offlineProfile:OfflineProfile?=null)
 class LogisticsViewModel(
     private val repo: LogisticsRepository,
     private val save: LogisticsUseCase,
     private val locations: LocationRepository,
     private val catalog: CatalogRepository? = null,
-    private val guides: GuideRepository? = null
+    private val guides: GuideRepository? = null,
+    private val offline: OfflineWork? = null
 ):ViewModel(){
  private val mutableLocation = MutableStateFlow<MotorcycleLocation?>(null)
  val location = mutableLocation.asStateFlow()
+ val offlineStatus=offline?.status?:MutableStateFlow(OfflineStatus()).asStateFlow()
  private val mutable=MutableStateFlow(UiState());val state=mutable.asStateFlow()
  private fun work(block:suspend()->Unit){if(mutable.value.busy)return;mutable.update{it.copy(busy=true,error=null,message=null)};viewModelScope.launch{try{block()}catch(e:CancellationException){throw e}catch(e:AppException){if(e.error==AppError.Unauthorized){repo.clearSession();mutable.value=UiState(error=if(mutable.value.access==null)"Usuario o contraseña incorrectos, o cuenta inactiva." else "Tu sesión venció. Inicia sesión nuevamente.")}else mutable.update{it.copy(error=e.message)}}catch(e:Exception){mutable.update{it.copy(error=e.message?:"No se pudo completar la operación")}}finally{mutable.update{it.copy(busy=false)}}}}
  fun login(url:String,user:String,password:String)=work{val a=repo.login(url,user,password);mutable.value=UiState(access=a,busy=true)}
+ fun findOffline(origin:String)=work{val p=offline?.availableProfile()?.takeIf{it.origin==origin.trimEnd('/')};mutable.update{it.copy(offlineProfile=p)}}
+ fun openOffline(profile:OfflineProfile)=work{val access=requireNotNull(offline).resumeReadOnly(profile);mutable.value=UiState(access=access,busy=true,message="Consulta de datos guardados en este teléfono.")}
+ fun offlineError(message:String){mutable.update{it.copy(error=message)}}
+ fun synchronize()=work{offline?.synchronize()}
+ fun downloadOffline()=work{offline?.downloadInventory()}
+ fun reconnect(){if(!state.value.busy){repo.clearSession();mutable.value=UiState(message="Inicia sesión online para sincronizar tus borradores.")}}
+ fun refreshConnection(){if(state.value.busy||offlineStatus.value.syncing||offlineStatus.value.readOnlySession||state.value.access==null)return;viewModelScope.launch{try{offline?.synchronize()}catch(e:CancellationException){throw e}catch(e:AppException){if(e.error==AppError.Unauthorized)expireSession()}}}
  fun open(module:Module?){if(mutable.value.busy)return;if(module!=null&&!canRead(module))return;mutable.update{it.copy(module=module,editing=false,editOptions=emptyList(),rows=emptyList(),detail=null,error=null,message=null,filter=InventoryFilter(),page=0,pages=0,total=0)};if(module==Module.INVENTORY)work{loadRecent()}}
  private suspend fun loadRecent(){val first=repo.inventory(InventoryFilter(),0);val last=if(first.totalPaginas>1)repo.inventory(InventoryFilter(),first.totalPaginas-1)else first;mutable.update{it.copy(rows=last.items.reversed(),page=last.pagina,pages=last.totalPaginas,total=last.totalElementos)}}
  fun arrivals(guide:String)=work{val rows=repo.arrivals(guide);mutable.update{it.copy(rows=rows,detail=null)}}
@@ -76,5 +85,8 @@ class LogisticsViewModel(
  fun logout()=work{repo.logout();mutable.value=UiState(message="Sesión cerrada correctamente.")}
  fun expireSession(){repo.clearSession();mutableLocation.value=null;mutable.value=UiState(error="Tu sesión venció. Inicia sesión nuevamente.")}
  fun allowed(permission:String)=state.value.access?.permisos?.any{it.codigo==permission&&it.permitido}==true
- fun canRead(module:Module)=when(module){Module.ARRIVALS->allowed("LLEGADAS_REGISTRAR")||allowed("INVENTARIO_CONSULTAR");Module.FICHAS->allowed("FICHAS_REGISTRAR")||allowed("INVENTARIO_CONSULTAR");else->allowed(module.permission)}
+ fun canRead(module:Module):Boolean {
+  if(offlineStatus.value.offline&&module !in listOf(Module.CATALOG,Module.INVENTORY,Module.ARRIVALS,Module.FICHAS))return false
+  return when(module){Module.ARRIVALS->allowed("LLEGADAS_REGISTRAR")||allowed("INVENTARIO_CONSULTAR");Module.FICHAS->allowed("FICHAS_REGISTRAR")||allowed("INVENTARIO_CONSULTAR");else->allowed(module.permission)}
+ }
 }

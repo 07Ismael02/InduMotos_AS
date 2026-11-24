@@ -20,7 +20,8 @@ class OfflineSession(val store:OfflineStore) {
     suspend fun available():OfflineProfile?=store.profile()?.takeIf{epochMillis()-it.authenticatedMs in 0..86_400_000L}
     suspend fun resume(profile:OfflineProfile):Access {
         require(available()==profile){"Conecta e inicia sesión para renovar la consulta local."}
-        current=profile;mutable.value=OfflineStatus(offline=true,readOnlySession=true,message="Consulta local desbloqueada. No es una sesión del servidor.");refresh();return profile.access
+        val last=store.all(profile.owner,"http").maxOfOrNull{it.savedMs}
+        current=profile;mutable.value=OfflineStatus(offline=true,readOnlySession=true,lastDownloadMs=last,message="Consulta local desbloqueada. No es una sesión del servidor.");refresh();return profile.access
     }
     fun close(){current=null;mutable.value=OfflineStatus()}
     fun readOnly()=status.value.readOnlySession

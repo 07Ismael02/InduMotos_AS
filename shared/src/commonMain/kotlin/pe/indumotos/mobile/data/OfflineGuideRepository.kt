@@ -7,6 +7,15 @@ import pe.indumotos.mobile.domain.*
 class OfflineGuideRepository(private val read:GuideRepository,private val server:GuideRepository,
     private val store:OfflineStore,private val session:OfflineSession,private val sync:DraftSynchronizer):GuideRepository by read {
     private val json=Json{encodeDefaults=true;ignoreUnknownKeys=true}
+    override suspend fun arrivals(guide:String,state:String,page:Int):ArrivalPage {
+        try{return read.arrivals(guide,state,page)}catch(e:AppException){
+            if(e.error!=AppError.Network)throw e
+            val snapshots=store.all(session.owner(),"http").mapNotNull{runCatching{json.decodeFromString<ArrivalPage>(it.payload)}.getOrNull()}
+            if(snapshots.isEmpty())throw e
+            val matches=snapshots.flatMap{it.items}.distinctBy{it.id}.filter{it.numeroGuia.contains(guide.trim(),true)&&(state.isBlank()||it.estadoRegistro==state)}.sortedByDescending{it.id}
+            return ArrivalPage(matches.drop(page*10).take(10),page,(matches.size+9)/10,matches.size.toLong())
+        }
+    }
     override suspend fun localDrafts(id:Long)=store.drafts(session.owner()).filter{it.guideId==id}.map{LocalDraftView(json.decodeFromString<MotorcycleDraft>(it.payload),it.state,it.detail)}
     override suspend fun saveDraft(id:Long,draft:MotorcycleDraft):GuideRegistration {
         val owner=session.owner()

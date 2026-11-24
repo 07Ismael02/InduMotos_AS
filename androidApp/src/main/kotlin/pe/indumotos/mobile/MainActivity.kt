@@ -8,6 +8,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.compose.BackHandler
 import android.widget.Toast
+import android.app.Activity
+import android.app.KeyguardManager
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
@@ -18,6 +23,23 @@ import java.io.ByteArrayOutputStream
 import pe.indumotos.mobile.domain.*
 
 class MainActivity : ComponentActivity() {
+    private var appActive by mutableStateOf(false)
+    private var unlockReceiver:((Boolean,String?)->Unit)?=null
+    private val deviceUnlock=registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result->
+        val receiver=unlockReceiver;unlockReceiver=null
+        receiver?.invoke(result.resultCode==Activity.RESULT_OK,if(result.resultCode==Activity.RESULT_OK)null else "Se canceló el desbloqueo del dispositivo.")
+    }
+    @Suppress("DEPRECATION")
+    private fun unlockLocal(receiver:(Boolean,String?)->Unit) {
+        val guard=getSystemService(KeyguardManager::class.java)
+        if(!guard.isDeviceSecure){receiver(false,"Configura un PIN, patrón o contraseña de bloqueo para consultar datos offline.");return}
+        if(unlockReceiver!=null){receiver(false,"Ya hay un desbloqueo en curso.");return}
+        val intent=guard.createConfirmDeviceCredentialIntent("Indumotos AS","Desbloquea los datos guardados de tu cuenta")
+        if(intent==null){receiver(false,"No se pudo abrir el desbloqueo seguro.");return}
+        unlockReceiver=receiver;deviceUnlock.launch(intent)
+    }
+    override fun onStart(){super.onStart();appActive=true}
+    override fun onStop(){appActive=false;super.onStop()}
     private var photoReceiver:((PhotoSelection)->Unit)?=null
     private val photoPicker=registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
         val receiver=photoReceiver;photoReceiver=null
@@ -62,7 +84,9 @@ class MainActivity : ComponentActivity() {
                 onDarkTheme = { dark -> window.decorView.post { updateSystemBars(dark) } },
                 installSystemBack = { enabled, handler -> BackHandler(enabled,handler) },
                 onExitHint = { Toast.makeText(this,"Pulsa Atrás otra vez para salir",Toast.LENGTH_SHORT).show() },
-                onExitRequested = { finish() }
+                onExitRequested = { finish() },
+                unlockOffline = ::unlockLocal,
+                isActive = appActive
             )
         }
     }

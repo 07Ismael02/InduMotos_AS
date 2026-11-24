@@ -39,6 +39,6 @@ val appModule = module {
     single<OperationsRepository> { get<RemoteRepository>() }
     viewModel { OperationsViewModel(get(), get(), get(), get()) }
     factory { LogisticsUseCase(get()) }
-    viewModel { LogisticsViewModel(get(), get(), get(), get(), get()) }
+    viewModel { LogisticsViewModel(get(), get(), get(), get(), get(), get()) }
 }
 fun initKoin(configure:KoinApplication.()->Unit={})=startKoin{configure();modules(platformModule,appModule)}

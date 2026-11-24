@@ -20,7 +20,7 @@ import pe.indumotos.mobile.domain.*
 import pe.indumotos.mobile.presentation.CatalogViewModel
 
 @OptIn(ExperimentalLayoutApi::class)
-@Composable fun CatalogScreen(account: Access, expired: () -> Unit) {
+@Composable fun CatalogScreen(account: Access, expired: () -> Unit,offline:Boolean=false) {
     val vm: CatalogViewModel=koinViewModel();val state by vm.state.collectAsState()
     var brand by remember(account.usuarioId){mutableStateOf("")}
     var model by remember(account.usuarioId){mutableStateOf("")}
@@ -52,7 +52,7 @@ import pe.indumotos.mobile.presentation.CatalogViewModel
             state.error?.let{Text(it,color=MaterialTheme.colorScheme.error)}
             state.message?.let{Text(it,color=MaterialTheme.colorScheme.secondary)}
         }
-        if(account.rolCodigo=="ADMIN" && account.permisos.any{it.codigo==MANAGE_CATALOG&&it.permitido}) item {
+        if(!offline&&account.rolCodigo=="ADMIN" && account.permisos.any{it.codigo==MANAGE_CATALOG&&it.permitido}) item {
             if(!showForm) FilledTonalButton(onClick={showForm=true},modifier=Modifier.fillMaxWidth()) {
                 Icon(Icons.Default.Add,null);Spacer(Modifier.width(8.dp));Text("Nueva combinación")
             }
