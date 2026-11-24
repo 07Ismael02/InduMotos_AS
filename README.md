@@ -1,3 +1,5 @@
+Estado más reciente: **0.3.5-sprint2 / código12**. [Demostración, recuperación y pendientes](docs/DEMOSTRACION.md), [manifiesto](docs/build-035.json). Las versiones descritas debajo son antecedentes.
+
 # Indumotos AS — aplicativo móvil
 
 Estado vigente: **0.3.4-sprint2-offline / código 11**, trabajo del 23/11/2026. Rama `feature/ismael-offline-cuentas`; main permanece estable y sin este incremento. Leer primero [continuidad](docs/CONTINUIDAD.md), AGENTS.md y [uso offline](docs/OFFLINE-USO.md).

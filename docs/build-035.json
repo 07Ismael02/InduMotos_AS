@@ -1,0 +1,17 @@
+{
+  "fecha": "2026-11-24T00:00:42-05:00",
+  "versionName": "0.3.5-sprint2",
+  "versionCode": 12,
+  "applicationId": "pe.indumotos.asapp",
+  "tipo": "Debug",
+  "codigoApp": "f9c24db",
+  "codigoBackend": "0e84511",
+  "sha256": "fecd05d5be579ae5b68ba9316ded8e3fe59031cbeae28817cf1d6ea4e99a63cd",
+  "certificadoSha256": "23c1a0373560f28c3d2b64103e50a0dff54bb955fd75b20ac40d52253e33b0f0",
+  "bytes": 23231972,
+  "pruebasMoviles": 53,
+  "pruebasBackendEspecificas": 8,
+  "http": 14,
+  "instalacion": "Success -r; misma firma; sin borrar datos",
+  "fisico": "Recuperación informativa y recorrido observados; inventario y formulario de reset pendiente de validación manual final"
+}

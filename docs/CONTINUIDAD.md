@@ -1,3 +1,9 @@
+# Estado vigente — 0.3.5
+
+Leer DEMOSTRACION.md. Appf9c24db, backend0e84511; 53 pruebas móviles,8 backend y14 HTTP aprobadas. Recuperación mediante administrador, tokens anteriores invalidados y navegación de Traslados corregida. APK instalado sin borrado. Inventario: corrección del salto de carga, revisión perceptiva pendiente. Solo iniciar DB y API actuales; detalles/puertos/script en DEMOSTRACION.md. Main intacto.
+
+## Antecedentes
+
 # Estado vigente — login0.3.4
 
 Código adff08e, rama feature/ismael-offline-cuentas. Leer LOGIN-034.md y PENDIENTES-ENTREGA.md. Login limpio con botón Sin conexión y selector de cuentas; tres comprobaciones Samsung y build aprobados, instalación compatible sin borrado. Suite53 anterior conservada, no repetida. Backend/BD no cambiaron en este bloque. Main intacto.
