@@ -24,7 +24,7 @@ import kotlinx.serialization.json.*
 @Composable fun GuidesScreen(account:Access,editing:Boolean,pickPhotos:((PhotoSelection)->Unit)->Unit,expired:()->Unit,offlineStatus:OfflineStatus=OfflineStatus()) {
     val vm:GuidesViewModel=koinViewModel();val s by vm.state.collectAsState()
     fun can(code:String)=account.permisos.any{it.codigo==code&&it.permitido}
-    val canEdit=editing&&can("FICHAS_REGISTRAR")&&can("INVENTARIO_CONSULTAR")
+    val canEdit=account.canRegisterGuideDrafts()
     var query by remember{mutableStateOf("")};var creating by remember{mutableStateOf(false)}
     var warehouse by remember{mutableStateOf<Site?>(null)}
     var confirmReload by remember{mutableStateOf(false)};var confirmFinish by remember{mutableStateOf(false)};var confirmLeave by remember{mutableStateOf(false)}
@@ -108,7 +108,8 @@ import kotlinx.serialization.json.*
                 item {
                     if(registration!=null&&can("INVENTARIO_CONSULTAR"))OutlinedButton(onClick={
                         if(hasUnsaved())confirmReload=true else vm.select(arrival,canEdit)
-                    },enabled=!s.busy){Text("Actualizar desde servidor")}
+                    },enabled=!s.busy){Text(if(offlineStatus.offline)"Recargar datos locales"else"Actualizar desde servidor")}
+                    if(canEdit&&offlineStatus.offline&&registration!=null&&!registration.terminado)Text("Puedes completar y guardar borradores en este teléfono. Inicia sesión online para sincronizarlos; la finalización requiere conexión.",style=MaterialTheme.typography.bodySmall)
                     registration?.let{Text("Registradas: ${it.registradas} · Pendientes: ${it.pending} · ${if(it.terminado)"Confirmada" else "Pendiente"}")}
                     if(s.images.isEmpty()&&!s.busy)Text("Esta recepción no tiene fotos adjuntas.")
                     if(registration==null&&!s.busy&&can("INVENTARIO_CONSULTAR"))OutlinedButton(onClick={vm.select(arrival,canEdit)}){Text("Cargar detalle de guía")}

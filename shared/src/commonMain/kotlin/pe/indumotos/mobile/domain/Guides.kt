@@ -11,6 +11,7 @@ import kotlinx.serialization.json.JsonObject
 @Serializable data class GuideImage(val id:Long,val orden:Int,val nombreArchivo:String,val tipoMime:String,val tamano:Int)
 data class GuidePhoto(val name:String,val mime:String,val bytes:ByteArray)
 data class PhotoSelection(val photos:List<GuidePhoto> = emptyList(),val error:String?=null)
+fun Access.canRegisterGuideDrafts()=listOf("FICHAS_REGISTRAR","INVENTARIO_CONSULTAR").all{code->permisos.any{it.codigo==code&&it.permitido}}
 @Serializable data class MotorcycleDraft(val posicion:Int,val marca:String="",val modelo:String="",val color:String="",
     val chasisCompleto:String="",val numeroMotor:String="",val dua:String="",val itemDua:String="")
 @Serializable data class GuideRegistration(val terminado:Boolean,val recibidas:Int,val registradas:Int,val borradores:List<MotorcycleDraft>,val version:String?=null) {

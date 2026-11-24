@@ -4,6 +4,14 @@ import kotlin.test.*
 import pe.indumotos.mobile.domain.*
 
 class ProfileAndPhotosTest {
+    @Test fun authorizedAccountCanEditDownloadedGuideRegardlessOfEntryScreen(){
+        val access=Access(1,"admin.indumotos","ADMIN",listOf(Permission("FICHAS_REGISTRAR",true),Permission("INVENTARIO_CONSULTAR",true)))
+        assertTrue(access.canRegisterGuideDrafts())
+    }
+    @Test fun administratorRoleDoesNotBypassMissingRegistrationPermission(){
+        val access=Access(1,"admin.indumotos","ADMIN",listOf(Permission("FICHAS_REGISTRAR",false),Permission("INVENTARIO_CONSULTAR",true)))
+        assertFalse(access.canRegisterGuideDrafts())
+    }
     @Test fun profileGroupsOnlyEffectiveAccessAndDoesNotDuplicateActions(){
         val account=Access(1,"almacen.indumotos","ALMACEN",listOf(Permission("LLEGADAS_REGISTRAR",true),Permission("LLEGADAS_REGISTRAR",true),Permission("PAGOS_CONFIRMAR",false),Permission("INVENTARIO_CONSULTAR",true)))
         val groups=account.profileAccessGroups()
