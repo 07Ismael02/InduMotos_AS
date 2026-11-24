@@ -1,0 +1,19 @@
+{
+  "fecha": "2026-11-24",
+  "version": "0.4.4-evolucion",
+  "versionCode": 17,
+  "applicationId": "pe.indumotos.asapp",
+  "tipo": "debug",
+  "sourceCommit": "277bd46433a8ecb24706754b2f1b83eb4b952bbc",
+  "backendCommit": "67e54f2",
+  "apk": "C:\\Users\\Ismael Logacho\\Documents\\PharmaMobil\\proyecto-final-dam\\InduMotos-Sprint2\\entrega\\Indumotos-AS-0.4.4-evolucion-debug.apk",
+  "bytes": 23414323,
+  "sha256": "b95cef0834ad550e1eea51e4af618e65810825e3eedc30986192ac25b4f7ac60",
+  "certificadoSha256": "23c1a0373560f28c3d2b64103e50a0dff54bb955fd75b20ac40d52253e33b0f0",
+  "pruebasMoviles": 64,
+  "fallos": 0,
+  "instalacion": "adb install -r: Success; firma original y datos persistentes conservados",
+  "alcanceOffline": "Borradores de fichas en guías existentes; no cola general de operaciones",
+  "archivoPublicado": "entregables/android/Indumotos-AS-0.4.4-evolucion-debug.apk",
+  "verificacionFisica": "Instalación comprobada. Revisión final de edición offline interrumpida por cambio de pantalla; no se marca aprobada."
+}
