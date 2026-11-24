@@ -7,10 +7,7 @@ import kotlinx.serialization.json.long
 class OfflineService(private val remote:RemoteRepository,private val guides:GuideRepository,
     private val session:OfflineSession,private val sync:DraftSynchronizer):OfflineWork {
     override val status=session.status
-    override suspend fun availableProfile():OfflineProfile? {
-        val p=session.available()?:return null
-        return p.takeIf{session.store.all(it.owner,"http").isNotEmpty()}
-    }
+    override suspend fun availableProfiles():List<OfflineProfile> = session.availableProfiles().filter{session.store.all(it.owner,"http").isNotEmpty()}
     override suspend fun resumeReadOnly(profile:OfflineProfile):Access {remote.restoreOrigin(profile.origin);return session.resume(profile)}
     override suspend fun synchronize(){sync.synchronize()}
     override suspend fun downloadInventory() {

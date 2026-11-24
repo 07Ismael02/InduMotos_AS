@@ -19,13 +19,16 @@ interface OfflineStore {
     suspend fun mark(draft:LocalDraft,state:String,detail:String)
     suspend fun acknowledge(draft:LocalDraft,serverPayload:String)
     suspend fun rebase(draft:LocalDraft,baseline:String?)
+    suspend fun profiles():List<OfflineProfile>
+    suspend fun removeProfile(owner:String)
     suspend fun profile():OfflineProfile?
     suspend fun profile(value:OfflineProfile?)
 }
 expect fun epochMillis():Long
 interface OfflineWork {
     val status:StateFlow<OfflineStatus>
-    suspend fun availableProfile():OfflineProfile?
+    suspend fun availableProfiles():List<OfflineProfile>
+    suspend fun availableProfile():OfflineProfile? = availableProfiles().firstOrNull()
     suspend fun resumeReadOnly(profile:OfflineProfile):Access
     suspend fun downloadInventory()
     suspend fun synchronize()

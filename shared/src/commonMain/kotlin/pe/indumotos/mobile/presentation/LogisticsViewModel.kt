@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.serialization.json.*
 import pe.indumotos.mobile.domain.*
 
-data class UiState(val access:Access?=null,val module:Module?=null,val rows:List<JsonObject> = emptyList(),val page:Int=0,val pages:Int=0,val total:Long=0,val filter:InventoryFilter=InventoryFilter(),val busy:Boolean=false,val editing:Boolean=false,val editOptions:List<CatalogOption> = emptyList(),val error:String?=null,val message:String?=null,val form:Form?=null,val detail:JsonObject?=null,val offlineProfile:OfflineProfile?=null)
+data class UiState(val access:Access?=null,val module:Module?=null,val rows:List<JsonObject> = emptyList(),val page:Int=0,val pages:Int=0,val total:Long=0,val filter:InventoryFilter=InventoryFilter(),val busy:Boolean=false,val editing:Boolean=false,val editOptions:List<CatalogOption> = emptyList(),val error:String?=null,val message:String?=null,val form:Form?=null,val detail:JsonObject?=null,val offlineProfiles:List<OfflineProfile> = emptyList())
 class LogisticsViewModel(
     private val repo: LogisticsRepository,
     private val save: LogisticsUseCase,
@@ -22,7 +22,7 @@ class LogisticsViewModel(
  private val mutable=MutableStateFlow(UiState());val state=mutable.asStateFlow()
  private fun work(block:suspend()->Unit){if(mutable.value.busy)return;mutable.update{it.copy(busy=true,error=null,message=null)};viewModelScope.launch{try{block()}catch(e:CancellationException){throw e}catch(e:AppException){if(e.error==AppError.Unauthorized){repo.clearSession();mutable.value=UiState(error=if(mutable.value.access==null)"Usuario o contraseña incorrectos, o cuenta inactiva." else "Tu sesión venció. Inicia sesión nuevamente.")}else mutable.update{it.copy(error=e.message)}}catch(e:Exception){mutable.update{it.copy(error=e.message?:"No se pudo completar la operación")}}finally{mutable.update{it.copy(busy=false)}}}}
  fun login(url:String,user:String,password:String)=work{val a=repo.login(url,user,password);mutable.value=UiState(access=a,busy=true)}
- fun findOffline(origin:String)=work{val p=offline?.availableProfile()?.takeIf{it.origin==origin.trimEnd('/')};mutable.update{it.copy(offlineProfile=p)}}
+ fun findOffline(origin:String)=work{val p=offline?.availableProfiles().orEmpty().filter{it.origin==origin.trimEnd('/')};mutable.update{it.copy(offlineProfiles=p)}}
  fun openOffline(profile:OfflineProfile)=work{val access=requireNotNull(offline).resumeReadOnly(profile);mutable.value=UiState(access=access,busy=true,message="Consulta de datos guardados en este teléfono.")}
  fun offlineError(message:String){mutable.update{it.copy(error=message)}}
  fun synchronize()=work{offline?.synchronize()}

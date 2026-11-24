@@ -26,7 +26,7 @@ class RemoteRepository(private val http:HttpClient,private val offline:OfflineSe
  private suspend fun checkedText(response:HttpResponse,sentToken:String=token):String{
   val text=response.bodyAsText()
   if(response.status.value !in 200..299){
-   if(response.status.value==401&&token==sentToken){token="";store?.profile(null)}
+   if(response.status.value==401&&token==sentToken){token="";offline?.current?.let{store?.removeProfile(it.owner)}}
    val message=runCatching{val o=json.parseToJsonElement(text).jsonObject;o["error"]?.jsonPrimitive?.content?:o["detail"]?.jsonPrimitive?.content}.getOrNull()
    val fields=runCatching{json.parseToJsonElement(text).jsonObject["errores"]?.jsonObject?.mapValues{it.value.jsonPrimitive.content}}.getOrNull().orEmpty()
    throw AppException(apiError(response.status.value,message,fields))
@@ -100,7 +100,7 @@ class RemoteRepository(private val http:HttpClient,private val offline:OfflineSe
   }
   return result
  }
- override suspend fun logout(){if(offline?.status?.value?.offline!=true)request("auth/logout","{}","POST");store?.profile(null);clearSession()}
+ override suspend fun logout(){if(offline?.status?.value?.offline!=true)request("auth/logout","{}","POST");offline?.current?.let{store?.removeProfile(it.owner)};clearSession()}
  override suspend fun currentLocation(id: Long): LocationRecord? =
      request("motocicletas/$id/ubicacion").takeIf { it.isNotBlank() }
          ?.let { json.decodeFromString<LocationRecord?>(it) }

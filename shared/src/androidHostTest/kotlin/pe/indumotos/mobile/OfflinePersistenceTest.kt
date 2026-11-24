@@ -2,6 +2,7 @@ package pe.indumotos.mobile
 
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.encodeToString
 import kotlin.test.*
 import java.nio.file.Files
 import pe.indumotos.mobile.db.OfflineDb
@@ -78,5 +79,30 @@ class OfflinePersistenceTest {
             assertContentEquals(image,s.image("s|1",9,10))
             assertNull(s.image("s|2",9,10))
         }finally{d.close()}
+    }
+    @Test fun multipleAccountsRemainAvailableAndLogoutRevokesOnlySelectedAccount()=runTest {
+        val (d,s)=memory();try {
+            val session=OfflineSession(s)
+            session.online("http://localhost",Access(1,"almacen.indumotos","ALMACEN",emptyList()));val first=session.current!!
+            s.edit(first.owner,8,draft,null,"PENDING")
+            session.online("http://localhost",Access(2,"inventarios.indumotos","INVENTARIOS",emptyList()));val second=session.current!!
+            assertEquals(2,session.availableProfiles().size)
+            session.close();session.resume(first);assertEquals(first.owner,session.owner())
+            s.removeProfile(first.owner);session.close()
+            assertEquals(listOf(second),session.availableProfiles());assertEquals(1,s.drafts(first.owner).size)
+            assertFailsWith<IllegalArgumentException>{session.resume(first)}
+            session.resume(second);assertTrue(s.drafts(second.owner).isEmpty())
+        }finally{d.close()}
+    }
+    @Test fun legacyProfileAndRegistrySurviveReopenWithoutSchemaMigration()=runTest {
+        val path=Files.createTempFile("perfiles-", ".db");var d=JdbcSqliteDriver("jdbc:sqlite:$path")
+        try {
+            OfflineDb.Schema.create(d);val db=OfflineDb(d);val s=SqlOfflineStore(db);val session=OfflineSession(s)
+            val a=Access(1,"almacen.indumotos","ALMACEN",emptyList())
+            db.offlineQueries.putProfile("http://local|1","http://local",kotlinx.serialization.json.Json.encodeToString(a),epochMillis())
+            session.online("http://local",Access(2,"ensamblaje.indumotos","ENSAMBLAJE",emptyList()))
+            d.close();d=JdbcSqliteDriver("jdbc:sqlite:$path")
+            assertEquals(2,OfflineSession(SqlOfflineStore(OfflineDb(d))).availableProfiles().size)
+        }finally{d.close();Files.deleteIfExists(path)}
     }
 }

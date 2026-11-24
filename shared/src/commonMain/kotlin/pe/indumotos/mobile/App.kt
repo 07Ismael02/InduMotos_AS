@@ -176,9 +176,12 @@ private fun createForm(module:Module):Form=when(module){
   OutlinedTextField(password,{password=it},label={Text("Contraseña")},keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Password,autoCorrectEnabled=false),singleLine=true,enabled=!state.busy,visualTransformation=if(visible)VisualTransformation.None else PasswordVisualTransformation(),trailingIcon={IconButton(onClick={visible=!visible}){Icon(if(visible)Icons.Default.VisibilityOff else Icons.Default.Visibility,if(visible)"Ocultar contraseña"else"Mostrar contraseña")}},modifier=Modifier.fillMaxWidth())
   Spacer(Modifier.height(12.dp));state.error?.let{Notice(it,true)};state.message?.let{Notice(it,false)}
   Button(onClick={vm.login(backendUrl,user,password);password=""},enabled=!state.busy&&user.isNotBlank()&&password.isNotBlank(),modifier=Modifier.fillMaxWidth().height(52.dp),colors=ButtonDefaults.buttonColors(containerColor=Yellow,contentColor=Ink)){if(state.busy)CircularProgressIndicator(Modifier.size(22.dp),color=Ink)else Text("Ingresar",fontWeight=FontWeight.SemiBold)}
-  state.offlineProfile?.let{profile->
+  if(state.offlineProfiles.isNotEmpty()){
+   Text("Cuentas disponibles sin conexión",style=MaterialTheme.typography.titleSmall)
+   state.offlineProfiles.forEach{profile->
    TextButton(onClick={unlockOffline{ok,error->if(ok)vm.openOffline(profile)else vm.offlineError(error?:"No se desbloquearon los datos locales.")}},enabled=!state.busy){Text("Consultar sin conexión · ${profile.access.nombreUsuario}")}
-   Text("Datos descargados de esta cuenta. Requiere el bloqueo del dispositivo y no habilita operaciones del servidor.",style=MaterialTheme.typography.bodySmall,color=Muted)
+   }
+   Text("Solo cuentas con datos descargados y acceso local vigente. Requiere el bloqueo del dispositivo; no inicia una sesión del servidor.",style=MaterialTheme.typography.bodySmall,color=Muted)
   }
   Spacer(Modifier.height(20.dp));Text("Acceso exclusivo para personal autorizado. Si necesitas una cuenta, comunícate con el administrador.",fontSize=11.sp,color=Muted,lineHeight=18.sp)
  }

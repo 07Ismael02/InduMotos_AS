@@ -58,6 +58,24 @@ class SqlOfflineStore(private val db:OfflineDb):OfflineStore {
         if(current?.revision==draft.revision)q.putDraft(current.owner,current.guide_id,current.position,current.payload,baseline,current.revision+1,"PENDING",null)
         Unit
     }
-    override suspend fun profile():OfflineProfile?=io{q.getProfile().executeAsOneOrNull()?.let{OfflineProfile(it.owner,it.origin,json.decodeFromString(it.access_json),it.authenticated_ms)}}
-    override suspend fun profile(value:OfflineProfile?)=io{if(value==null)q.dropProfile() else q.putProfile(value.owner,value.origin,json.encodeToString(value.access),value.authenticatedMs);Unit}
+    private fun legacyProfile():OfflineProfile?=q.getProfile().executeAsOneOrNull()?.let{OfflineProfile(it.owner,it.origin,json.decodeFromString(it.access_json),it.authenticated_ms)}
+    override suspend fun profiles():List<OfflineProfile> = io {
+        (q.allCache("_device_profiles","profile").executeAsList().map{json.decodeFromString<OfflineProfile>(it.payload)}+listOfNotNull(legacyProfile()))
+            .distinctBy{it.owner}.sortedBy{it.access.nombreUsuario}
+    }
+    override suspend fun removeProfile(owner:String)=io {
+        q.transaction {
+            q.dropCache("_device_profiles","profile",owner)
+            if(legacyProfile()?.owner==owner)q.dropProfile()
+        };Unit
+    }
+    override suspend fun profile():OfflineProfile?=io{legacyProfile()}
+    override suspend fun profile(value:OfflineProfile?)=io {
+        q.transaction {
+            // Existing installations keep their profile without changing the SQLite schema.
+            legacyProfile()?.let{q.putCache("_device_profiles","profile",it.owner,json.encodeToString(it),it.authenticatedMs)}
+            if(value==null){legacyProfile()?.let{q.dropCache("_device_profiles","profile",it.owner)};q.dropProfile()}
+            else{q.putProfile(value.owner,value.origin,json.encodeToString(value.access),value.authenticatedMs);q.putCache("_device_profiles","profile",value.owner,json.encodeToString(value),value.authenticatedMs)}
+        };Unit
+    }
 }
