@@ -9,6 +9,8 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import pe.indumotos.mobile.domain.profileAccessGroups
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.ui.window.Dialog
@@ -103,8 +105,18 @@ internal fun AccountEntry(account: Access, onClick: () -> Unit) {
             Text("Usuario",style=MaterialTheme.typography.labelMedium);Text(account.nombreUsuario)
             Text("Rol asignado",style=MaterialTheme.typography.labelMedium);Text(roleLabel(account.rolCodigo))
         }}
-        Text("Permisos habilitados",style=MaterialTheme.typography.titleMedium)
-        account.permisos.filter{it.permitido}.forEach{permission->Text(pe.indumotos.mobile.domain.PermissionLabels[permission.codigo]?:permission.codigo.lowercase().replace('_',' '),style=MaterialTheme.typography.bodyMedium)}
+        Text("Funciones de tu cuenta",style=MaterialTheme.typography.titleMedium)
+        Text("Estos son los módulos en los que puedes trabajar. Abre uno para consultar sus acciones autorizadas.",style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSurfaceVariant)
+        account.profileAccessGroups().forEach{group->
+            var expanded by remember(account.usuarioId,group.name){mutableStateOf(false)}
+            OutlinedCard(onClick={expanded=!expanded},modifier=Modifier.fillMaxWidth()){
+                Column(Modifier.padding(16.dp),verticalArrangement=Arrangement.spacedBy(8.dp)){
+                    Row(verticalAlignment=Alignment.CenterVertically){Text(group.name,style=MaterialTheme.typography.titleSmall,modifier=Modifier.weight(1f));Text(if(expanded)"Ocultar"else"Ver acciones",style=MaterialTheme.typography.labelMedium,color=MaterialTheme.colorScheme.primary)}
+                    if(expanded){HorizontalDivider();group.permissions.forEach{permission->Text("• "+(pe.indumotos.mobile.domain.PermissionLabels[permission.codigo]?:permission.codigo.lowercase().replace('_',' ').replaceFirstChar{it.uppercase()}),style=MaterialTheme.typography.bodySmall)}}
+                }
+            }
+        }
+        if(account.profileAccessGroups().isEmpty())Text("Esta cuenta no tiene módulos operativos habilitados.")
         Text("Para corregir tus datos o recuperar tu contraseña, comunícate con el administrador. Los permisos se confirman en el servidor al iniciar sesión.",style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

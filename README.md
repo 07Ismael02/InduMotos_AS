@@ -1,4 +1,4 @@
-Trabajo vigente, 24/11/2026: **0.4.1-evolucion / código14**, rama `feature/ismael-catalogo-ventas`. [Perfil, navegación y consulta local](docs/PERFIL-Y-NAVEGACION.md), [manifiesto del APK](docs/build-041.json) y [estado de la evolución](docs/EVOLUCION-ACTIVA.md). Actualización instalada en Samsung conservando datos y firma. Suite móvil: 59 pruebas aprobadas. Regreso de Solicitudes/Traslados, Ajustes/Perfil y conservación del selector tras cerrar sesión online y offline comprobados. Barra compacta para horizontal y contraste oscuro revisados. Los apartados siguientes son antecedentes.
+Trabajo vigente, 24/11/2026: **0.4.2-evolucion / código15**, rama `feature/ismael-catalogo-ventas`. [Cámara y perfil agrupado](docs/CAMARA-Y-PERFIL.md). Compilación y 62 pruebas móviles aprobadas; instalada conservando datos y firma. Docker recuperado, salud HTTPS200. Captura física con cámara pendiente de completar. [Correcciones previas de navegación y offline](docs/PERFIL-Y-NAVEGACION.md). Los apartados siguientes son antecedentes.
 
 # Indumotos AS — aplicativo móvil
 

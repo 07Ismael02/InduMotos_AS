@@ -21,6 +21,8 @@ import kotlinx.coroutines.withContext
 import android.graphics.BitmapFactory
 import java.io.ByteArrayOutputStream
 import pe.indumotos.mobile.domain.*
+import androidx.core.content.FileProvider
+import java.io.File
 
 class MainActivity : ComponentActivity() {
     private var appActive by mutableStateOf(false)
@@ -41,6 +43,18 @@ class MainActivity : ComponentActivity() {
     override fun onStart(){super.onStart();appActive=true}
     override fun onStop(){appActive=false;super.onStop()}
     private var photoReceiver:((PhotoSelection)->Unit)?=null
+    private var cameraFile:File?=null
+    private val camera=registerForActivityResult(ActivityResultContracts.TakePicture()){saved->
+        val receiver=photoReceiver;photoReceiver=null
+        val file=cameraFile;cameraFile=null
+        if(!saved||file==null){file?.delete();receiver?.invoke(PhotoSelection());return@registerForActivityResult}
+        lifecycleScope.launch{
+            val result=withContext(Dispatchers.IO){
+                try{PhotoSelection(listOf(readCameraPhoto(file)))}catch(e:Exception){PhotoSelection(error=e.message?:"No se pudo procesar la fotografía.")}finally{file.delete()}
+            }
+            receiver?.invoke(result)
+        }
+    }
     private val photoPicker=registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
         val receiver=photoReceiver;photoReceiver=null
         if(uris.isEmpty()){receiver?.invoke(PhotoSelection());return@registerForActivityResult}
@@ -68,7 +82,22 @@ class MainActivity : ComponentActivity() {
             receiver?.invoke(selection)
         }
     }
-    private fun selectPhotos(receiver:(PhotoSelection)->Unit){photoReceiver=receiver;photoPicker.launch(arrayOf("image/jpeg","image/png"))}
+    private fun selectPhotos(receiver:(PhotoSelection)->Unit){
+        if(photoReceiver!=null){receiver(PhotoSelection(error="Termina la selección de fotos en curso."));return}
+        photoReceiver=receiver
+        android.app.AlertDialog.Builder(this).setTitle("Añadir fotografía")
+            .setItems(arrayOf("Tomar foto","Elegir de galería")){_,option->
+                try{
+                    if(option==0){
+                        val folder=File(cacheDir,"capturas").apply{mkdirs()}
+                        val file=File.createTempFile("foto-",".jpg",folder);cameraFile=file
+                        camera.launch(FileProvider.getUriForFile(this,"$packageName.capturas",file))
+                    }else photoPicker.launch(arrayOf("image/jpeg","image/png"))
+                }catch(e:Exception){cameraFile?.delete();cameraFile=null;photoReceiver=null;receiver(PhotoSelection(error="No se pudo abrir la cámara o galería. Intenta con la otra opción."))}
+            }
+            .setNegativeButton("Cancelar"){_,_->photoReceiver=null;receiver(PhotoSelection())}
+            .setOnCancelListener{photoReceiver=null;receiver(PhotoSelection())}.show()
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val settings = getSharedPreferences("appearance", MODE_PRIVATE)

@@ -37,6 +37,12 @@ interface GuideRepository {
 }
 data class LocalDraftView(val draft:MotorcycleDraft,val state:String,val detail:String?)
 object GuideRules {
+    fun addPhotos(current:List<GuidePhoto>,incoming:List<GuidePhoto>):List<GuidePhoto>{
+        incoming.forEach(::photo)
+        val result=(current+incoming).fold(emptyList<GuidePhoto>()){list,item->if(list.any{it.bytes.contentEquals(item.bytes)})list else list+item}
+        require(result.size<=3){"Puedes adjuntar hasta tres fotografías. Quita una antes de añadir otra."}
+        return result
+    }
     fun photo(photo:GuidePhoto) {
         require(photo.mime in listOf("image/jpeg","image/png") && photo.bytes.isNotEmpty() && photo.bytes.size<=5*1024*1024) { "Selecciona fotos JPG/PNG de hasta 5 MB." }
     }

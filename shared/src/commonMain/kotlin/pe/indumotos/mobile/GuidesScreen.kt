@@ -213,9 +213,9 @@ import kotlinx.serialization.json.*
         OutlinedTextField(declared,{declared=it},label={Text("Cantidad declarada")},enabled=!busy,keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Number))
         OutlinedTextField(received,{received=it},label={Text("Cantidad recibida")},enabled=!busy,keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Number))
         OutlinedTextField(note,{if(it.length<=1000)note=it},label={Text("Observación opcional")},enabled=!busy)
-        OutlinedButton(onClick={pick{result->local=result.error;if(result.error==null&&result.photos.isNotEmpty())photos=result.photos}},enabled=!busy){Text("Seleccionar de 1 a 3 fotos")}
+        OutlinedButton(onClick={pick{result->local=result.error;if(result.error==null&&result.photos.isNotEmpty())runCatching{GuideRules.addPhotos(photos,result.photos)}.onSuccess{photos=it}.onFailure{local=it.message}}},enabled=!busy&&photos.size<3){Text("Añadir foto de la guía (${photos.size}/3)")}
         Text("JPG/PNG · hasta 5 MB por foto · mínimo 600 × 600 px · máximo 20 MP.")
-        photos.forEachIndexed{i,photo->GuidePicture(photo.bytes,Modifier.fillMaxWidth().height(110.dp));Text("Foto ${i+1} · ${photo.name}")}
+        photos.forEachIndexed{i,photo->GuidePicture(photo.bytes,Modifier.fillMaxWidth().height(110.dp));Row(verticalAlignment=androidx.compose.ui.Alignment.CenterVertically){Text("Foto ${i+1}",Modifier.weight(1f));TextButton(onClick={photos=photos.filterIndexed{index,_->index!=i}},enabled=!busy){Text("Quitar")}}}
         (local?:error)?.let{Text(it,color=MaterialTheme.colorScheme.error)}
     }},confirmButton={Button(onClick={
         local=runCatching{GuideRules.arrival(guide,declared.toIntOrNull()?:0,received.toIntOrNull()?:0,photos)}.exceptionOrNull()?.message
