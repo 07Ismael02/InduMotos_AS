@@ -1,0 +1,19 @@
+{
+  "fecha": "2026-11-23T19:10:55-05:00",
+  "rama": "feature/sprint2-paridad-web",
+  "commitCodigo": "f24119d5a02c29bbbea354ec4a56e363a3f6de28",
+  "versionName": "0.2.4-sprint2",
+  "versionCode": 6,
+  "applicationId": "pe.indumotos.asapp",
+  "tipo": "Debug",
+  "sha256": "ca0971a66e977e085e48acad24f3365332dabeaad9aa02cbdf48c38e3ffb77b7",
+  "certificadoSha256": "23c1a0373560f28c3d2b64103e50a0dff54bb955fd75b20ac40d52253e33b0f0",
+  "bytes": 23051345,
+  "rutaLocal": "C:\\Users\\Ismael Logacho\\Documents\\PharmaMobil\\proyecto-final-dam\\InduMotos-Sprint2\\entrega\\Indumotos-AS-0.2.4-sprint2-debug.apk",
+  "compilacion": "BUILD SUCCESSFUL",
+  "tests": 30,
+  "fallos": 0,
+  "apiComprobacionesAprobadas": 110,
+  "instalacion": "0.2.4 inicial instalada con firma compatible. APK final posterior a ajustes menores generado y verificado, no reinstalado tras fallo ADB.",
+  "validacionFisica": "Parcial; ver CIERRE-PARIDAD-20261123.md. No afirmar recorrido integral aprobado."
+}

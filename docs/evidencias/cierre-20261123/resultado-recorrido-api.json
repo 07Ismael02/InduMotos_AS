@@ -1,0 +1,894 @@
+{
+  "fecha": "2026-11-23T18:51:47-05:00",
+  "base": "indumotos_s2_paridad_20261123",
+  "backend": "5b37b9b",
+  "datos": "Fixtures sinteticos QA aislados; no documentos comerciales reales",
+  "casos": [
+    {
+      "caso": "Login ADMIN",
+      "metodo": "POST",
+      "ruta": "auth/login",
+      "rol": "SIN_TOKEN",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Login ALMACEN",
+      "metodo": "POST",
+      "ruta": "auth/login",
+      "rol": "SIN_TOKEN",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Login INVENTARIOS",
+      "metodo": "POST",
+      "ruta": "auth/login",
+      "rol": "SIN_TOKEN",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Login COMERCIAL",
+      "metodo": "POST",
+      "ruta": "auth/login",
+      "rol": "SIN_TOKEN",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Login FACTURACION",
+      "metodo": "POST",
+      "ruta": "auth/login",
+      "rol": "SIN_TOKEN",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Login incorrecto",
+      "metodo": "POST",
+      "ruta": "auth/login",
+      "rol": "SIN_TOKEN",
+      "esperado": 401,
+      "obtenido": 401,
+      "aprobado": true
+    },
+    {
+      "caso": "Consultar perfil ADMIN",
+      "metodo": "GET",
+      "ruta": "auth/me",
+      "rol": "ADMIN",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Perfil corresponde al rol ADMIN",
+      "aprobado": true
+    },
+    {
+      "caso": "Consultar perfil ALMACEN",
+      "metodo": "GET",
+      "ruta": "auth/me",
+      "rol": "ALMACEN",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Perfil corresponde al rol ALMACEN",
+      "aprobado": true
+    },
+    {
+      "caso": "Consultar perfil INVENTARIOS",
+      "metodo": "GET",
+      "ruta": "auth/me",
+      "rol": "INVENTARIOS",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Perfil corresponde al rol INVENTARIOS",
+      "aprobado": true
+    },
+    {
+      "caso": "Consultar perfil COMERCIAL",
+      "metodo": "GET",
+      "ruta": "auth/me",
+      "rol": "COMERCIAL",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Perfil corresponde al rol COMERCIAL",
+      "aprobado": true
+    },
+    {
+      "caso": "Consultar perfil FACTURACION",
+      "metodo": "GET",
+      "ruta": "auth/me",
+      "rol": "FACTURACION",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Perfil corresponde al rol FACTURACION",
+      "aprobado": true
+    },
+    {
+      "caso": "Listado de cuentas",
+      "metodo": "GET",
+      "ruta": "usuarios?pagina=0&tamano=10",
+      "rol": "ADMIN",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Listado no contiene hashes ni contraseñas",
+      "aprobado": true
+    },
+    {
+      "caso": "Buscar cuenta por nombre de usuario",
+      "metodo": "GET",
+      "ruta": "usuarios?buscar=qa.s2.20261123184707.almacen&tamano=10",
+      "rol": "ADMIN",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Busqueda encuentra cuenta especifica",
+      "aprobado": true
+    },
+    {
+      "caso": "Pagina siguiente de cuentas",
+      "metodo": "GET",
+      "ruta": "usuarios?pagina=1&tamano=10",
+      "rol": "ADMIN",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Tamaño de pagina inválido",
+      "metodo": "GET",
+      "ruta": "usuarios?tamano=20",
+      "rol": "ADMIN",
+      "esperado": 400,
+      "obtenido": 400,
+      "aprobado": true
+    },
+    {
+      "caso": "Almacen no administra personal",
+      "metodo": "GET",
+      "ruta": "usuarios",
+      "rol": "ALMACEN",
+      "esperado": 403,
+      "obtenido": 403,
+      "aprobado": true
+    },
+    {
+      "caso": "Crear usuario invalido",
+      "metodo": "POST",
+      "ruta": "usuarios",
+      "rol": "ADMIN",
+      "esperado": 400,
+      "obtenido": 400,
+      "aprobado": true
+    },
+    {
+      "caso": "Crear cuenta autorizada",
+      "metodo": "POST",
+      "ruta": "usuarios",
+      "rol": "ADMIN",
+      "esperado": 201,
+      "obtenido": 201,
+      "aprobado": true
+    },
+    {
+      "caso": "Usuario duplicado",
+      "metodo": "POST",
+      "ruta": "usuarios",
+      "rol": "ADMIN",
+      "esperado": 409,
+      "obtenido": 409,
+      "aprobado": true
+    },
+    {
+      "caso": "Consultar todos los permisos efectivos",
+      "metodo": "GET",
+      "ruta": "usuarios/6/permisos",
+      "rol": "ADMIN",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Permisos incluyen catalogo y Sprint2",
+      "aprobado": true
+    },
+    {
+      "caso": "Cambiar rol de fixture",
+      "metodo": "PUT",
+      "ruta": "usuarios/6/rol",
+      "rol": "ADMIN",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Restituir rol de fixture",
+      "metodo": "PUT",
+      "ruta": "usuarios/6/rol",
+      "rol": "ADMIN",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Excepcion permitida",
+      "metodo": "PUT",
+      "ruta": "usuarios/6/permisos/UBICACIONES_CONSULTAR",
+      "rol": "ADMIN",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Excepcion denegada",
+      "metodo": "PUT",
+      "ruta": "usuarios/6/permisos/UBICACIONES_CONSULTAR",
+      "rol": "ADMIN",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Restablecer permiso de rol",
+      "metodo": "DELETE",
+      "ruta": "usuarios/6/permisos/UBICACIONES_CONSULTAR",
+      "rol": "ADMIN",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "No elevar cuenta operativa a administrador",
+      "metodo": "PUT",
+      "ruta": "usuarios/6/permisos/PERMISOS_ASIGNAR",
+      "rol": "ADMIN",
+      "esperado": 403,
+      "obtenido": 403,
+      "aprobado": true
+    },
+    {
+      "caso": "Consultar catalogo",
+      "metodo": "GET",
+      "ruta": "catalogo-motocicletas",
+      "rol": "ADMIN",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Alta de catalogo ADMIN",
+      "metodo": "POST",
+      "ruta": "catalogo-motocicletas",
+      "rol": "ADMIN",
+      "esperado": 201,
+      "obtenido": 201,
+      "aprobado": true
+    },
+    {
+      "caso": "Duplicado de catalogo",
+      "metodo": "POST",
+      "ruta": "catalogo-motocicletas",
+      "rol": "ADMIN",
+      "esperado": 409,
+      "obtenido": 409,
+      "aprobado": true
+    },
+    {
+      "caso": "Inventarios no crea catalogo",
+      "metodo": "POST",
+      "ruta": "catalogo-motocicletas",
+      "rol": "INVENTARIOS",
+      "esperado": 403,
+      "obtenido": 403,
+      "aprobado": true
+    },
+    {
+      "caso": "Comercial consulta opciones autorizadas",
+      "metodo": "GET",
+      "ruta": "solicitudes/opciones-motocicleta",
+      "rol": "COMERCIAL",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Recepcion prohibida a Comercial",
+      "metodo": "POST",
+      "ruta": "llegadas/con-guia",
+      "rol": "COMERCIAL",
+      "esperado": 403,
+      "obtenido": 403,
+      "aprobado": true
+    },
+    {
+      "caso": "Recepcion sin imagenes rechazada",
+      "metodo": "POST",
+      "ruta": "llegadas/con-guia",
+      "rol": "ALMACEN",
+      "esperado": 400,
+      "obtenido": 400,
+      "aprobado": true
+    },
+    {
+      "caso": "Recepcion con dos imagenes",
+      "metodo": "POST",
+      "ruta": "llegadas/con-guia",
+      "rol": "ALMACEN",
+      "esperado": 201,
+      "obtenido": 201,
+      "aprobado": true
+    },
+    {
+      "caso": "Guia pendiente en listado",
+      "metodo": "GET",
+      "ruta": "llegadas/pagina?estado=PENDIENTE&numeroGuia=QA20261123185147",
+      "rol": "INVENTARIOS",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Consultar imagenes protegidas",
+      "metodo": "GET",
+      "ruta": "llegadas/2/guias",
+      "rol": "INVENTARIOS",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Dos imagenes persistidas",
+      "aprobado": true
+    },
+    {
+      "caso": "Descargar imagen protegida",
+      "metodo": "GET",
+      "ruta": "llegadas/2/guias/1",
+      "rol": "INVENTARIOS",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Imagen devuelta coincide con original",
+      "aprobado": true
+    },
+    {
+      "caso": "OCR real de dos imagenes sinteticas",
+      "metodo": "GET",
+      "ruta": "llegadas/2/sugerencias-ocr",
+      "rol": "INVENTARIOS",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "OCR analiza todas las fotos",
+      "aprobado": true
+    },
+    {
+      "caso": "OCR devuelve sugerencias de chasis",
+      "aprobado": true
+    },
+    {
+      "caso": "Finalizar sin borradores se rechaza",
+      "metodo": "POST",
+      "ruta": "llegadas/2/registro/finalizar",
+      "rol": "INVENTARIOS",
+      "esperado": 400,
+      "obtenido": 400,
+      "aprobado": true
+    },
+    {
+      "caso": "Guardar borrador 1",
+      "metodo": "PUT",
+      "ruta": "llegadas/2/registro/borradores/1",
+      "rol": "INVENTARIOS",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Reabrir borradores guardados 1",
+      "metodo": "GET",
+      "ruta": "llegadas/2/registro",
+      "rol": "INVENTARIOS",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Cantidad de borradores 1",
+      "aprobado": true
+    },
+    {
+      "caso": "Detalle previo a finalizar 1",
+      "metodo": "GET",
+      "ruta": "llegadas/2/detalle",
+      "rol": "INVENTARIOS",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Borradores no son stock",
+      "aprobado": true
+    },
+    {
+      "caso": "Guardar borrador 2",
+      "metodo": "PUT",
+      "ruta": "llegadas/2/registro/borradores/2",
+      "rol": "INVENTARIOS",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Reabrir borradores guardados 2",
+      "metodo": "GET",
+      "ruta": "llegadas/2/registro",
+      "rol": "INVENTARIOS",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Cantidad de borradores 2",
+      "aprobado": true
+    },
+    {
+      "caso": "Detalle previo a finalizar 2",
+      "metodo": "GET",
+      "ruta": "llegadas/2/detalle",
+      "rol": "INVENTARIOS",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Borradores no son stock",
+      "aprobado": true
+    },
+    {
+      "caso": "Almacen no puede finalizar fichas",
+      "metodo": "POST",
+      "ruta": "llegadas/2/registro/finalizar",
+      "rol": "ALMACEN",
+      "esperado": 403,
+      "obtenido": 403,
+      "aprobado": true
+    },
+    {
+      "caso": "Finalizacion transaccional",
+      "metodo": "POST",
+      "ruta": "llegadas/2/registro/finalizar",
+      "rol": "INVENTARIOS",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Registro confirmado con dos motos",
+      "aprobado": true
+    },
+    {
+      "caso": "Doble finalizacion rechazada",
+      "metodo": "POST",
+      "ruta": "llegadas/2/registro/finalizar",
+      "rol": "INVENTARIOS",
+      "esperado": 409,
+      "obtenido": 409,
+      "aprobado": true
+    },
+    {
+      "caso": "Consultar fichas vinculadas",
+      "metodo": "GET",
+      "ruta": "llegadas/2/detalle",
+      "rol": "INVENTARIOS",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Dos fichas vinculadas",
+      "aprobado": true
+    },
+    {
+      "caso": "Guia en lista confirmadas",
+      "metodo": "GET",
+      "ruta": "llegadas/pagina?estado=CONFIRMADA&numeroGuia=QA20261123185147",
+      "rol": "INVENTARIOS",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Inventario filtro chasis QA202611231851470001",
+      "metodo": "GET",
+      "ruta": "motocicletas?chasis=QA202611231851470001",
+      "rol": "INVENTARIOS",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Inventario filtro chasis 0001",
+      "metodo": "GET",
+      "ruta": "motocicletas?chasis=0001",
+      "rol": "INVENTARIOS",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Inventario filtro marca Honda",
+      "metodo": "GET",
+      "ruta": "motocicletas?marca=Honda",
+      "rol": "INVENTARIOS",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Editar ficha con permiso",
+      "metodo": "PUT",
+      "ruta": "motocicletas/4",
+      "rol": "INVENTARIOS",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Edicion conserva ID y llegada",
+      "aprobado": true
+    },
+    {
+      "caso": "Almacen no edita ficha",
+      "metodo": "PUT",
+      "ruta": "motocicletas/4",
+      "rol": "ALMACEN",
+      "esperado": 403,
+      "obtenido": 403,
+      "aprobado": true
+    },
+    {
+      "caso": "Chasis duplicado rechazado",
+      "metodo": "PUT",
+      "ruta": "motocicletas/4",
+      "rol": "INVENTARIOS",
+      "esperado": 409,
+      "obtenido": 409,
+      "aprobado": true
+    },
+    {
+      "caso": "Crear sede QA ALMACEN",
+      "metodo": "POST",
+      "ruta": "ubicaciones",
+      "rol": "ADMIN",
+      "esperado": 201,
+      "obtenido": 201,
+      "aprobado": true
+    },
+    {
+      "caso": "Crear sede QA TIENDA",
+      "metodo": "POST",
+      "ruta": "ubicaciones",
+      "rol": "ADMIN",
+      "esperado": 201,
+      "obtenido": 201,
+      "aprobado": true
+    },
+    {
+      "caso": "Registrar ubicacion inicial",
+      "metodo": "POST",
+      "ruta": "motocicletas/4/ubicacion",
+      "rol": "ALMACEN",
+      "esperado": 201,
+      "obtenido": 201,
+      "aprobado": true
+    },
+    {
+      "caso": "Registrar ubicacion inicial",
+      "metodo": "POST",
+      "ruta": "motocicletas/5/ubicacion",
+      "rol": "ALMACEN",
+      "esperado": 201,
+      "obtenido": 201,
+      "aprobado": true
+    },
+    {
+      "caso": "Crear solicitud Comercial",
+      "metodo": "POST",
+      "ruta": "solicitudes",
+      "rol": "COMERCIAL",
+      "esperado": 201,
+      "obtenido": 201,
+      "aprobado": true
+    },
+    {
+      "caso": "Comercial no prepara solicitud",
+      "metodo": "POST",
+      "ruta": "solicitudes/9/seguimiento",
+      "rol": "COMERCIAL",
+      "esperado": 403,
+      "obtenido": 403,
+      "aprobado": true
+    },
+    {
+      "caso": "Preparar solicitud Almacen",
+      "metodo": "POST",
+      "ruta": "solicitudes/9/seguimiento",
+      "rol": "ALMACEN",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true,
+      "nota": "Expectativa corregida al contrato del controlador: POST seguimiento devuelve 200, no 201. No se repitió la escritura."
+    },
+    {
+      "caso": "Login ADMIN",
+      "metodo": "POST",
+      "ruta": "auth/login",
+      "rol": "SIN_TOKEN",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Login ALMACEN",
+      "metodo": "POST",
+      "ruta": "auth/login",
+      "rol": "SIN_TOKEN",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Login INVENTARIOS",
+      "metodo": "POST",
+      "ruta": "auth/login",
+      "rol": "SIN_TOKEN",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Login COMERCIAL",
+      "metodo": "POST",
+      "ruta": "auth/login",
+      "rol": "SIN_TOKEN",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Login FACTURACION",
+      "metodo": "POST",
+      "ruta": "auth/login",
+      "rol": "SIN_TOKEN",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Recuperar solicitud para continuar sin repetir alta",
+      "metodo": "GET",
+      "ruta": "solicitudes/9",
+      "rol": "ADMIN",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Atender sin unidades rechazado",
+      "metodo": "POST",
+      "ruta": "solicitudes/9/seguimiento",
+      "rol": "ALMACEN",
+      "esperado": 409,
+      "obtenido": 409,
+      "aprobado": true
+    },
+    {
+      "caso": "Buscar unidades elegibles",
+      "metodo": "GET",
+      "ruta": "motocicletas/elegibles?chasis=QA20261123185147",
+      "rol": "ALMACEN",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Asignar unidad compatible",
+      "metodo": "POST",
+      "ruta": "solicitudes/9/lineas/12/unidades",
+      "rol": "ALMACEN",
+      "esperado": 201,
+      "obtenido": 201,
+      "aprobado": true
+    },
+    {
+      "caso": "Consultar unidades asignadas",
+      "metodo": "GET",
+      "ruta": "solicitudes/9/lineas/12/unidades",
+      "rol": "ALMACEN",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Cupo excedido rechazado",
+      "metodo": "POST",
+      "ruta": "solicitudes/9/lineas/12/unidades",
+      "rol": "ALMACEN",
+      "esperado": 409,
+      "obtenido": 409,
+      "aprobado": true
+    },
+    {
+      "caso": "Retiro exige motivo",
+      "metodo": "DELETE",
+      "ruta": "solicitudes/9/lineas/12/unidades/6",
+      "rol": "ALMACEN",
+      "esperado": 400,
+      "obtenido": 400,
+      "aprobado": true
+    },
+    {
+      "caso": "Retirar unidad con motivo",
+      "metodo": "DELETE",
+      "ruta": "solicitudes/9/lineas/12/unidades/6",
+      "rol": "ALMACEN",
+      "esperado": 204,
+      "obtenido": 204,
+      "aprobado": true
+    },
+    {
+      "caso": "Reasignar unidad",
+      "metodo": "POST",
+      "ruta": "solicitudes/9/lineas/12/unidades",
+      "rol": "ALMACEN",
+      "esperado": 201,
+      "obtenido": 201,
+      "aprobado": true
+    },
+    {
+      "caso": "Atender solicitud completa",
+      "metodo": "POST",
+      "ruta": "solicitudes/9/seguimiento",
+      "rol": "ALMACEN",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Historial de estados",
+      "metodo": "GET",
+      "ruta": "solicitudes/9/seguimiento",
+      "rol": "COMERCIAL",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Historial termina atendida",
+      "aprobado": true
+    },
+    {
+      "caso": "Solicitud para anulacion",
+      "metodo": "POST",
+      "ruta": "solicitudes",
+      "rol": "COMERCIAL",
+      "esperado": 201,
+      "obtenido": 201,
+      "aprobado": true
+    },
+    {
+      "caso": "Anulacion exige motivo",
+      "metodo": "POST",
+      "ruta": "solicitudes/10/anulacion",
+      "rol": "COMERCIAL",
+      "esperado": 400,
+      "obtenido": 400,
+      "aprobado": true
+    },
+    {
+      "caso": "Anular pendiente con motivo",
+      "metodo": "POST",
+      "ruta": "solicitudes/10/anulacion",
+      "rol": "COMERCIAL",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Solicitud para rechazo",
+      "metodo": "POST",
+      "ruta": "solicitudes",
+      "rol": "COMERCIAL",
+      "esperado": 201,
+      "obtenido": 201,
+      "aprobado": true
+    },
+    {
+      "caso": "Rechazar exige motivo",
+      "metodo": "POST",
+      "ruta": "solicitudes/11/seguimiento",
+      "rol": "ALMACEN",
+      "esperado": 400,
+      "obtenido": 400,
+      "aprobado": true
+    },
+    {
+      "caso": "Rechazar con motivo",
+      "metodo": "POST",
+      "ruta": "solicitudes/11/seguimiento",
+      "rol": "ALMACEN",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Traslado fisico separado",
+      "metodo": "POST",
+      "ruta": "motocicletas/4/traslados",
+      "rol": "ALMACEN",
+      "esperado": 201,
+      "obtenido": 201,
+      "aprobado": true
+    },
+    {
+      "caso": "Historial de ubicacion",
+      "metodo": "GET",
+      "ruta": "motocicletas/4/ubicacion/historial",
+      "rol": "INVENTARIOS",
+      "esperado": 200,
+      "obtenido": 200,
+      "aprobado": true
+    },
+    {
+      "caso": "Historial conserva origen y traslado",
+      "aprobado": true
+    },
+    {
+      "caso": "Logout revoca token",
+      "metodo": "POST",
+      "ruta": "auth/logout",
+      "rol": "FACTURACION",
+      "esperado": 204,
+      "obtenido": 204,
+      "aprobado": true
+    },
+    {
+      "caso": "Token revocado se rechaza",
+      "metodo": "GET",
+      "ruta": "auth/me",
+      "rol": "FACTURACION",
+      "esperado": 401,
+      "obtenido": 401,
+      "aprobado": true
+    }
+  ]
+}

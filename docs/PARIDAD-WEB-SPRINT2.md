@@ -1,5 +1,7 @@
 # Paridad funcional móvil — 23/11/2026
 
+Actualización final: los faltantes de implementación indicados en el cotejo siguiente fueron cubiertos por 824be6c/f24119d (0.2.4). Ver CIERRE-PARIDAD-20261123.md: usuarios, permisos dinámicos y fichas vinculadas presentes; OCR funcionando en Docker y 110 comprobaciones API aprobadas. Queda validación física integral y no se declara aceptación completa. El cotejo inferior se conserva como diagnóstico anterior, no como lista vigente de ausencias.
+
 ## Cotejo posterior al APK 0.2.3: paridad todavía incompleta
 
 Referencias main verificadas nuevamente en remoto el 23/11: web f2981a3 y backend 5b37b9b, sin cambios respecto a las copias inspeccionadas. La existencia de endpoints/pantallas no acredita su funcionamiento integral.
