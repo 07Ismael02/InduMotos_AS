@@ -18,6 +18,7 @@ interface OfflineStore {
     suspend fun edit(owner:String,guide:Long,draft:MotorcycleDraft,baseline:String?,state:String):LocalDraft
     suspend fun mark(draft:LocalDraft,state:String,detail:String)
     suspend fun acknowledge(draft:LocalDraft,serverPayload:String)
+    suspend fun rebase(draft:LocalDraft,baseline:String?)
     suspend fun profile():OfflineProfile?
     suspend fun profile(value:OfflineProfile?)
 }

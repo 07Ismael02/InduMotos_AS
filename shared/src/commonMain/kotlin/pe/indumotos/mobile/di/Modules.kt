@@ -16,10 +16,21 @@ val appModule = module {
     single<OfflineStore> { pe.indumotos.mobile.data.SqlOfflineStore(get()) }
     single { pe.indumotos.mobile.data.OfflineSession(get()) }
     single { createHttpClient(get()) }
-    single { RemoteRepository(get()) }
+    single { RemoteRepository(get(), get(), get()) }
     single<LogisticsRepository> { get<RemoteRepository>() }
     single<LocationRepository> { get<RemoteRepository>() }
-    single<GuideRepository> { pe.indumotos.mobile.data.GuideRemoteRepository(get()) }
+    single { pe.indumotos.mobile.data.GuideRemoteRepository(get()) }
+    single {
+        pe.indumotos.mobile.data.DraftSynchronizer(get(),get(),pe.indumotos.mobile.data.GuideRemoteRepository(get(),true)) {
+            val remote=get<RemoteRepository>();val session=get<pe.indumotos.mobile.data.OfflineSession>()
+            val before=requireNotNull(session.current)
+            val access=remote.profile()
+            require(access.usuarioId==before.access.usuarioId){"La sesión cambió de cuenta."}
+            session.online(before.origin,access);access
+        }
+    }
+    single<GuideRepository> { pe.indumotos.mobile.data.OfflineGuideRepository(get<pe.indumotos.mobile.data.GuideRemoteRepository>(),pe.indumotos.mobile.data.GuideRemoteRepository(get(),true),get(),get(),get()) }
+    single<OfflineWork> { pe.indumotos.mobile.data.OfflineService(get(),get<pe.indumotos.mobile.data.GuideRemoteRepository>(),get(),get()) }
     single<UsersRepository> { pe.indumotos.mobile.data.UsersRemoteRepository(get()) }
     viewModel { pe.indumotos.mobile.presentation.UsersViewModel(get()) }
     viewModel { pe.indumotos.mobile.presentation.GuidesViewModel(get(), get()) }

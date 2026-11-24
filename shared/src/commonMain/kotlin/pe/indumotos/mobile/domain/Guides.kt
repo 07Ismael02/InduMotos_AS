@@ -13,13 +13,16 @@ data class GuidePhoto(val name:String,val mime:String,val bytes:ByteArray)
 data class PhotoSelection(val photos:List<GuidePhoto> = emptyList(),val error:String?=null)
 @Serializable data class MotorcycleDraft(val posicion:Int,val marca:String="",val modelo:String="",val color:String="",
     val chasisCompleto:String="",val numeroMotor:String="",val dua:String="",val itemDua:String="")
-@Serializable data class GuideRegistration(val terminado:Boolean,val recibidas:Int,val registradas:Int,val borradores:List<MotorcycleDraft>) {
+@Serializable data class GuideRegistration(val terminado:Boolean,val recibidas:Int,val registradas:Int,val borradores:List<MotorcycleDraft>,val version:String?=null) {
     val pending get()=(recibidas-registradas).coerceAtLeast(0)
 }
 @Serializable data class OcrSuggestion(val pagina:Int=1,val marca:String="",val modelo:String="",val color:String="",
     val chasisCompleto:String="",val numeroMotor:String="",val dua:String="",val itemDua:String="")
 @Serializable data class OcrResult(val fotosAnalizadas:Int,val sugerencias:List<OcrSuggestion>)
 interface GuideRepository {
+    suspend fun localDrafts(id:Long):List<LocalDraftView> = emptyList()
+    suspend fun resolveLocal(id:Long,position:Int,keepLocal:Boolean){error("No hay borradores locales")}
+    suspend fun conditionalSave(id:Long,draft:MotorcycleDraft,version:String):GuideRegistration=error("El repositorio no permite escritura condicional")
     suspend fun detail(id:Long):ArrivalDetail
     suspend fun arrivals(guide:String,state:String,page:Int):ArrivalPage
     suspend fun register(guide:String,declared:Int,received:Int,note:String,photos:List<GuidePhoto>):Arrival
@@ -30,6 +33,7 @@ interface GuideRepository {
     suspend fun finish(id:Long):GuideRegistration
     suspend fun ocr(id:Long):OcrResult
 }
+data class LocalDraftView(val draft:MotorcycleDraft,val state:String,val detail:String?)
 object GuideRules {
     fun photo(photo:GuidePhoto) {
         require(photo.mime in listOf("image/jpeg","image/png") && photo.bytes.isNotEmpty() && photo.bytes.size<=5*1024*1024) { "Selecciona fotos JPG/PNG de hasta 5 MB." }

@@ -42,6 +42,11 @@ class SqlOfflineStore(private val db:OfflineDb):OfflineStore {
             else if(current!=null&&current.baseline==draft.baseline)q.putDraft(current.owner,current.guide_id,current.position,current.payload,serverPayload,current.revision,current.state,current.detail)
         }
     }
+    override suspend fun rebase(draft:LocalDraft,baseline:String?)=io {
+        val current=q.getDraft(draft.owner,draft.guideId,draft.position.toLong()).executeAsOneOrNull()
+        if(current?.revision==draft.revision)q.putDraft(current.owner,current.guide_id,current.position,current.payload,baseline,current.revision+1,"PENDING",null)
+        Unit
+    }
     override suspend fun profile():OfflineProfile?=io{q.getProfile().executeAsOneOrNull()?.let{OfflineProfile(it.owner,it.origin,json.decodeFromString(it.access_json),it.authenticated_ms)}}
     override suspend fun profile(value:OfflineProfile?)=io{if(value==null)q.dropProfile() else q.putProfile(value.owner,value.origin,json.encodeToString(value.access),value.authenticatedMs);Unit}
 }
