@@ -1,3 +1,9 @@
+# Estado vigente — cuentas y perfiles0.3.3
+
+Leer CUENTAS-Y-PERFILES-20261123.md. App feature/ismael-offline-cuentas (código14618b2); backend feature/ismael-cuentas-presentacion (sin cambios Java). 53 pruebas aprobadas y seis logins HTTP200. Samsung conserva cuatro perfiles descargados tras reapertura. Credenciales académicas configuradas localmente, sin publicarlas. Catálogo/sedes/guías sintéticos renombrados con respaldo e IDs conservados. Facturación habilitada solo para consulta por aprobación explícita: dos lecturas200 y cinco escrituras403 verificadas. Main intacto.
+
+## Antecedentes
+
 # Estado vigente — offline 0.3.2
 
 Leer OFFLINE-CONTINUIDAD.md y OFFLINE-USO.md. APK código92f3bce, backend95261ad; 51 pruebas móviles,2 backend,14 HTTP aprobadas. Samsung conservó el borrador después de actualización/reapertura y lo sincronizó: API confirma mismo motor, un borrador y stock0. Evidencias y manifiesto en docs. Main intacto. Falta validación integral Sprint2/release/iOS; no confundir las notas históricas siguientes con estado vigente.

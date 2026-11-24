@@ -12,7 +12,7 @@ El aviso **Sin servidor · consulta local** distingue los datos guardados de la 
 
 Para una guía previamente descargada, completar o editar un bloque y pulsar **Guardar borrador**. **Guardado en el teléfono · pendiente de envío** significa persistencia local, no confirmación del servidor. No se añade stock y no se finaliza la recepción offline. Los campos aún no guardados no se garantizan después de cerrar forzadamente la app; se solicita confirmación al abandonar una pantalla con cambios no guardados.
 
-Tras cerrar/reabrir, usar **Consultar sin conexión · usuario** y autenticar con el bloqueo del dispositivo. La consulta local dura como máximo 24 horas desde el login online; no restaura un JWT. Si el dispositivo no tiene bloqueo seguro o caduca el perfil, se requiere login online. Cerrar sesión retira la reapertura offline, pero conserva los borradores de esa cuenta para su próximo login correcto.
+Tras cerrar/reabrir, usar **Consultar sin conexión · usuario** y autenticar con el bloqueo del dispositivo. La consulta local dura como máximo 24 horas desde el login online; no restaura un JWT. Si el dispositivo no tiene bloqueo seguro o caduca el perfil, se requiere login online. Se pueden conservar varias cuentas previamente autenticadas y descargadas, seleccionables al reabrir. Cerrar sesión retira la reapertura offline solo de la cuenta activa, pero conserva los borradores de esa cuenta para su próximo login correcto.
 
 ## Reconectar
 
@@ -26,7 +26,7 @@ Login del servidor, alta de llegadas con fotos, OCR, finalización/stock, edici�
 
 ## Entorno y recuperación
 
-- Móvil: rama feature/sprint2-paridad-web. Backend offline: feature/sprint2-offline-borradores, base 95261ad, sin migraciones nuevas.
+- Móvil: rama feature/ismael-offline-cuentas. Backend offline: feature/sprint2-offline-borradores, base 95261ad, sin migraciones nuevas.
 - API Docker indumotos-paridad-api, imagen indumotos-paridad-ocr:95261ad, puerto 127.0.0.1:8090. Base de pruebas aislada indumotos_s2_paridad_20261123. Contenedor anterior conservado detenido como indumotos-paridad-api-pre-offline.
 - App: http://127.0.0.1:8089; `adb -s RFGL11XYCTD reverse tcp:8089 tcp:8090`. Tras reiniciar ADB/USB, restablecer el túnel para sincronizar; su ausencia no impide consultar lo ya descargado.
 - El modo offline Android usa SQLDelight, almacenamiento privado, copia de seguridad Android deshabilitada y confirmación nativa del dispositivo. No guarda contraseñas ni JWT. iOS conserva adaptadores de base, pero no se ha compilado ni se ofrece el desbloqueo offline como verificado.

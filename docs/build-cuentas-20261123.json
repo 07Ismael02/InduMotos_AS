@@ -1,0 +1,18 @@
+{
+  "fecha": "2026-11-23T23:26:28-05:00",
+  "versionName": "0.3.3-sprint2-offline",
+  "versionCode": 10,
+  "applicationId": "pe.indumotos.asapp",
+  "tipo": "Debug",
+  "commitCodigo": "14618b2",
+  "backendCommit": "95261ad1ad4e375150acd3c196969f7e73db627c",
+  "sha256": "714874a59e3786b9a5088426b5f484d12e121b2a2ea7939c9eeae7bcff205b01",
+  "certificadoSha256": "23c1a0373560f28c3d2b64103e50a0dff54bb955fd75b20ac40d52253e33b0f0",
+  "bytes": 23199208,
+  "rutaLocal": "C:\\Users\\Ismael Logacho\\Documents\\PharmaMobil\\proyecto-final-dam\\InduMotos-Sprint2\\entrega\\Indumotos-AS-0.3.3-sprint2-offline-debug.apk",
+  "tests": 53,
+  "fallos": 0,
+  "compilacion": "BUILD SUCCESSFUL",
+  "httpCas": 14,
+  "validacionFisica": "Samsung: login y descarga por cuatro cuentas; reapertura conserva las cuatro opciones offline simultáneas. Facturación: consulta200 y cinco escrituras403 verificadas por API. No se repitió desbloqueo PIN de cada perfil."
+}

@@ -1,0 +1,12 @@
+{
+  "version": "0.3.3-sprint2-offline",
+  "cuentas": [
+    {
+      "cuenta": "facturacion.indumotos",
+      "login": true,
+      "descarga": true
+    }
+  ],
+  "seleccionTrasReapertura": true,
+  "nota": "No se simuló desbloqueo PIN ni se compartieron cachés. Logout explícito revoca solo el perfil seleccionado."
+}

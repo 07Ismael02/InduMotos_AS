@@ -1,6 +1,8 @@
 # Indumotos AS — aplicativo móvil
 
-Estado vigente: **0.3.2-sprint2-offline / código 9**, trabajo del 23/11/2026. Rama `feature/sprint2-paridad-web`; main permanece estable y sin este incremento. Leer primero [continuidad](docs/CONTINUIDAD.md), AGENTS.md y [uso offline](docs/OFFLINE-USO.md).
+Estado vigente: **0.3.3-sprint2-offline / código 10**, trabajo del 23/11/2026. Rama `feature/ismael-offline-cuentas`; main permanece estable y sin este incremento. Leer primero [continuidad](docs/CONTINUIDAD.md), AGENTS.md y [uso offline](docs/OFFLINE-USO.md).
+
+Cuentas legibles, ajustes de datos y evidencia de cuatro perfiles en Samsung: [cuentas y perfiles](docs/CUENTAS-Y-PERFILES-20261123.md). Backend del bloque actual: `feature/ismael-cuentas-presentacion`; el binario sigue en95261ad, sin cambios Java.
 
 ## Funciones y arquitectura
 
@@ -12,7 +14,7 @@ Incluye catálogo con selección marca→modelo→color y alta administrativa ex
 
 Descarga explícita de catálogo, inventario/fichas y guías con fotos. Consulta de lo descargado y guardado de borradores de guías previamente descargadas, separados por servidor/usuario. Cada pendiente conserva baseline y revisión; al reconectar renueva permisos y envía PUT condicional If-Match. Conflictos requieren revisión; no se reenvían automáticamente.
 
-Reapertura local protegida por credencial nativa Android, máximo 24 horas desde login online. No restaura sesión del servidor ni guarda JWT/contraseñas. Logout retira la reapertura y conserva borradores separados para el próximo login de la misma cuenta. No se cachean credenciales ni administración de personal. Datos locales son la última lectura, no stock actual confirmado.
+Reapertura local protegida por credencial nativa Android, máximo 24 horas desde login online. No restaura sesión del servidor ni guarda JWT/contraseñas. Se pueden conservar varios perfiles independientes. Logout retira la reapertura de la cuenta activa y conserva borradores separados para el próximo login de la misma cuenta. No se cachean credenciales ni administración de personal. Datos locales son la última lectura, no stock actual confirmado.
 
 Sin conexión no se crean llegadas/fotos, ejecuta OCR, finaliza stock, asignan unidades, trasladan ni administran accesos. Esas operaciones requieren servidor. Sincronización explícita y periódica mientras la app está activa; no se promete ejecución con la app cerrada. [Procedimiento completo](docs/OFFLINE-USO.md).
 
@@ -37,9 +39,9 @@ Java21 y wrappers existentes. Configuración para ahorrar RAM: Gradle1536MB, un 
 ./gradlew.bat :shared:testAndroidHostTest :androidApp:assembleDebug --console=plain
 ```
 
-APK estable local ignorado por Git: `entrega/Indumotos-AS-0.3.2-sprint2-offline-debug.apk`. AppID `pe.indumotos.asapp`, misma firma Debug e instalación -r sin borrar datos. Código del APK `92f3bce`; hash/certificado/ruta exactos en [manifiesto](docs/build-offline-20261123.json). No es release de producción ni AAB/iOS certificado.
+APK estable local ignorado por Git: `entrega/Indumotos-AS-0.3.3-sprint2-offline-debug.apk`. AppID `pe.indumotos.asapp`, misma firma Debug e instalación -r sin borrar datos. Código del APK `14618b2`; hash/certificado/ruta exactos en [manifiesto](docs/build-cuentas-20261123.json). No es release de producción ni AAB/iOS certificado.
 
-Verificación actual: **51 pruebas móviles JVM/SQLite/HTTP aprobadas**, 2 unitarias backend y 14 comprobaciones HTTP reales de control de concurrencia. Las 110 comprobaciones API anteriores pertenecen al bloque previo. No son 51 recorridos físicos. Resultado Samsung y evidencias: [continuidad offline](docs/OFFLINE-CONTINUIDAD.md). Los hitos históricos no sustituyen la validación del APK actual.
+Verificación actual: **53 pruebas móviles JVM/SQLite/HTTP aprobadas**, 2 unitarias backend y 14 comprobaciones HTTP reales de control de concurrencia. Las 110 comprobaciones API anteriores pertenecen al bloque previo. No son 51 recorridos físicos. Resultado Samsung y evidencias: [continuidad offline](docs/OFFLINE-CONTINUIDAD.md). Los hitos históricos no sustituyen la validación del APK actual.
 
 ## Pendientes y entrega
 

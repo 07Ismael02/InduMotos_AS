@@ -13,3 +13,5 @@ Leer README.md, docs/CONTINUIDAD.md y docs/SPRINT2.md antes de modificar código
 - Antes de terminar cada bloque, actualizar README/CONTINUIDAD con fecha, rama/commit, verificación real y siguiente acción. No marcar Sprint 2 terminado solo por la urgencia del 19/11/2026.
 
 - Offline fue autorizado el 23/11/2026: seguir docs/OFFLINE-USO.md y OFFLINE-CONTINUIDAD.md. Consulta local y borradores de guías descargadas; no extender cola a operaciones sensibles. Backend vigente de integración: feature/sprint2-offline-borradores (base main 5b37b9b), no sustituir por la referencia histórica Sprint1.
+
+- El23/11 el responsable autorizó nombres de cuentas operativas legibles y contraseña común solo en la copia académica local. No publicar valores ni incorporar excepciones débiles al alta general. Ramas actuales con Ismael: feature/ismael-offline-cuentas y feature/ismael-cuentas-presentacion. Ver docs/CUENTAS-Y-PERFILES-20261123.md.
