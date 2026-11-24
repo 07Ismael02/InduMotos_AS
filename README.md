@@ -1,4 +1,4 @@
-Trabajo vigente, 24/11/2026: **0.4.1-evolucion / código14**, rama `feature/ismael-catalogo-ventas`. [Perfil, navegación y consulta local](docs/PERFIL-Y-NAVEGACION.md) y [estado de la evolución](docs/EVOLUCION-ACTIVA.md). La instalación física de esta actualización está pendiente de recuperar ADB; 0.4.0 sí se instaló y autenticó por HTTPS en el hotspot. Los apartados siguientes son antecedentes y no acreditan validación de la versión nueva.
+Trabajo vigente, 24/11/2026: **0.4.1-evolucion / código14**, rama `feature/ismael-catalogo-ventas`. [Perfil, navegación y consulta local](docs/PERFIL-Y-NAVEGACION.md) y [estado de la evolución](docs/EVOLUCION-ACTIVA.md). Actualización instalada en Samsung conservando datos y firma. Suite móvil: 59 pruebas aprobadas. Regreso de Solicitudes/Traslados, Ajustes/Perfil y conservación del selector tras logout online comprobados; ciclo físico completo de salida/reentrada offline pendiente de desbloqueo Android. Los apartados siguientes son antecedentes.
 
 # Indumotos AS — aplicativo móvil
 

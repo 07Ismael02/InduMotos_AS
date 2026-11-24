@@ -1,5 +1,7 @@
 # Corte 24/11/2026 — perfil y navegación
 
+Actualización del corte: ADB recuperado, 0.4.1 instalada (firma compatible, install-r Success). Build final aprobado; 59 pruebas móviles sin fallos/errores. Ver resultados físicos y límites en PERFIL-Y-NAVEGACION.md. Barra de conexión compactada, contraste oscuro ajustado; todas las acciones están en «Ver estado». Falta que el responsable complete el desbloqueo Android para comprobar el ciclo físico de cierre y reentrada offline. No pedir ni registrar su PIN. El párrafo siguiente describe el impedimento anterior, ya resuelto.
+
 Rama feature/ismael-catalogo-ventas. Leer PERFIL-Y-NAVEGACION.md y EVOLUCION-ACTIVA.md. Correcciones de permanencia del perfil offline, pantallas de ajustes/perfil y Atrás por niveles. Suite móvil: 59 pruebas, cero fallos/errores. Versión0.4.1, código14; comprobar final del build en tmp/sprint2-auditoria/perfil-041-build.log. Samsung antes en192.168.137.64:45165 dejó de aceptar ADB: se solicitó nueva dirección principal, sin nuevo emparejamiento. No declarar instalada ni revisada físicamente esta versión hasta comprobarlo. Backend de este entorno: indumotos-evolucion-api, HTTPS192.168.137.1:8443, copiaDBV34; originalV23 conservado. No cambios backend para este bloque. Main intacto.
 
 ## Antecedentes

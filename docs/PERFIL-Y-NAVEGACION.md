@@ -11,6 +11,10 @@ Rama: feature/ismael-catalogo-ventas. Actualización Android 0.4.1-evolucion, c�
 
 ## Verificación
 
-Se ejecutaron 59 pruebas móviles, cero fallos/errores, incluidas las regresiones de repositorio HTTP/SQLite para cerrar sesión online y offline conservando el perfil sin sesión activa. Revisión física pendiente: ADB inalámbrico dejó de aceptar la dirección anterior y se solicitó al responsable la dirección actual. No se declara aprobado el recorrido visual por estas pruebas de repositorio.
+Se ejecutaron 59 pruebas móviles, cero fallos/errores, incluidas las regresiones de repositorio HTTP/SQLite para cerrar sesión online y offline conservando el perfil sin sesión activa. Compilación Android aprobada y firma original verificada. Se recuperó ADB inalámbrico sin nuevo emparejamiento.
+
+En el Samsung se comprobaron Perfil → Ajustes, Preferencias → Ajustes, detalle de Solicitud → lista y recorrido de Traslados → selección utilizando KEYCODE_BACK. Tras cerrar sesión online, admin.indumotos siguió visible en el selector offline. Se capturó la barra compacta en horizontal; fecha, mensajes y acciones se consultan mediante «Ver estado». Ajuste posterior de contraste del tema oscuro compilado y con suite aprobada. La salida y reentrada desde una sesión offline requiere todavía completar el desbloqueo de Android en la prueba física; no se declara ese último recorrido aprobado únicamente por la regresión automatizada.
+
+Evidencias privadas conservadas fuera de Git: 041-ajustes.png, 041-perfil.png, 041-atras-solicitudes.png, 041-atras-traslados.png, 041-horizontal.png y 041-cuenta-conservada.png en tmp/sprint2-auditoria/privado-paridad del espacio de trabajo. Las capturas preceden al último ajuste de contraste; no acreditan su apariencia final.
 
 Pendientes del bloque anterior: práctica de fotografías propias, ventas y offline/reconexión por hotspot. La conexión Wi-Fi con servidor es online; no equivale a modo offline.
