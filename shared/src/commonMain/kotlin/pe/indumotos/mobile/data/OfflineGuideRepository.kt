@@ -10,7 +10,7 @@ class OfflineGuideRepository(private val read:GuideRepository,private val server
     override suspend fun arrivals(guide:String,state:String,page:Int):ArrivalPage {
         try{return read.arrivals(guide,state,page)}catch(e:AppException){
             if(e.error!=AppError.Network)throw e
-            val snapshots=store.all(session.owner(),"http").mapNotNull{runCatching{json.decodeFromString<ArrivalPage>(it.payload)}.getOrNull()}
+            val snapshots=store.all(session.owner(),"http").filter{it.key.startsWith("llegadas/pagina|")}.mapNotNull{runCatching{json.decodeFromString<ArrivalPage>(it.payload)}.getOrNull()}
             if(snapshots.isEmpty())throw e
             val matches=snapshots.flatMap{it.items}.distinctBy{it.id}.filter{it.numeroGuia.contains(guide.trim(),true)&&(state.isBlank()||it.estadoRegistro==state)}.sortedByDescending{it.id}
             return ArrivalPage(matches.drop(page*10).take(10),page,(matches.size+9)/10,matches.size.toLong())

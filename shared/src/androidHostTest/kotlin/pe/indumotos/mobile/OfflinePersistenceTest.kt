@@ -62,4 +62,13 @@ class OfflinePersistenceTest {
             assertNull(OfflineSession(s).available())
         }finally{d.close()}
     }
+    @Test fun oldConnectionCheckCannotRestoreLoggedOutProfile()=runTest {
+        val (d,s)=memory();try {
+            val session=OfflineSession(s);val access=Access(1,"qa","INVENTARIOS",emptyList())
+            session.online("http://localhost",access);val before=session.current!!
+            s.profile(null);session.close()
+            assertFailsWith<kotlinx.coroutines.CancellationException>{session.confirmOnline(access,before)}
+            assertNull(session.current);assertNull(s.profile())
+        }finally{d.close()}
+    }
 }

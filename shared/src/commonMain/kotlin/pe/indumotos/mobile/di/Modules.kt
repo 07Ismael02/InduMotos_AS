@@ -25,8 +25,7 @@ val appModule = module {
             val remote=get<RemoteRepository>();val session=get<pe.indumotos.mobile.data.OfflineSession>()
             val before=requireNotNull(session.current)
             val access=remote.profile()
-            require(access.usuarioId==before.access.usuarioId){"La sesión cambió de cuenta."}
-            session.online(before.origin,access);access
+            session.confirmOnline(access,before);access
         }
     }
     single<GuideRepository> { pe.indumotos.mobile.data.OfflineGuideRepository(get<pe.indumotos.mobile.data.GuideRemoteRepository>(),pe.indumotos.mobile.data.GuideRemoteRepository(get(),true),get(),get(),get()) }

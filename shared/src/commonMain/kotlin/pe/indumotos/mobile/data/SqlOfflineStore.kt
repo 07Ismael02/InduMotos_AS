@@ -17,7 +17,7 @@ class SqlOfflineStore(private val db:OfflineDb):OfflineStore {
     private suspend fun <T> io(block:()->T):T=withContext(Dispatchers.Default){mutex.withLock{block()}}
     private fun Local_draft.domain()=LocalDraft(owner,guide_id,position.toInt(),payload,baseline,revision,state,detail)
     override suspend fun get(owner:String,resource:String,key:String)=io{q.getCache(owner,resource,key).executeAsOneOrNull()?.let{CachedValue(it.payload,it.saved_ms)}}
-    override suspend fun all(owner:String,resource:String)=io{q.allCache(owner,resource).executeAsList().map{CachedValue(it.payload,it.saved_ms)}}
+    override suspend fun all(owner:String,resource:String)=io{q.allCache(owner,resource).executeAsList().map{CachedValue(it.payload,it.saved_ms,it.cache_key)}}
     override suspend fun put(owner:String,resource:String,key:String,payload:String,time:Long)=io{q.putCache(owner,resource,key,payload,time);Unit}
     override suspend fun remove(owner:String,resource:String,key:String)=io{q.dropCache(owner,resource,key);Unit}
     override suspend fun image(owner:String,guide:Long,image:Long)=io{q.getImage(owner,guide,image).executeAsOneOrNull()}

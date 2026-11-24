@@ -3,7 +3,7 @@ package pe.indumotos.mobile.domain
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.Serializable
 
-data class CachedValue(val payload:String,val savedMs:Long)
+data class CachedValue(val payload:String,val savedMs:Long,val key:String="")
 @Serializable data class OfflineProfile(val owner:String,val origin:String,val access:Access,val authenticatedMs:Long)
 data class LocalDraft(val owner:String,val guideId:Long,val position:Int,val payload:String,val baseline:String?,val revision:Long,val state:String,val detail:String?)
 data class OfflineStatus(val offline:Boolean=false,val readOnlySession:Boolean=false,val pending:Int=0,val conflicts:Int=0,val lastDownloadMs:Long?=null,val syncing:Boolean=false,val message:String?=null)

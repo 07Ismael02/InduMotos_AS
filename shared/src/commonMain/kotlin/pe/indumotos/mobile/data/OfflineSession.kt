@@ -1,6 +1,7 @@
 package pe.indumotos.mobile.data
 
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.CancellationException
 import pe.indumotos.mobile.domain.*
 
 class OfflineSession(val store:OfflineStore) {
@@ -24,6 +25,10 @@ class OfflineSession(val store:OfflineStore) {
         current=profile;mutable.value=OfflineStatus(offline=true,readOnlySession=true,lastDownloadMs=last,message="Consulta local desbloqueada. No es una sesión del servidor.");refresh();return profile.access
     }
     fun close(){current=null;mutable.value=OfflineStatus()}
+    fun confirmOnline(access:Access,expected:OfflineProfile){
+        if(current!==expected||access.usuarioId!=expected.access.usuarioId)throw CancellationException("La cuenta cambió durante la comprobación de conexión")
+        mutable.update{it.copy(offline=false)}
+    }
     fun readOnly()=status.value.readOnlySession
     fun offline(){mutable.update{it.copy(offline=true)}}
     fun downloaded(time:Long){mutable.update{it.copy(offline=false,lastDownloadMs=time)}}
