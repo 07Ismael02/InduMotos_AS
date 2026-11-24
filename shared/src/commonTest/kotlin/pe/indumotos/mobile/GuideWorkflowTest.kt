@@ -5,6 +5,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.test.*
 import pe.indumotos.mobile.domain.*
 import pe.indumotos.mobile.presentation.GuidesViewModel
+import kotlinx.serialization.json.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class GuideWorkflowTest {
@@ -47,8 +48,15 @@ class GuideWorkflowTest {
         vm.reviewed(true);vm.useSuggestion(0,1);assertFalse(vm.state.value.ocrReviewed)
         vm.save(vm.state.value.drafts.first());advanceUntilIdle();assertTrue(repo.current.borradores.isEmpty())
     }
+    @Test fun linkedMotorcyclesBelongToSelectedGuideAndClearOnExit()=runTest {
+        val repo=Fake();repo.linked=listOf(buildJsonObject{put("id",77);put("llegadaId",arrival.id)})
+        val vm=GuidesViewModel(repo,repo);vm.select(arrival,false);advanceUntilIdle()
+        assertEquals(77,vm.state.value.detail!!.fichas.single()["id"]!!.jsonPrimitive.int)
+        vm.list();advanceUntilIdle();assertNull(vm.state.value.detail)
+    }
     private inner class Fake:GuideRepository,CatalogRepository {
-        override suspend fun detail(id:Long)=ArrivalDetail(arrival,emptyList(),0,1)
+        var linked:List<JsonObject> = emptyList()
+        override suspend fun detail(id:Long)=ArrivalDetail(arrival,linked,linked.size,1-linked.size)
         var current=GuideRegistration(false,1,0,emptyList());var finishes=0;var uploads=0;var failUpload=false;var gate:CompletableDeferred<Unit>?=null
         override suspend fun arrivals(guide:String,state:String,page:Int)=ArrivalPage(listOf(arrival),0,1,1)
         override suspend fun register(guide:String,declared:Int,received:Int,note:String,photos:List<GuidePhoto>):Arrival{uploads++;if(failUpload)throw AppException(AppError.Network);return arrival}

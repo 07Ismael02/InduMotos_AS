@@ -177,7 +177,8 @@ private fun createForm(module:Module):Form=when(module){
  var touched by remember{mutableStateOf(false)}
  LaunchedEffect(chasis,marca,modelo,color,state.busy){
   if(touched&&!state.busy){delay(300);val filter=InventoryFilter(chasis,marca,modelo,color)
-   if(filter!=state.filter&&(chasis.isBlank()||chasis.trim().length>=4))vm.search(filter)
+   val value=chasis.trim()
+   if(filter!=state.filter&&(value.isEmpty()||value.length>4||(value.length==4&&value.all{it.isDigit()})))vm.search(filter)
   }
  }
  LazyColumn(contentPadding=PaddingValues(start=20.dp,end=20.dp,top=20.dp,bottom=110.dp),verticalArrangement=Arrangement.spacedBy(14.dp)){
@@ -201,57 +202,6 @@ private fun createForm(module:Module):Form=when(module){
  }
 }
 
-@Composable private fun QueryScreen(state:UiState,vm:LogisticsViewModel){
- val module=state.module!!;var id by remember(module){mutableStateOf("")}
- LazyColumn(contentPadding=PaddingValues(start=20.dp,end=20.dp,top=24.dp,bottom=110.dp),verticalArrangement=Arrangement.spacedBy(18.dp)){
-  item{Text(module.title,fontSize=24.sp,fontWeight=FontWeight.Bold);Spacer(Modifier.height(8.dp));Text(module.description,fontSize=13.sp,color=Muted,lineHeight=20.sp)}
-  if(module==Module.USERS)item{EmptyState("Cuentas individuales","Usa Nueva cuenta para registrar un trabajador y asignarle su rol. Para consultar accesos, abre Roles y permisos.")}
-  if(module==Module.ARRIVALS) {
-   if(vm.allowed("INVENTARIO_CONSULTAR")) {
-    item{OutlinedTextField(id,{id=it},label={Text("Número de guía")},singleLine=true,modifier=Modifier.fillMaxWidth());Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){Button(onClick={vm.arrivals(id)},enabled=!state.busy){Text("Buscar guía")};OutlinedButton(onClick={id="";vm.arrivals("")},enabled=!state.busy){Text("Recientes")}};Text("Recepciones recientes · máximo 20 coincidencias",fontSize=12.sp)}
-    items(state.rows,key={it.text("id")}){row->OutlinedCard(onClick={vm.query(row.text("id"))},modifier=Modifier.fillMaxWidth()){Column(Modifier.padding(16.dp)){Text("Guía ${row.text("numeroGuia")}",fontWeight=FontWeight.SemiBold);Text("Recibidas: ${row.text("cantidadRecibida")} · ${row.text("fechaLlegada")}");Text("Ver recepción →")}}}
-    state.detail?.let{record->item{RecordDetail(record)}}
-    if(state.rows.isEmpty()&&!state.busy)item{EmptyState("Sin recepciones","Busca por número de guía o registra una recepción con una cuenta autorizada.")}
-   } else item{EmptyState("Registro de recepción","Tu cuenta puede registrar llegadas. La consulta requiere permiso de inventario.")}
-  }
-  val consult=if(module==Module.PERMISSIONS)vm.allowed("PERMISOS_ASIGNAR")else vm.allowed("INVENTARIO_CONSULTAR")
-  if(module!=Module.USERS&&module!=Module.ARRIVALS&&consult)item{
-   OutlinedCard(colors=CardDefaults.outlinedCardColors(containerColor=MaterialTheme.colorScheme.surface)){Column(Modifier.padding(20.dp)){
-    Text(if(module==Module.ARRIVALS)"Consultar recepción"else if(module==Module.PERMISSIONS)"Consultar cuenta"else"Consultar ficha",fontWeight=FontWeight.SemiBold)
-    Spacer(Modifier.height(12.dp));OutlinedTextField(id,{id=it},label={Text(if(module==Module.ARRIVALS)"ID de llegada"else if(module==Module.PERMISSIONS)"ID de usuario"else"ID de motocicleta")},singleLine=true,modifier=Modifier.fillMaxWidth(),keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Number));Spacer(Modifier.height(12.dp));Button(onClick={vm.query(id)},enabled=!state.busy&&Rules.positive(id)){Text("Consultar")}
-   }}
-  }
-  state.detail?.takeIf{module!=Module.ARRIVALS}?.let{record->
-   if(module==Module.PERMISSIONS)item{PermissionDetail(record,vm)}
-   else item{RecordDetail(record)}
-  }
-  if(module!=Module.USERS&&module!=Module.ARRIVALS&&state.detail==null)item{EmptyState(if(consult)"Consulta por identificador"else"Registro autorizado",if(consult)"Ingresa el identificador asignado por el servidor al guardar el registro."else"Tu cuenta puede registrar información. La consulta requiere el permiso de inventario.")}
- }
-}
-
-@Composable private fun PermissionDetail(record:JsonObject,vm:LogisticsViewModel){
- val accountId=record.text("usuarioId");var selectedRole by remember(record){mutableStateOf(record.text("rolCodigo"))};var code by remember(record){mutableStateOf(PermissionLabels.keys.first())};var decision by remember(record){mutableStateOf("DENEGAR")}
- Column(verticalArrangement=Arrangement.spacedBy(16.dp)){
-  OutlinedCard(colors=CardDefaults.outlinedCardColors(containerColor=MaterialTheme.colorScheme.surface)){Column(Modifier.padding(20.dp)){
-   Text(record.text("nombreUsuario"),fontSize=19.sp,fontWeight=FontWeight.Bold);Text("#"+accountId+" · "+roleLabel(record.text("rolCodigo")),color=Blue,fontSize=12.sp);Spacer(Modifier.height(18.dp))
-   record["permisos"]?.jsonArray?.forEach{p->val permission=p.jsonObject;Row(Modifier.fillMaxWidth().padding(vertical=10.dp),verticalAlignment=Alignment.CenterVertically){Text(PermissionLabels[permission.text("codigo")]?:permission.text("codigo"),modifier=Modifier.weight(1f),fontSize=12.sp);Text(if(permission["permitido"]?.jsonPrimitive?.booleanOrNull==true)"Permitido"else"Denegado",color=if(permission["permitido"]?.jsonPrimitive?.booleanOrNull==true)Blue else MaterialTheme.colorScheme.error,fontSize=11.sp)};HorizontalDivider()}
-  }}
-  OutlinedCard(colors=CardDefaults.outlinedCardColors(containerColor=MaterialTheme.colorScheme.surface)){Column(Modifier.padding(20.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){
-   Text("Modificar acceso",fontWeight=FontWeight.SemiBold);OptionSelect("Rol",RoleCodes,selectedRole,{selectedRole=it},roleNames)
-   OutlinedButton(onClick={vm.form(Form("Confirmar cambio de rol de #$accountId","usuarios/$accountId/rol",listOf(Field("rolCodigo","Rol",options=listOf(selectedRole),labels=roleNames)),"PUT",sensitive=true))},enabled=selectedRole!=record.text("rolCodigo")){Text("Cambiar rol")}
-   HorizontalDivider();OptionSelect("Permiso",PermissionLabels.keys.toList(),code,{code=it},PermissionLabels);OptionSelect("Excepción",listOf("PERMITIR","DENEGAR"),decision,{decision=it},mapOf("PERMITIR" to "Permitir","DENEGAR" to "Denegar"))
-   OutlinedButton(onClick={vm.form(Form("Confirmar excepción de #$accountId","usuarios/$accountId/permisos/$code",listOf(Field("decision","Decisión",options=listOf(decision),labels=mapOf("PERMITIR" to "Permitir","DENEGAR" to "Denegar"))),"PUT",sensitive=true))}){Text("Guardar excepción")}
-   TextButton(onClick={vm.form(Form("Retirar excepción de #$accountId","usuarios/$accountId/permisos/$code",emptyList(),"DELETE",sensitive=true))}){Text("Retirar excepción seleccionada")}
-  }}
- }
-}
-
-private val FieldLabels=mapOf("id" to "Identificador","llegadaId" to "Llegada vinculada","numeroGuia" to "Guía de remisión","fechaLlegada" to "Fecha de recepción","receptorId" to "ID de receptor","receptorUsuario" to "Recibido por","cantidadDeclarada" to "Cantidad declarada","cantidadRecibida" to "Cantidad recibida","observacion" to "Observación","marca" to "Marca","modelo" to "Modelo","color" to "Color","chasisCompleto" to "Chasis completo","numeroMotor" to "Número de motor","dua" to "DUA","itemDua" to "Ítem DUA","creadorUsuario" to "Registrado por","creadoEn" to "Fecha de registro","cantidadFichas" to "Fichas registradas","diferenciaInformativa" to "Diferencia informativa")
-@Composable private fun RecordDetail(record:JsonObject){
- OutlinedCard(colors=CardDefaults.outlinedCardColors(containerColor=MaterialTheme.colorScheme.surface)){Column(Modifier.padding(20.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){
-  record.forEach{(key,value)->when(value){is JsonObject->{Text(if(key=="llegada")"Recepción"else key,fontWeight=FontWeight.SemiBold);RecordDetail(value)};is JsonArray->{Text("Fichas vinculadas (${value.size})",fontWeight=FontWeight.SemiBold);value.forEach{if(it is JsonObject)RecordDetail(it)}};else->{Column{Text(FieldLabels[key]?:key,color=Muted,fontSize=11.sp);Spacer(Modifier.height(4.dp));Text((value as? JsonPrimitive)?.contentOrNull?.ifBlank{"Sin información"}?:"Sin información",fontSize=13.sp)}}}}
- }}
-}
 @Composable private fun EmptyState(title:String,copy:String){Column(Modifier.fillMaxWidth().padding(vertical=24.dp),horizontalAlignment=Alignment.CenterHorizontally){Icon(Icons.Default.Info,null,tint=Blue);Spacer(Modifier.height(12.dp));Text(title,fontWeight=FontWeight.SemiBold);Spacer(Modifier.height(8.dp));Text(copy,color=Muted,fontSize=12.sp,lineHeight=19.sp)}}
 @Composable private fun Notice(message:String,error:Boolean){Surface(Modifier.fillMaxWidth().padding(horizontal=20.dp,vertical=6.dp),shape=RoundedCornerShape(8.dp),color=if(error)MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.secondaryContainer){Text(message,Modifier.padding(14.dp),fontSize=12.sp,lineHeight=19.sp,color=if(error)MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onSecondaryContainer)}}
 @Composable private fun OptionSelect(label:String,options:List<String>,value:String,change:(String)->Unit,labels:Map<String,String> = emptyMap()){

@@ -38,7 +38,7 @@ internal fun MotorcycleDetail(record: JsonObject, busy: Boolean, close: () -> Un
                     title = { Text("Ficha de motocicleta") },
                     navigationIcon = {
                         IconButton(onClick = close, enabled = !busy) {
-                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver a inventario")
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)

@@ -95,7 +95,6 @@ import kotlinx.serialization.json.*
                         if(s.drafts.any{d->registration.borradores.none{it==d}})confirmReload=true else vm.select(arrival,canEdit)
                     },enabled=!s.busy){Text("Actualizar desde servidor")}
                     registration?.let{Text("Registradas: ${it.registradas} · Pendientes: ${it.pending} · ${if(it.terminado)"Confirmada" else "Pendiente"}")}
-                    s.detail?.let{detail->Text("Declaradas: ${detail.llegada.cantidadDeclarada} · Recibidas: ${detail.llegada.cantidadRecibida}")}
                     if(s.images.isEmpty()&&!s.busy)Text("Esta recepción no tiene fotos adjuntas.")
                     if(registration==null&&!s.busy&&can("INVENTARIO_CONSULTAR"))OutlinedButton(onClick={vm.select(arrival,canEdit)}){Text("Cargar detalle de guía")}
                     if(canEdit&&registration!=null&&!registration.terminado)OutlinedButton(onClick=vm::ocr,enabled=!s.busy&&s.images.isNotEmpty()){Text("Leer fotos con OCR")}
