@@ -85,18 +85,17 @@ class MainActivity : ComponentActivity() {
     private fun selectPhotos(receiver:(PhotoSelection)->Unit){
         if(photoReceiver!=null){receiver(PhotoSelection(error="Termina la selección de fotos en curso."));return}
         photoReceiver=receiver
-        android.app.AlertDialog.Builder(this).setTitle("Añadir fotografía")
-            .setItems(arrayOf("Tomar foto","Elegir de galería")){_,option->
-                try{
-                    if(option==0){
-                        val folder=File(cacheDir,"capturas").apply{mkdirs()}
-                        val file=File.createTempFile("foto-",".jpg",folder);cameraFile=file
-                        camera.launch(FileProvider.getUriForFile(this,"$packageName.capturas",file))
-                    }else photoPicker.launch(arrayOf("image/jpeg","image/png"))
-                }catch(e:Exception){cameraFile?.delete();cameraFile=null;photoReceiver=null;receiver(PhotoSelection(error="No se pudo abrir la cámara o galería. Intenta con la otra opción."))}
-            }
-            .setNegativeButton("Cancelar"){_,_->photoReceiver=null;receiver(PhotoSelection())}
-            .setOnCancelListener{photoReceiver=null;receiver(PhotoSelection())}.show()
+        try{photoPicker.launch(arrayOf("image/jpeg","image/png"))}
+        catch(e:Exception){photoReceiver=null;receiver(PhotoSelection(error="No se pudo abrir la galería."))}
+    }
+    private fun capturePhoto(receiver:(PhotoSelection)->Unit){
+        if(photoReceiver!=null){receiver(PhotoSelection(error="Termina la selección de fotos en curso."));return}
+        photoReceiver=receiver
+        try{
+            val folder=File(cacheDir,"capturas").apply{mkdirs()}
+            val file=File.createTempFile("foto-",".jpg",folder);cameraFile=file
+            camera.launch(FileProvider.getUriForFile(this,"$packageName.capturas",file))
+        }catch(e:Exception){cameraFile?.delete();cameraFile=null;photoReceiver=null;receiver(PhotoSelection(error="No se pudo abrir la cámara. Puedes elegir una imagen de galería."))}
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -108,6 +107,7 @@ class MainActivity : ComponentActivity() {
             App(
                 backendUrl = BuildConfig.BACKEND_URL,
                 pickGuidePhotos = ::selectPhotos,
+                takePhoto = ::capturePhoto,
                 initialTheme = appearance,
                 onAppearanceChanged = { settings.edit().putString("theme", it.name).apply() },
                 onDarkTheme = { dark -> window.decorView.post { updateSystemBars(dark) } },

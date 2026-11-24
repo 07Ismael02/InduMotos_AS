@@ -61,10 +61,12 @@ private fun createForm(module:Module):Form=when(module){
     onExitHint: () -> Unit = {},
     onExitRequested: () -> Unit = {},
     unlockOffline: ((Boolean,String?)->Unit)->Unit = {it(false,"La consulta offline protegida no está disponible en esta plataforma.")},
-    isActive:Boolean=true
+    isActive:Boolean=true,
+    takePhoto: ((PhotoSelection)->Unit)->Unit = {it(PhotoSelection(error="La cámara no está disponible en esta plataforma."))}
 ){
  val vm:LogisticsViewModel=koinViewModel();val state by vm.state.collectAsState()
  val offlineStatus by vm.offlineStatus.collectAsState()
+ var photoRequest by remember(state.access?.usuarioId){mutableStateOf<((PhotoSelection)->Unit)?>(null)}
  LaunchedEffect(isActive,state.access?.usuarioId,offlineStatus.readOnlySession){
   if(isActive&&state.access!=null&&!offlineStatus.readOnlySession)while(true){delay(30000);vm.refreshConnection()}
  }
@@ -91,11 +93,16 @@ private fun createForm(module:Module):Form=when(module){
  IndumotosTheme(darkTheme = darkTheme){
   CompositionLocalProvider(LocalSystemBack provides installSystemBack,LocalReturnHome provides {vm.open(null);onExitHint();exitArmed=true}) {
   Surface(Modifier.fillMaxSize(),color=MaterialTheme.colorScheme.background){
-   if(state.access==null)Login(state,vm,backendUrl,unlockOffline)else Workspace(state,vm,appearance,pickGuidePhotos,offlineStatus) {
+   if(state.access==null)Login(state,vm,backendUrl,unlockOffline)else Workspace(state,vm,appearance,{photoRequest=it},offlineStatus) {
        appearance = it
        onAppearanceChanged(it)
    }
    state.form?.let{form->FormDialog(form,state.busy,state.error,{vm.form(null)},vm::submit)}
+   photoRequest?.let{receiver->PhotoSourceDialog(
+       onCamera={photoRequest=null;takePhoto(receiver)},
+       onGallery={photoRequest=null;pickGuidePhotos(receiver)},
+       onClose={photoRequest=null;receiver(PhotoSelection())}
+   )}
   }
   }
  }

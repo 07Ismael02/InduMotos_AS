@@ -1,10 +1,10 @@
 # Cámara y perfil — 24/11/2026
 
-Rama feature/ismael-catalogo-ventas. Versión0.4.2-evolucion, código15. Backend y esquema conservados.
+Rama feature/ismael-catalogo-ventas. Cámara y perfil en0.4.2-evolucion/código15; selector de origen adaptado al tema en0.4.3-evolucion/código16. Backend y esquema conservados.
 
 ## Alcance
 
-- La selección de fotografías Android permite «Tomar foto» o «Elegir de galería». Se usa la cámara del sistema, no una cámara integrada nueva. La fotografía se recibe por URI temporal de FileProvider no exportado, limitado al directorio privado de capturas. No se añaden permisos CAMERA ni de acceso general al almacenamiento.
+- La selección de origen permite «Tomar foto» o «Elegir de galería» mediante un diálogo Compose Material3 que hereda la apariencia de Indumotos. Sustituye al selector Android claro detectado en la primera prueba. Se usa la cámara del sistema, no una cámara integrada nueva. La fotografía se recibe por URI temporal de FileProvider no exportado, limitado al directorio privado de capturas. No se añaden permisos CAMERA ni de acceso general al almacenamiento.
 - Captura a resolución completa, lectura acotada, reducción de tamaño, corrección de orientación EXIF y recodificación JPEG de hasta5MB. La imagen final no copia metadatos GPS. Se elimina el archivo temporal al procesar o cancelar la captura.
 - En Nueva llegada se pueden acumular hasta tres fotos y quitar una sin reemplazar las restantes. La cámara también está disponible donde ya se adjuntaban fotos de unidades o comprobantes. No se cambia la autorización ni se añaden envíos offline de imágenes.
 - Se conservan los formularios durante cambios de orientación mediante la configuración Android de la actividad; esto no garantiza recuperar un formulario sin guardar después de que Android termine el proceso.
@@ -22,4 +22,12 @@ Referencia técnica: [contrato TakePicture](https://developer.android.com/refere
 
 Se iniciaron los contenedores existentes indumotos-distribuidas-db-1 e indumotos-evolucion-api. PostgreSQL permanece en loopback55432 y API enlazada exclusivamente a hotspot192.168.137.1:8443 y loopback8091. Salud HTTPS HTTP200 con certificado validado. Sin recrear volumen, ejecutar migraciones de nuevo, cambiar firewall ni publicar API en campus.
 
-Build Android aprobado; 62 pruebas móviles, cero fallos/errores, incluidas tres nuevas comprobaciones de agrupación de accesos efectivos y acumulación/límite de fotos. Firma del APK comparada con la instalación existente y coincidente: SHA256 23c1a0373560f28c3d2b64103e50a0dff54bb955fd75b20ac40d52253e33b0f0. Instalación con adb install -r: Success, datos conservados. La captura física y retorno de cámara todavía deben ejecutarse; no se declaran aprobados solo porque compiló. Las comprobaciones del backend de pagos anteriores no equivalen a prueba física de Yape/Plin; sigue siendo registro académico con confirmación manual, sin integración bancaria.
+Build Android0.4.2 aprobado; 62 pruebas móviles, cero fallos/errores, incluidas tres nuevas comprobaciones de agrupación de accesos efectivos y acumulación/límite de fotos. Firma del APK comparada con la instalación existente y coincidente: SHA256 23c1a0373560f28c3d2b64103e50a0dff54bb955fd75b20ac40d52253e33b0f0. Instalación con adb install -r: Success, datos conservados. Las comprobaciones del backend de pagos anteriores no equivalen a prueba física de Yape/Plin; sigue siendo registro académico con confirmación manual, sin integración bancaria.
+
+### Resultado físico posterior
+
+Con almacen.indumotos se verificó el perfil agrupado sin la antigua lista extensa y se abrió Nueva llegada con fotos. Desde Tomar foto se abrió la cámara Samsung; el responsable fotografió una imagen académica mostrada en el monitor, confirmó la toma y regresó al formulario. Se observó miniatura, contador1/3 y opción Quitar; el directorio privado de capturas quedó vacío. No se registró la llegada ni se subió esta fotografía al servidor, no se ejecutó OCR y no se creó stock. Esta prueba acredita captura/retorno/previsualización, no lectura de una guía real ni persistencia de una nueva recepción.
+
+Evidencias privadas fuera del repositorio: 042-perfil-modulos.png, 042-origen-fotografia.png y 042-camara-retorno.png en tmp/sprint2-auditoria/privado-paridad del espacio de trabajo. La toma del monitor contiene personas en el fondo y no se publica. APK y huella en build-042.json.
+
+El responsable observó que el selector de origen anterior no respetaba el tema oscuro; se reemplazó por un diálogo compartido dentro de IndumotosTheme. Cámara y galería quedan como operaciones Android separadas. La toma de la prueba permanece sin registrar; no se afirma que un formulario sin guardar sobreviva a instalar otro APK. La comprobación adicional de cancelación se interrumpió por pérdida de ADB, sin llegar a ejecutarse y sin cambios de datos. Instalación y revisión visual de0.4.3 deben confirmarse con el dispositivo disponible.
