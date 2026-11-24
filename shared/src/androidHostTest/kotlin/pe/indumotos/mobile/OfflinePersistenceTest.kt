@@ -71,4 +71,12 @@ class OfflinePersistenceTest {
             assertNull(session.current);assertNull(s.profile())
         }finally{d.close()}
     }
+    @Test fun fiveMegabyteGuidePhotoCanBeReadInBoundedSlices()=runTest {
+        val (d,s)=memory();try {
+            val image=ByteArray(5*1024*1024){(it%251).toByte()}
+            s.image("s|1",9,10,image)
+            assertContentEquals(image,s.image("s|1",9,10))
+            assertNull(s.image("s|2",9,10))
+        }finally{d.close()}
+    }
 }

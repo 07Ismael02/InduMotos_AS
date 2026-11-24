@@ -20,7 +20,18 @@ class SqlOfflineStore(private val db:OfflineDb):OfflineStore {
     override suspend fun all(owner:String,resource:String)=io{q.allCache(owner,resource).executeAsList().map{CachedValue(it.payload,it.saved_ms,it.cache_key)}}
     override suspend fun put(owner:String,resource:String,key:String,payload:String,time:Long)=io{q.putCache(owner,resource,key,payload,time);Unit}
     override suspend fun remove(owner:String,resource:String,key:String)=io{q.dropCache(owner,resource,key);Unit}
-    override suspend fun image(owner:String,guide:Long,image:Long)=io{q.getImage(owner,guide,image).executeAsOneOrNull()}
+    override suspend fun image(owner:String,guide:Long,image:Long):ByteArray?=io {
+        val size=q.imageSize(owner,guide,image).executeAsOneOrNull()?.toInt()
+        if(size==null)null else {
+            // Android CursorWindow cannot hold a multi-megabyte BLOB row. Read bounded slices.
+            val bytes=ByteArray(size);var offset=0
+            while(offset<size) {
+                val part=requireNotNull(q.imagePart(offset.toLong()+1,524288,owner,guide,image).executeAsOneOrNull())
+                require(part.isNotEmpty());part.copyInto(bytes,offset);offset+=part.size
+            }
+            bytes
+        }
+    }
     override suspend fun image(owner:String,guide:Long,image:Long,bytes:ByteArray)=io{q.putImage(owner,guide,image,bytes);Unit}
     override suspend fun drafts(owner:String)=io{q.allDrafts(owner).executeAsList().map{it.domain()}}
     override suspend fun edit(owner:String,guide:Long,draft:MotorcycleDraft,baseline:String?,state:String):LocalDraft=io {

@@ -45,6 +45,8 @@ import kotlinx.serialization.json.*
     LaunchedEffect(s.expired){if(s.expired)expired()}
     LaunchedEffect(s.selected?.id){if(s.selected!=null)creating=false}
     fun leave(){leaveHome=false;if(hasUnsaved())confirmLeave=true else vm.list(s.query,s.filter)}
+    BoxWithConstraints(Modifier.fillMaxSize().imePadding()) {
+    val compactPhoto=maxHeight<500.dp
     Column(Modifier.fillMaxSize()) {
         if(s.selected!=null)OutlinedButton(onClick={leave()},enabled=!s.busy,modifier=Modifier.fillMaxWidth().padding(horizontal=16.dp)){Text("← Volver a guías")}
         if(s.busy)LinearProgressIndicator(Modifier.fillMaxWidth())
@@ -86,7 +88,8 @@ import kotlinx.serialization.json.*
             Text("Guía ${arrival.numeroGuia}",style=MaterialTheme.typography.titleLarge,modifier=Modifier.padding(horizontal=16.dp))
             Text("Declaradas: ${arrival.cantidadDeclarada} · Recibidas: ${arrival.cantidadRecibida}",modifier=Modifier.padding(horizontal=16.dp))
             val registration=s.registration
-            if(s.imageBytes!=null) {
+            if(s.imageBytes!=null&&compactPhoto)TextButton(onClick={zoom=true}){Text("Ver foto de la guía")}
+            if(s.imageBytes!=null&&!compactPhoto) {
                 GuidePicture(requireNotNull(s.imageBytes),Modifier.fillMaxWidth().height(170.dp))
                 Row(Modifier.padding(horizontal=16.dp),horizontalArrangement=Arrangement.spacedBy(10.dp)) {
                     OutlinedButton(onClick={vm.image(s.imageIndex-1)},enabled=!s.busy&&s.imageIndex>0){Text("‹")}
@@ -157,6 +160,7 @@ import kotlinx.serialization.json.*
                 else if(!editing)item{Text("Para registrar las motocicletas, Inventarios debe abrir Fichas y seleccionar esta guía.")}
             }
         }
+    }
     }
     viewedFicha?.let{ficha->MotorcycleDetail(ficha,s.busy,{viewedFicha=null}){}}
     resolve?.let{(position,keep)->AlertDialog(onDismissRequest={resolve=null},title={Text(if(keep)"Confirmar datos revisados" else "Descartar copia local")},text={Text(if(keep)"Se comparará de nuevo la versión del servidor antes de enviar tus datos del bloque $position. Si vuelve a cambiar, se conservará el conflicto." else "Se eliminará únicamente la copia del teléfono del bloque $position. El servidor no se modifica.")},confirmButton={TextButton(onClick={resolve=null;vm.resolveLocal(position,keep)},enabled=!s.busy){Text("Confirmar")}},dismissButton={TextButton(onClick={resolve=null}){Text("Cancelar")}})}

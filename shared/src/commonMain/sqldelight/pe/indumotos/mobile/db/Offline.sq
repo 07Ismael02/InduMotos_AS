@@ -50,6 +50,12 @@ DELETE FROM local_cache WHERE owner=? AND resource=? AND cache_key=?;
 getImage:
 SELECT bytes FROM local_image WHERE owner=? AND guide_id=? AND image_id=?;
 
+imageSize:
+SELECT length(bytes) FROM local_image WHERE owner=? AND guide_id=? AND image_id=?;
+
+imagePart:
+SELECT CAST(substr(bytes, ?, ?) AS BLOB) FROM local_image WHERE owner=? AND guide_id=? AND image_id=?;
+
 putImage:
 INSERT OR REPLACE INTO local_image(owner,guide_id,image_id,bytes) VALUES (?,?,?,?);
 
