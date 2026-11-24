@@ -1,3 +1,9 @@
+# Estado vigente — login0.3.4
+
+Código adff08e, rama feature/ismael-offline-cuentas. Leer LOGIN-034.md y PENDIENTES-ENTREGA.md. Login limpio con botón Sin conexión y selector de cuentas; tres comprobaciones Samsung y build aprobados, instalación compatible sin borrado. Suite53 anterior conservada, no repetida. Backend/BD no cambiaron en este bloque. Main intacto.
+
+## Antecedentes
+
 # Estado vigente — cuentas y perfiles0.3.3
 
 Leer CUENTAS-Y-PERFILES-20261123.md. App feature/ismael-offline-cuentas (código14618b2); backend feature/ismael-cuentas-presentacion (sin cambios Java). 53 pruebas aprobadas y seis logins HTTP200. Samsung conserva cuatro perfiles descargados tras reapertura. Credenciales académicas configuradas localmente, sin publicarlas. Catálogo/sedes/guías sintéticos renombrados con respaldo e IDs conservados. Facturación habilitada solo para consulta por aprobación explícita: dos lecturas200 y cinco escrituras403 verificadas. Main intacto.

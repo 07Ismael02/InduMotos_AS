@@ -1,0 +1,19 @@
+{
+  "version": "0.3.4-sprint2-offline",
+  "dispositivo": "Samsung SM-S948U1",
+  "casos": [
+    {
+      "caso": "Login con un único botón Sin conexión y sin lista de usuarios",
+      "aprobado": true
+    },
+    {
+      "caso": "Selector muestra cuatro cuentas descargadas y roles legibles",
+      "aprobado": true
+    },
+    {
+      "caso": "Seleccionar Facturación y volver al login sin iniciar sesión",
+      "aprobado": true
+    }
+  ],
+  "limite": "No se repitió el desbloqueo nativo; solo presentación y selección. Suite53 anterior, sin repetición por cambio visual."
+}

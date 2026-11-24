@@ -1,8 +1,10 @@
 # Indumotos AS — aplicativo móvil
 
-Estado vigente: **0.3.3-sprint2-offline / código 10**, trabajo del 23/11/2026. Rama `feature/ismael-offline-cuentas`; main permanece estable y sin este incremento. Leer primero [continuidad](docs/CONTINUIDAD.md), AGENTS.md y [uso offline](docs/OFFLINE-USO.md).
+Estado vigente: **0.3.4-sprint2-offline / código 11**, trabajo del 23/11/2026. Rama `feature/ismael-offline-cuentas`; main permanece estable y sin este incremento. Leer primero [continuidad](docs/CONTINUIDAD.md), AGENTS.md y [uso offline](docs/OFFLINE-USO.md).
 
 Cuentas legibles, ajustes de datos y evidencia de cuatro perfiles en Samsung: [cuentas y perfiles](docs/CUENTAS-Y-PERFILES-20261123.md). Backend del bloque actual: `feature/ismael-cuentas-presentacion`; el binario sigue en95261ad, sin cambios Java.
+
+Login simplificado con selector offline: [versión0.3.4](docs/LOGIN-034.md). [Pendientes concretos de entrega](docs/PENDIENTES-ENTREGA.md).
 
 ## Funciones y arquitectura
 
@@ -39,9 +41,9 @@ Java21 y wrappers existentes. Configuración para ahorrar RAM: Gradle1536MB, un 
 ./gradlew.bat :shared:testAndroidHostTest :androidApp:assembleDebug --console=plain
 ```
 
-APK estable local ignorado por Git: `entrega/Indumotos-AS-0.3.3-sprint2-offline-debug.apk`. AppID `pe.indumotos.asapp`, misma firma Debug e instalación -r sin borrar datos. Código del APK `14618b2`; hash/certificado/ruta exactos en [manifiesto](docs/build-cuentas-20261123.json). No es release de producción ni AAB/iOS certificado.
+APK estable local ignorado por Git: `entrega/Indumotos-AS-0.3.4-sprint2-offline-debug.apk`. AppID `pe.indumotos.asapp`, misma firma Debug e instalación -r sin borrar datos. Código del APK `adff08e`; hash/certificado/ruta exactos en [manifiesto](docs/build-login-20261123.json). No es release de producción ni AAB/iOS certificado.
 
-Verificación actual: **53 pruebas móviles JVM/SQLite/HTTP aprobadas**, 2 unitarias backend y 14 comprobaciones HTTP reales de control de concurrencia. Las 110 comprobaciones API anteriores pertenecen al bloque previo. No son 51 recorridos físicos. Resultado Samsung y evidencias: [continuidad offline](docs/OFFLINE-CONTINUIDAD.md). Los hitos históricos no sustituyen la validación del APK actual.
+Verificación: **53 pruebas móviles JVM/SQLite/HTTP aprobadas en0.3.3**; ajuste visual0.3.4 compilado y tres comprobaciones Samsung aprobadas, sin repetir esa suite, 2 unitarias backend y 14 comprobaciones HTTP reales de control de concurrencia. Las 110 comprobaciones API anteriores pertenecen al bloque previo. No son 51 recorridos físicos. Resultado Samsung y evidencias: [continuidad offline](docs/OFFLINE-CONTINUIDAD.md). Los hitos históricos no sustituyen la validación del APK actual.
 
 ## Pendientes y entrega
 

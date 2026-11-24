@@ -1,0 +1,21 @@
+{
+  "fecha": "2026-11-23T23:37:57-05:00",
+  "versionName": "0.3.4-sprint2-offline",
+  "versionCode": 11,
+  "applicationId": "pe.indumotos.asapp",
+  "tipo": "Debug",
+  "commitCodigo": "adff08e",
+  "sha256": "f207b509a13edef67afb86c460e76db6ef0837462e262dcd362c9ee22a81d666",
+  "bytes": 23215592,
+  "certificadoSha256": "23c1a0373560f28c3d2b64103e50a0dff54bb955fd75b20ac40d52253e33b0f0",
+  "rutaLocal": "C:\\Users\\Ismael Logacho\\Documents\\PharmaMobil\\proyecto-final-dam\\InduMotos-Sprint2\\entrega\\Indumotos-AS-0.3.4-sprint2-offline-debug.apk",
+  "build": "BUILD SUCCESSFUL",
+  "verificacionActual": "3 comprobaciones visuales/navegación Samsung aprobadas; capturas originales revisadas",
+  "suiteAnterior": {
+    "version": "0.3.3",
+    "pruebas": 53,
+    "fallos": 0,
+    "repetida": false
+  },
+  "datos": "Instalación -r compatible; perfiles conservados; sin cambios backend/BD"
+}
