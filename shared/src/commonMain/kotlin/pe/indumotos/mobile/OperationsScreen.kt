@@ -206,7 +206,7 @@ private data class DraftLine(val key: Int,val brand: String="",val model: String
 }
 
 @Composable fun TransfersScreen(account: Access,expired:()->Unit) {
-    val vm: OperationsViewModel=koinViewModel();val state by vm.state.collectAsState()
+    val vm: OperationsViewModel=koinViewModel(key="traslados-${account.usuarioId}");val state by vm.state.collectAsState()
     var motorcycle by remember{mutableStateOf("")};var loadedId by remember{mutableStateOf<Long?>(null)}
     var destination by remember(loadedId){mutableStateOf<Site?>(null)};var confirm by remember{mutableStateOf(false)}
     DisposableEffect(account.usuarioId) { onDispose { vm.reset() } }
@@ -216,14 +216,14 @@ private data class DraftLine(val key: Int,val brand: String="",val model: String
     Column(Modifier.fillMaxSize()) {
         OperationMessages(state)
         LazyColumn(contentPadding=PaddingValues(20.dp),verticalArrangement=Arrangement.spacedBy(14.dp)) {
-            item {
+            if(loadedId==null)item {
                 Text("Traslado de motocicletas",fontSize=24.sp,fontWeight=FontWeight.Bold)
                 Text("Consulta el recorrido antes de trasladar a una tienda o despacho activo.",fontSize=13.sp)
                 OutlinedTextField(motorcycle,{motorcycle=it;loadedId=null;destination=null;confirm=false},label={Text("Buscar por chasis completo o últimos 4 dígitos")},enabled=!state.busy,singleLine=true,modifier=Modifier.fillMaxWidth(),keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Text))
                 Row(horizontalArrangement=Arrangement.spacedBy(8.dp)){Button(onClick={loadedId=null;vm.motorcycles(motorcycle)},enabled=!state.busy&&motorcycle.isNotBlank()){Text("Buscar motocicleta")};OutlinedButton(onClick={motorcycle="";loadedId=null;vm.motorcycles()},enabled=!state.busy){Text("Recientes")}}
                 Text("Selecciona una motocicleta para consultar su recorrido.",fontSize=12.sp)
             }
-            items(state.motorcycles,key={it["id"]?.jsonPrimitive?.content.orEmpty()}) { row ->
+            if(loadedId==null)items(state.motorcycles,key={it["id"]?.jsonPrimitive?.content.orEmpty()}) { row ->
                 OutlinedCard(onClick={loadedId=row["id"]?.jsonPrimitive?.longOrNull;destination=null;loadedId?.let(vm::movements)},enabled=!state.busy,modifier=Modifier.fillMaxWidth()) {
                     Column(Modifier.padding(16.dp)) {
                         Text("${row["marca"]?.jsonPrimitive?.content.orEmpty()} ${row["modelo"]?.jsonPrimitive?.content.orEmpty()} · ${row["color"]?.jsonPrimitive?.content.orEmpty()}",fontWeight=FontWeight.SemiBold)
@@ -231,6 +231,12 @@ private data class DraftLine(val key: Int,val brand: String="",val model: String
                         Text("Consultar recorrido →")
                     }
                 }
+            }
+            if(loadedId!=null)item{
+                OutlinedButton(onClick={loadedId=null;destination=null;confirm=false},enabled=!state.busy){Text("← Volver a motocicletas")}
+                Text("Recorrido de la motocicleta",fontSize=24.sp,fontWeight=FontWeight.Bold)
+                if(state.busy)Text("Cargando recorrido…")
+                state.error?.let{TextButton(onClick={loadedId?.let(vm::movements)},enabled=!state.busy){Text("Reintentar consulta")}}
             }
             if(loadedId!=null&&state.movements.isNotEmpty())item{
                 // The API returns history in ascending order; the last event is current.
@@ -243,7 +249,7 @@ private data class DraftLine(val key: Int,val brand: String="",val model: String
                 }
             }
             if(loadedId!=null&&state.movements.isEmpty()&&!state.busy&&state.error==null)item{Text("Sin movimientos. Registra primero la ubicación inicial desde la ficha de inventario.")}
-            items(state.movements,key={it.id}) { movement ->
+            if(loadedId!=null)items(state.movements,key={it.id}) { movement ->
                 OutlinedCard(Modifier.fillMaxWidth()){Column(Modifier.padding(16.dp)){
                     Text(if(movement.tipo=="TRASLADO")"Traslado #${movement.id}"else"Ubicación inicial #${movement.id}",fontWeight=FontWeight.SemiBold)
                     Text("${movement.origenId?.let{"Origen #$it → "}?:""}${movement.destinoNombre}")

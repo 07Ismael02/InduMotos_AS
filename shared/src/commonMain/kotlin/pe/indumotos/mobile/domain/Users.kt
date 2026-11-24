@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
     val pages get()=((totalElementos+tamano-1)/tamano).toInt()
 }
 interface UsersRepository {
+    suspend fun resetPassword(id:Long,adminPassword:String,newPassword:String) { error("Restablecimiento no disponible") }
     suspend fun users(search:String,page:Int):UserPage
     suspend fun userAccess(id:Long):Access
     suspend fun changeRole(id:Long,role:String):Access

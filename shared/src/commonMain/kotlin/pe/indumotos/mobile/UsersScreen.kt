@@ -1,11 +1,15 @@
 package pe.indumotos.mobile
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -20,6 +24,7 @@ import pe.indumotos.mobile.presentation.UsersViewModel
     var search by remember(account.usuarioId,permissions){mutableStateOf("")}
     var edit by remember(s.selected?.id){mutableStateOf(false)}
     var role by remember(s.access){mutableStateOf(s.access?.rolCodigo.orEmpty())}
+    var resetUser by remember{mutableStateOf<UserAccount?>(null)}
     var confirm by remember{mutableStateOf<Pair<String,String?>?>(null)}
     DisposableEffect(account.usuarioId,permissions){onDispose{vm.reset()}}
     LaunchedEffect(account.usuarioId,permissions){vm.reset();vm.list()}
@@ -35,6 +40,7 @@ import pe.indumotos.mobile.presentation.UsersViewModel
                 OutlinedTextField(search,{if(it.length<=180)search=it},label={Text("Nombre o usuario")},singleLine=true,enabled=!s.busy,modifier=Modifier.fillMaxWidth())
                 OutlinedButton(onClick={vm.list(search)},enabled=!s.busy){Text("Actualizar")}
                 if(s.busy)LinearProgressIndicator(Modifier.fillMaxWidth())
+                s.message?.let{Text(it,color=MaterialTheme.colorScheme.primary)}
                 if(s.selected==null)s.error?.let{Text(it,color=MaterialTheme.colorScheme.error)}
                 s.page?.let{Text("${it.totalElementos} cuentas")}
             }
@@ -45,6 +51,7 @@ import pe.indumotos.mobile.presentation.UsersViewModel
                         Text("@${user.nombreUsuario} · ${roleLabel(user.rolCodigo)}")
                         Text(user.estado)
                         if(permissions)Text("Consultar accesos →",color=MaterialTheme.colorScheme.primary)
+                        if(!permissions&&account.rolCodigo=="ADMIN"&&user.id!=account.usuarioId&&user.estado=="ACTIVO")OutlinedButton(onClick={resetUser=user},enabled=!s.busy){Text("Restablecer contraseña")}
                     }
                 }
             }
@@ -88,4 +95,14 @@ import pe.indumotos.mobile.presentation.UsersViewModel
         }
     }}
     confirm?.let{change->AlertDialog(onDismissRequest={confirm=null},title={Text("Confirmar cambio de acceso")},text={Text("Cuenta: ${s.selected?.nombreUsuario}. ${if(change.first=="ROL")"Nuevo rol: ${roleLabel(change.second.orEmpty())}" else "${PermissionLabels[change.first]?:change.first}: ${change.second?:"restablecer"}"}. Afectará los permisos de esta cuenta.")},confirmButton={Button(onClick={confirm=null;if(change.first=="ROL")vm.role(change.second!!) else vm.permission(change.first,change.second)},enabled=!s.busy){Text("Confirmar")}},dismissButton={TextButton(onClick={confirm=null}){Text("Cancelar")}})}
+    resetUser?.let{user->
+        var adminKey by remember(user.id){mutableStateOf("")};var newKey by remember(user.id){mutableStateOf("")};var repeated by remember(user.id){mutableStateOf("")};var verified by remember(user.id){mutableStateOf(false)}
+        AlertDialog(onDismissRequest={resetUser=null},title={Text("Restablecer contraseña")},text={Column(Modifier.heightIn(max=360.dp).verticalScroll(androidx.compose.foundation.rememberScrollState()),verticalArrangement=Arrangement.spacedBy(12.dp)){
+            Text("Cuenta: ${user.nombreUsuario}. Verifica su identidad antes de continuar.")
+            listOf(Triple("Tu contraseña de administrador",adminKey,{v:String->adminKey=v}),Triple("Nueva contraseña",newKey,{v:String->newKey=v}),Triple("Repetir nueva contraseña",repeated,{v:String->repeated=v})).forEach{(label,value,change)->OutlinedTextField(value,{if(it.length<=100)change(it)},label={Text(label)},singleLine=true,visualTransformation=PasswordVisualTransformation(),keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Password),modifier=Modifier.fillMaxWidth())}
+            Text("Usa entre12 y100 caracteres. Se invalidarán las sesiones online anteriores de esta cuenta.",style=MaterialTheme.typography.bodySmall)
+            Row{Checkbox(verified,{verified=it});Text("Verifiqué la identidad del trabajador")}
+        }},confirmButton={Button(onClick={val a=adminKey;val n=newKey;adminKey="";newKey="";repeated="";resetUser=null;vm.resetPassword(user,a,n)},enabled=verified&&adminKey.isNotBlank()&&newKey.length in 12..100&&newKey==repeated&&!s.busy){Text("Restablecer")}},dismissButton={TextButton(onClick={resetUser=null}){Text("Cancelar")}})
+    }
+
 }

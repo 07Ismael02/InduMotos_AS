@@ -121,7 +121,7 @@ private fun createForm(module:Module):Form=when(module){
   }){padding->
    Column(Modifier.padding(padding).fillMaxSize()){
     OfflineBanner(offlineStatus,state.busy,vm.allowed("INVENTARIO_CONSULTAR"),vm::downloadOffline,vm::synchronize,vm::reconnect)
-    if(state.busy)LinearProgressIndicator(Modifier.fillMaxWidth(),color=Blue)
+    Box(Modifier.fillMaxWidth().height(4.dp)){if(state.busy)LinearProgressIndicator(Modifier.fillMaxWidth(),color=Blue)}
     state.error?.let{Notice(it,true)};state.message?.let{Notice(it,false)}
     when(state.module){null->Home(state,vm);Module.INVENTORY->Inventory(state,vm);Module.FICHAS->GuidesScreen(account,true,pickGuidePhotos,vm::expireSession,offlineStatus);Module.ARRIVALS->GuidesScreen(account,false,pickGuidePhotos,vm::expireSession,offlineStatus);Module.CATALOG->CatalogScreen(account,vm::expireSession,offlineStatus.offline);Module.USERS,Module.PERMISSIONS->UsersScreen(account,state.module==Module.PERMISSIONS,state.message,{vm.form(createForm(Module.USERS))},vm::expireSession);Module.REQUESTS->RequestsScreen(account,vm::expireSession);Module.TRANSFERS->TransfersScreen(account,vm::expireSession)}
    }
@@ -171,6 +171,7 @@ private fun createForm(module:Module):Form=when(module){
  LaunchedEffect(backendUrl){vm.findOffline(backendUrl)}
  var user by remember{mutableStateOf("")};var password by remember{mutableStateOf("")};var visible by remember{mutableStateOf(false)}
  var showOffline by remember{mutableStateOf(false)}
+ var showRecovery by remember{mutableStateOf(false)}
  Box(Modifier.fillMaxSize().safeDrawingPadding().imePadding(),contentAlignment=Alignment.Center){
  Column(Modifier.widthIn(max=440.dp).fillMaxWidth().fillMaxHeight().verticalScroll(rememberScrollState()).padding(horizontal=28.dp,vertical=24.dp),verticalArrangement=Arrangement.Center,horizontalAlignment=Alignment.CenterHorizontally){
   Brand(Modifier.fillMaxWidth().height(130.dp));Spacer(Modifier.height(30.dp));Text("Iniciar sesión",fontSize=28.sp,fontWeight=FontWeight.Bold);Spacer(Modifier.height(8.dp));Text("Gestión de inventario y recepción de motocicletas",color=Muted,fontSize=13.sp,lineHeight=20.sp);Spacer(Modifier.height(28.dp))
@@ -178,13 +179,15 @@ private fun createForm(module:Module):Form=when(module){
   OutlinedTextField(password,{password=it},label={Text("Contraseña")},keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Password,autoCorrectEnabled=false),singleLine=true,enabled=!state.busy,visualTransformation=if(visible)VisualTransformation.None else PasswordVisualTransformation(),trailingIcon={IconButton(onClick={visible=!visible}){Icon(if(visible)Icons.Default.VisibilityOff else Icons.Default.Visibility,if(visible)"Ocultar contraseña"else"Mostrar contraseña")}},modifier=Modifier.fillMaxWidth())
   Spacer(Modifier.height(12.dp));state.error?.let{Notice(it,true)};state.message?.let{Notice(it,false)}
   Button(onClick={vm.login(backendUrl,user,password);password=""},enabled=!state.busy&&user.isNotBlank()&&password.isNotBlank(),modifier=Modifier.fillMaxWidth().height(52.dp),colors=ButtonDefaults.buttonColors(containerColor=Yellow,contentColor=Ink)){if(state.busy)CircularProgressIndicator(Modifier.size(22.dp),color=Ink)else Text("Ingresar",fontWeight=FontWeight.SemiBold)}
-  Spacer(Modifier.height(12.dp))
+  TextButton(onClick={showRecovery=true},enabled=!state.busy){Text("Olvidé mi contraseña")}
+  Spacer(Modifier.height(8.dp))
   OutlinedButton(onClick={showOffline=true},enabled=!state.busy,modifier=Modifier.fillMaxWidth().heightIn(min=48.dp)){
    Icon(Icons.Default.CloudOff,null,modifier=Modifier.size(18.dp));Spacer(Modifier.width(8.dp));Text("Sin conexión")
   }
   Spacer(Modifier.height(20.dp));Text("Acceso exclusivo para personal autorizado. Si necesitas una cuenta, comunícate con el administrador.",fontSize=11.sp,color=Muted,lineHeight=18.sp)
  }
  }
+ if(showRecovery)AlertDialog(onDismissRequest={showRecovery=false},title={Text("Recuperar acceso")},text={Text("Comunícate con el administrador de Indumotos e indica tu usuario. Después de verificar tu identidad, podrá restablecer tu contraseña desde Personal registrado. No compartas tu contraseña anterior. La recuperación requiere conexión; este formulario no envía correos ni cambia contraseñas automáticamente.")},confirmButton={TextButton(onClick={showRecovery=false}){Text("Entendido")}})
  if(showOffline)OfflineAccountDialog(state.offlineProfiles,onDismiss={showOffline=false},onOpen={profile->
   showOffline=false
   unlockOffline{ok,error->if(ok)vm.openOffline(profile)else vm.offlineError(error?:"No se desbloquearon los datos locales.")}
@@ -244,7 +247,7 @@ private fun createForm(module:Module):Form=when(module){
   }
   if(state.rows.isEmpty()&&!state.busy&&state.error==null)item{EmptyState("Sin coincidencias","No hay unidades que coincidan con esta consulta.")}
   item{Text("Motocicletas · selecciona una para ver su ficha",fontWeight=FontWeight.SemiBold)}
-  items(state.rows,key={it.text("id")}){row->OutlinedCard(onClick={vm.inventoryDetail(row.text("id"))},modifier=Modifier.fillMaxWidth(),colors=CardDefaults.outlinedCardColors(containerColor=MaterialTheme.colorScheme.surface)){
+  items(state.rows,key={it.text("id")}){row->OutlinedCard(onClick={vm.inventoryDetail(row.text("id"))},enabled=!state.busy,modifier=Modifier.fillMaxWidth(),colors=CardDefaults.outlinedCardColors(containerColor=MaterialTheme.colorScheme.surface)){
    Column(Modifier.padding(18.dp)){Row(verticalAlignment=Alignment.CenterVertically){Icon(Icons.Default.TwoWheeler,null,tint=Blue);Spacer(Modifier.width(10.dp));Text(row.text("marca")+" "+row.text("modelo"),fontWeight=FontWeight.SemiBold,modifier=Modifier.weight(1f));Text("#"+row.text("id"),fontSize=11.sp,color=Muted)};Spacer(Modifier.height(10.dp));Text("Chasis: "+row.text("chasisVista"),fontSize=13.sp);Text("Color: "+row.text("color"),fontSize=12.sp,color=Muted);Spacer(Modifier.height(6.dp));Text("Ver ficha completa →",fontSize=12.sp,color=Blue)}
   }}
   if(state.pages>0)item{Column {

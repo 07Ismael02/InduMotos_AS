@@ -44,4 +44,9 @@ class UsersViewModel(private val repo:UsersRepository):ViewModel() {
         val updated=repo.permission(requireNotNull(s.selected).id,code,decision)
         mutable.update{it.copy(access=updated,message=if(decision==null)"Excepción retirada." else "Excepción actualizada.")}
     }
+    fun resetPassword(user:UserAccount,adminPassword:String,newPassword:String)=work {
+        require(newPassword.length in 12..100){"La nueva contraseña debe tener entre12 y100 caracteres."}
+        repo.resetPassword(user.id,adminPassword,newPassword)
+        mutable.update{it.copy(message="Contraseña restablecida para ${user.nombreUsuario}. Sus sesiones anteriores ya no son válidas.")}
+    }
 }

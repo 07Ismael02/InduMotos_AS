@@ -43,8 +43,8 @@ android {
         applicationId = "pe.indumotos.asapp"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 11
-        versionName = "0.3.4-sprint2-offline"
+        versionCode = 12
+        versionName = "0.3.5-sprint2"
         buildConfigField("String", "BACKEND_URL", "\"$backendUrl\"")
     }
     packaging {
