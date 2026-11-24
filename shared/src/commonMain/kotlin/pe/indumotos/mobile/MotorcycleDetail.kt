@@ -22,7 +22,7 @@ import kotlinx.serialization.json.contentOrNull
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun MotorcycleDetail(record: JsonObject, busy: Boolean, close: () -> Unit, location: @Composable () -> Unit) {
+internal fun MotorcycleDetail(record: JsonObject, busy: Boolean, close: () -> Unit, extras:@Composable ()->Unit = {}, location: @Composable () -> Unit) {
     val clipboard=LocalClipboardManager.current
     var copied by remember(record) { mutableStateOf(false) }
     val title = listOfNotNull(record.value("marca"), record.value("modelo")).joinToString(" ")
@@ -50,6 +50,7 @@ internal fun MotorcycleDetail(record: JsonObject, busy: Boolean, close: () -> Un
                 contentPadding = PaddingValues(20.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
+                item { extras() }
                 item {
                     Card(
                         modifier = Modifier.fillMaxWidth(),

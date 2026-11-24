@@ -6,7 +6,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import pe.indumotos.mobile.domain.*
 
-data class UsersState(val page:UserPage?=null,val search:String="",val selected:UserAccount?=null,val access:Access?=null,val busy:Boolean=false,val error:String?=null,val message:String?=null,val expired:Boolean=false)
+data class UsersState(val stores:List<StoreSummary> = emptyList(),val page:UserPage?=null,val search:String="",val selected:UserAccount?=null,val access:Access?=null,val busy:Boolean=false,val error:String?=null,val message:String?=null,val expired:Boolean=false)
 class UsersViewModel(private val repo:UsersRepository):ViewModel() {
     private val mutable=MutableStateFlow(UsersState());val state=mutable.asStateFlow()
     private var task:Job?=null;private var epoch=0
@@ -48,5 +48,10 @@ class UsersViewModel(private val repo:UsersRepository):ViewModel() {
         require(newPassword.length in 12..100){"La nueva contraseña debe tener entre12 y100 caracteres."}
         repo.resetPassword(user.id,adminPassword,newPassword)
         mutable.update{it.copy(message="Contraseña restablecida para ${user.nombreUsuario}. Sus sesiones anteriores ya no son válidas.")}
+    }
+    fun stores()=work{val stores=repo.stores();mutable.update{it.copy(stores=stores)}}
+    fun assignStore(user:UserAccount,store:StoreSummary)=work{
+        repo.assignStore(user.id,store.id)
+        mutable.update{it.copy(page=it.page?.copy(items=it.page.items.map{u->if(u.id==user.id)u.copy(tiendaId=store.id,tiendaNombre=store.nombre)else u}),message="Tienda asignada a ${user.nombreUsuario}.")}
     }
 }

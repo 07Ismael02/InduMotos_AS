@@ -29,7 +29,11 @@ val appModule = module {
         }
     }
     single<GuideRepository> { pe.indumotos.mobile.data.OfflineGuideRepository(get<pe.indumotos.mobile.data.GuideRemoteRepository>(),pe.indumotos.mobile.data.GuideRemoteRepository(get(),true),get(),get(),get()) }
-    single<OfflineWork> { pe.indumotos.mobile.data.OfflineService(get(),get<pe.indumotos.mobile.data.GuideRemoteRepository>(),get(),get()) }
+    single<OfflineWork> { pe.indumotos.mobile.data.OfflineService(get(),get<pe.indumotos.mobile.data.GuideRemoteRepository>(),get(),get(),get<VehicleRepository>()) }
+    single<SalesRepository>{pe.indumotos.mobile.data.SalesRemoteRepository(get())}
+    viewModel{pe.indumotos.mobile.presentation.SalesViewModel(get())}
+    single<VehicleRepository>{pe.indumotos.mobile.data.VehicleRemoteRepository(get())}
+    viewModel{pe.indumotos.mobile.presentation.VehicleViewModel(get())}
     single<UsersRepository> { pe.indumotos.mobile.data.UsersRemoteRepository(get()) }
     viewModel { pe.indumotos.mobile.presentation.UsersViewModel(get()) }
     viewModel { pe.indumotos.mobile.presentation.GuidesViewModel(get(), get()) }

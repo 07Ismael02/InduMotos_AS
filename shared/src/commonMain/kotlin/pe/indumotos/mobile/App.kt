@@ -24,15 +24,15 @@ import kotlinx.serialization.json.*
 import pe.indumotos.mobile.domain.*
 import pe.indumotos.mobile.presentation.*
 
-private val Ink=Color(0xFF171A1F)
-private val Yellow=Color(0xFFE4D92B)
+private val Ink=Color(0xFF142E49)
+private val Yellow=Color(0xFFEEE51B)
 private val Blue:Color @Composable get()=MaterialTheme.colorScheme.secondary
 private val Muted:Color @Composable get()=MaterialTheme.colorScheme.onSurfaceVariant
 private fun JsonObject.text(key:String)=get(key)?.jsonPrimitive?.contentOrNull.orEmpty()
 private val roleNames=RoleCodes.associateWith(::roleLabel)
-private fun icon(m:Module)=when(m){Module.CATALOG->Icons.Default.Category;Module.REQUESTS->Icons.Default.Assignment;Module.TRANSFERS->Icons.Default.LocalShipping;Module.INVENTORY->Icons.Default.Inventory2;Module.ARRIVALS->Icons.Default.LocalShipping;Module.FICHAS->Icons.Default.Description;Module.USERS->Icons.Default.PersonAdd;Module.PERMISSIONS->Icons.Default.AdminPanelSettings}
+private fun icon(m:Module)=when(m){Module.SALES->Icons.Default.PointOfSale;Module.CATALOG->Icons.Default.Category;Module.REQUESTS->Icons.Default.Assignment;Module.TRANSFERS->Icons.Default.LocalShipping;Module.INVENTORY->Icons.Default.Inventory2;Module.ARRIVALS->Icons.Default.LocalShipping;Module.FICHAS->Icons.Default.Description;Module.USERS->Icons.Default.PersonAdd;Module.PERMISSIONS->Icons.Default.AdminPanelSettings}
 private fun createForm(module:Module):Form=when(module){
- Module.CATALOG,Module.REQUESTS,Module.TRANSFERS->error("Operación mediante su pantalla específica")
+ Module.SALES,Module.CATALOG,Module.REQUESTS,Module.TRANSFERS->error("Operación mediante su pantalla específica")
  Module.INVENTORY,Module.FICHAS->Form("Registrar ficha de motocicleta","motocicletas",listOf(Field("llegadaId","ID de llegada",numeric=true),Field("marca","Marca"),Field("modelo","Modelo"),Field("color","Color"),Field("chasisCompleto","Chasis completo"),Field("numeroMotor","Número de motor"),Field("dua","DUA"),Field("itemDua","Ítem DUA")))
  Module.ARRIVALS->Form("Registrar llegada","llegadas",listOf(Field("numeroGuia","Número de guía"),Field("cantidadDeclarada","Cantidad declarada",numeric=true),Field("cantidadRecibida","Cantidad recibida",numeric=true),Field("observacion","Observación (opcional)",required=false,maxLength=1000)))
  Module.USERS->Form("Crear cuenta","usuarios",listOf(Field("nombreCompleto","Nombre completo",maxLength=180),Field("nombreUsuario","Usuario",maxLength=80),Field("clave","Contraseña inicial (12–100 caracteres)",secret=true,maxLength=100),Field("rolCodigo","Rol",options=RoleCodes,labels=roleNames)))
@@ -123,7 +123,7 @@ private fun createForm(module:Module):Form=when(module){
     OfflineBanner(offlineStatus,state.busy,vm.allowed("INVENTARIO_CONSULTAR"),vm::downloadOffline,vm::synchronize,vm::reconnect)
     Box(Modifier.fillMaxWidth().height(4.dp)){if(state.busy)LinearProgressIndicator(Modifier.fillMaxWidth(),color=Blue)}
     state.error?.let{Notice(it,true)};state.message?.let{Notice(it,false)}
-    when(state.module){null->Home(state,vm);Module.INVENTORY->Inventory(state,vm);Module.FICHAS->GuidesScreen(account,true,pickGuidePhotos,vm::expireSession,offlineStatus);Module.ARRIVALS->GuidesScreen(account,false,pickGuidePhotos,vm::expireSession,offlineStatus);Module.CATALOG->CatalogScreen(account,vm::expireSession,offlineStatus.offline);Module.USERS,Module.PERMISSIONS->UsersScreen(account,state.module==Module.PERMISSIONS,state.message,{vm.form(createForm(Module.USERS))},vm::expireSession);Module.REQUESTS->RequestsScreen(account,vm::expireSession);Module.TRANSFERS->TransfersScreen(account,vm::expireSession)}
+    when(state.module){Module.SALES->SalesScreen(account,pickGuidePhotos,vm::expireSession);null->Home(state,vm);Module.INVENTORY->Inventory(state,vm);Module.FICHAS->GuidesScreen(account,true,pickGuidePhotos,vm::expireSession,offlineStatus);Module.ARRIVALS->GuidesScreen(account,false,pickGuidePhotos,vm::expireSession,offlineStatus);Module.CATALOG->CatalogScreen(account,vm::expireSession,offlineStatus.offline);Module.USERS,Module.PERMISSIONS->UsersScreen(account,state.module==Module.PERMISSIONS,state.message,{vm.form(createForm(Module.USERS))},vm::expireSession);Module.REQUESTS->RequestsScreen(account,vm::expireSession);Module.TRANSFERS->TransfersScreen(account,vm::expireSession)}
    }
   }
  }
@@ -142,7 +142,7 @@ private fun createForm(module:Module):Form=when(module){
  if (state.module in listOf(Module.INVENTORY,Module.FICHAS)) state.detail?.let { record ->
      val location by vm.location.collectAsState()
      val id = record.text("id").toLongOrNull()
-     MotorcycleDetail(record, state.busy, vm::closeDetail) {
+     MotorcycleDetail(record, state.busy, vm::closeDetail,extras={if(id!=null)VehicleExtras(id,account,offlineStatus.offline,pickGuidePhotos,vm::expireSession)}) {
          if(vm.allowed("FICHAS_EDITAR"))OutlinedButton(onClick=vm::beginEdit,enabled=!state.busy){Text("Editar ficha")}
          if (id != null && vm.allowed(READ_LOCATIONS)) {
              LocationSection(

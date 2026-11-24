@@ -25,7 +25,7 @@ class OfflineReads(private val session:OfflineSession,private val store:OfflineS
     }
     companion object {
         fun eligible(path:String)=path=="catalogo-motocicletas"||path=="motocicletas"||Regex("motocicletas/\\d+").matches(path)||path=="ubicaciones"||Regex("motocicletas/\\d+/ubicacion(?:/historial)?").matches(path)||
-            path=="llegadas/pagina"||Regex("llegadas/\\d+(?:/detalle|/registro|/guias)?").matches(path)
+            Regex("motocicletas/\\d+/(?:ficha-ampliada|disponibilidad(?:/historial)?)").matches(path)||path=="llegadas/pagina"||Regex("llegadas/\\d+(?:/detalle|/registro|/guias)?").matches(path)
         fun key(path:String,params:Map<String,String>)=path+"|"+params.entries.sortedBy{it.key}.joinToString(""){(k,v)->"${k.length}:$k${v.length}:$v"}
     }
 }

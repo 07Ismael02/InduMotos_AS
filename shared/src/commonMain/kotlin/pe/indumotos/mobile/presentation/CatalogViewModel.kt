@@ -35,4 +35,8 @@ class CatalogViewModel(private val repo: CatalogRepository): ViewModel() {
         val saved=repo.addCatalog(option)
         mutable.update { it.copy(options=(it.options+saved).distinct(),message="Combinación agregada al catálogo.") }
     }
+    fun changeState(option:CatalogOption)=work {
+        val saved=repo.catalogState(option.id,!option.activo)
+        mutable.update{it.copy(options=it.options.map{o->if(o.id==saved.id)saved else o},message=if(saved.activo)"Combinación activada." else "Combinación desactivada; las motos existentes se conservan.")}
+    }
 }

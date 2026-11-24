@@ -9,6 +9,7 @@ import kotlinx.serialization.json.JsonObject
 @Serializable data class InventoryPage(val items:List<JsonObject>,val pagina:Int,val totalPaginas:Int,val totalElementos:Long)
 data class InventoryFilter(val chasis:String="",val marca:String="",val modelo:String="",val color:String="")
 enum class Module(val title:String,val permission:String,val description:String){
+ SALES("Ventas y pagos","TIENDA_CONSULTAR","Consultar stock y registrar pagos por tienda"),
  CATALOG("Catálogo",MANAGE_CATALOG,"Administrar marcas, modelos y colores"),
  REQUESTS("Solicitudes de ensamblaje",READ_REQUESTS,"Crear y atender solicitudes por líneas"),
  TRANSFERS("Traslados",READ_LOCATIONS,"Consultar recorrido y trasladar motocicletas"),

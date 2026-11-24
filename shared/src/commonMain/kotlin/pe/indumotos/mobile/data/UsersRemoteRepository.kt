@@ -12,4 +12,6 @@ class UsersRemoteRepository(private val remote:RemoteRepository):UsersRepository
     override suspend fun resetPassword(id:Long,adminPassword:String,newPassword:String){
         remote.guideJson("usuarios/$id/restablecer-clave",buildJsonObject{put("claveAdministrador",adminPassword);put("nuevaClave",newPassword);put("identidadVerificada",true)}.toString(),"POST",onlineOnly=true)
     }
+    override suspend fun stores():List<StoreSummary> = json.decodeFromString(remote.guideJson("modos/compania",onlineOnly=true))
+    override suspend fun assignStore(user:Long,store:Long){remote.guideJson("usuarios/$user/tienda",buildJsonObject{put("tiendaId",store)}.toString(),"PUT",onlineOnly=true)}
 }

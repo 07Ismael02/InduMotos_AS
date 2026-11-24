@@ -37,7 +37,7 @@ class RemoteRepository(private val http:HttpClient,private val offline:OfflineSe
  internal suspend fun profile():Access=json.decodeFromString(request("auth/me",onlineOnly=true))
  internal suspend fun guideBytes(path:String):ByteArray {
   val parts=path.split('/');val owner=offline?.current?.owner
-  val guide=parts.getOrNull(1)?.toLongOrNull();val image=parts.getOrNull(3)?.toLongOrNull()
+  val guide=parts.getOrNull(1)?.toLongOrNull()?.let{if(parts.firstOrNull()=="motocicletas")-it else it};val image=parts.getOrNull(3)?.toLongOrNull()
   if(offline?.status?.value?.offline==true&&owner!=null&&guide!=null&&image!=null){offline.owner();return store?.image(owner,guide,image)?:throw AppException(AppError.Network)}
   try {
   val response=try{http.get(base+path){bearerAuth(token)}}catch(e:CancellationException){throw e}catch(e:Exception){throw AppException(AppError.Network)}
@@ -45,6 +45,14 @@ class RemoteRepository(private val http:HttpClient,private val offline:OfflineSe
   val bytes:ByteArray=response.body();if(owner!=null&&guide!=null&&image!=null)store?.image(owner,guide,image,bytes)
   return if(owner!=null&&guide!=null&&image!=null)store?.image(owner,guide,image)?:bytes else bytes
   }catch(e:AppException){if(e.error==AppError.Network&&owner!=null&&guide!=null&&image!=null){offline?.offline();return store?.image(owner,guide,image)?:throw e};throw e}
+ }
+ internal suspend fun uploadImage(path:String,fields:Map<String,String>,photo:GuidePhoto):String {
+  if(offline?.status?.value?.offline==true||offline?.readOnly()==true)throw AppException(AppError.Network)
+  val response=try{http.submitFormWithBinaryData(url=base+path,formData=formData{
+   fields.forEach{(k,v)->append(k,v)}
+   append("imagen",photo.bytes,Headers.build{append(HttpHeaders.ContentType,photo.mime);append(HttpHeaders.ContentDisposition,"filename=imagen."+if(photo.mime=="image/png")"png" else "jpg")})
+  }){bearerAuth(token)}}catch(e:CancellationException){throw e}catch(e:Exception){throw AppException(AppError.Network)}
+  return checkedText(response)
  }
  internal suspend fun uploadGuide(guide:String,declared:Int,received:Int,note:String,photos:List<GuidePhoto>):String {
   if(offline?.readOnly()==true)throw AppException(AppError.Unauthorized)
@@ -145,4 +153,8 @@ class RemoteRepository(private val http:HttpClient,private val offline:OfflineSe
  override suspend fun transfer(motorcycle: Long,destination: Long): TransferRecord = json.decodeFromString(request("motocicletas/$motorcycle/traslados",buildJsonObject { put("destinoId",destination) }.toString(),"POST"))
  override suspend fun transfers(motorcycle: Long): List<TransferRecord> = json.decodeFromString(request("motocicletas/$motorcycle/ubicacion/historial"))
  override fun clearSession(){token="";offline?.close()}
+ override suspend fun catalogState(id:Long,active:Boolean):CatalogOption {
+  val saved=json.decodeFromString<CatalogOption>(request("catalogo-motocicletas/$id/estado",buildJsonObject{put("activo",active)}.toString(),"PUT",onlineOnly=true))
+  return saved
+ }
 }

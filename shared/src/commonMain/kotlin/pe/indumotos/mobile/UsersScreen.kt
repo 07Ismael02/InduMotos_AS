@@ -24,6 +24,8 @@ import pe.indumotos.mobile.presentation.UsersViewModel
     var search by remember(account.usuarioId,permissions){mutableStateOf("")}
     var edit by remember(s.selected?.id){mutableStateOf(false)}
     var role by remember(s.access){mutableStateOf(s.access?.rolCodigo.orEmpty())}
+    var storeUser by remember{mutableStateOf<UserAccount?>(null)}
+    var chosenStore by remember{mutableStateOf<StoreSummary?>(null)}
     var resetUser by remember{mutableStateOf<UserAccount?>(null)}
     var confirm by remember{mutableStateOf<Pair<String,String?>?>(null)}
     DisposableEffect(account.usuarioId,permissions){onDispose{vm.reset()}}
@@ -50,6 +52,9 @@ import pe.indumotos.mobile.presentation.UsersViewModel
                         Text(user.nombreCompleto,style=MaterialTheme.typography.titleMedium)
                         Text("@${user.nombreUsuario} · ${roleLabel(user.rolCodigo)}")
                         Text(user.estado)
+                        if(user.rolCodigo in listOf("COMERCIAL","FACTURACION"))Text(user.tiendaNombre?:"Sin tienda asignada",style=MaterialTheme.typography.bodySmall)
+                        if(!permissions&&account.rolCodigo=="ADMIN"&&user.rolCodigo in listOf("COMERCIAL","FACTURACION")&&user.estado=="ACTIVO")OutlinedButton(onClick={chosenStore=null;storeUser=user;vm.stores()},enabled=!s.busy){Text("Asignar tienda")}
+
                         if(permissions)Text("Consultar accesos →",color=MaterialTheme.colorScheme.primary)
                         if(!permissions&&account.rolCodigo=="ADMIN"&&user.id!=account.usuarioId&&user.estado=="ACTIVO")OutlinedButton(onClick={resetUser=user},enabled=!s.busy){Text("Restablecer contraseña")}
                     }
@@ -104,5 +109,10 @@ import pe.indumotos.mobile.presentation.UsersViewModel
             Row{Checkbox(verified,{verified=it});Text("Verifiqué la identidad del trabajador")}
         }},confirmButton={Button(onClick={val a=adminKey;val n=newKey;adminKey="";newKey="";repeated="";resetUser=null;vm.resetPassword(user,a,n)},enabled=verified&&adminKey.isNotBlank()&&newKey.length in 12..100&&newKey==repeated&&!s.busy){Text("Restablecer")}},dismissButton={TextButton(onClick={resetUser=null}){Text("Cancelar")}})
     }
+
+    storeUser?.let{user->AlertDialog(onDismissRequest={if(!s.busy)storeUser=null},title={Text("Asignar tienda")},text={Column(verticalArrangement=Arrangement.spacedBy(12.dp)){
+        Text(user.nombreUsuario);SimpleChoice("Tienda",chosenStore?.nombre.orEmpty(),s.stores.map{it.nombre},!s.busy){name->chosenStore=s.stores.firstOrNull{it.nombre==name}}
+        s.error?.let{Text(it,color=MaterialTheme.colorScheme.error)}
+    }},confirmButton={Button(onClick={storeUser=null;vm.assignStore(user,chosenStore!!)},enabled=chosenStore!=null&&!s.busy){Text("Guardar")}},dismissButton={TextButton(onClick={storeUser=null},enabled=!s.busy){Text("Cancelar")}})}
 
 }

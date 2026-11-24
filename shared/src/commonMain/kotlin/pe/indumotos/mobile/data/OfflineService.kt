@@ -5,7 +5,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.long
 
 class OfflineService(private val remote:RemoteRepository,private val guides:GuideRepository,
-    private val session:OfflineSession,private val sync:DraftSynchronizer):OfflineWork {
+    private val session:OfflineSession,private val sync:DraftSynchronizer,private val vehicles:VehicleRepository?=null):OfflineWork {
     override val status=session.status
     override suspend fun availableProfiles():List<OfflineProfile> = session.availableProfiles().filter{session.store.all(it.owner,"http").isNotEmpty()}
     override suspend fun resumeReadOnly(profile:OfflineProfile):Access {remote.restoreOrigin(profile.origin);return session.resume(profile)}
@@ -21,7 +21,11 @@ class OfflineService(private val remote:RemoteRepository,private val guides:Guid
             do {
                 val result=remote.inventory(InventoryFilter(),page)
                 if(session.status.value.offline)throw AppException(AppError.Network)
-                for(row in result.items){remote.detail(Module.FICHAS,row["id"]!!.jsonPrimitive.long);if(session.status.value.offline)throw AppException(AppError.Network)}
+                for(row in result.items){
+                    val id=row["id"]!!.jsonPrimitive.long;remote.detail(Module.FICHAS,id)
+                    vehicles?.let{v->val card=v.card(id);for(photo in card.fotos)v.photo(id,photo.id);if(access.permisos.any{it.codigo=="DISPONIBILIDAD_CONSULTAR"&&it.permitido})v.availability(id)}
+                    if(session.status.value.offline)throw AppException(AppError.Network)
+                }
                 page++
             }while(page<result.totalPaginas)
             for(filter in listOf("PENDIENTE","CONFIRMADA")) {

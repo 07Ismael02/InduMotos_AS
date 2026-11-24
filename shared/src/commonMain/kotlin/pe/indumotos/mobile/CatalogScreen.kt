@@ -26,6 +26,7 @@ import pe.indumotos.mobile.presentation.CatalogViewModel
     var model by remember(account.usuarioId){mutableStateOf("")}
     var color by remember(account.usuarioId){mutableStateOf("")}
     var showForm by remember(account.usuarioId){mutableStateOf(false)}
+    var stateChange by remember{mutableStateOf<CatalogOption?>(null)}
     var confirmLeave by remember{mutableStateOf(false)}
     val returnHome=LocalReturnHome.current
     LocalSystemBack.current(true) {
@@ -91,8 +92,9 @@ import pe.indumotos.mobile.presentation.CatalogViewModel
                     Column(verticalArrangement=Arrangement.spacedBy(6.dp)) {
                         Text(model,style=MaterialTheme.typography.titleMedium)
                         FlowRow(horizontalArrangement=Arrangement.spacedBy(8.dp),verticalArrangement=Arrangement.spacedBy(6.dp)) {
-                            rows.map{it.color}.distinct().forEach{color->Surface(color=MaterialTheme.colorScheme.secondaryContainer,shape=RoundedCornerShape(8.dp)) {
-                                Text(color,Modifier.padding(horizontal=10.dp,vertical=6.dp),style=MaterialTheme.typography.bodySmall,color=MaterialTheme.colorScheme.onSecondaryContainer)
+                            rows.forEach{option->Column{
+                                Surface(color=if(option.activo)MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.surfaceVariant,shape=RoundedCornerShape(8.dp)){Text(option.color+if(option.activo)" · Activo"else" · Inactivo",Modifier.padding(horizontal=10.dp,vertical=6.dp),style=MaterialTheme.typography.bodySmall)}
+                                if(!offline&&account.rolCodigo=="ADMIN")TextButton(onClick={stateChange=option},enabled=!state.busy){Text(if(option.activo)"Desactivar"else"Activar")}
                             }}
                         }
                     }
@@ -102,6 +104,7 @@ import pe.indumotos.mobile.presentation.CatalogViewModel
         if(!state.busy&&state.options.isEmpty())item{Text("No hay combinaciones disponibles en el catálogo.")}
     }
     }
+    stateChange?.let{option->AlertDialog(onDismissRequest={stateChange=null},title={Text(if(option.activo)"Desactivar combinación"else"Activar combinación")},text={Text("${option.marca} ${option.modelo} · ${option.color}. Las motos registradas se conservan.")},confirmButton={Button(onClick={stateChange=null;vm.changeState(option)}){Text("Confirmar")}},dismissButton={TextButton(onClick={stateChange=null}){Text("Cancelar")}})}
     if(confirmLeave)AlertDialog(onDismissRequest={confirmLeave=false},title={Text("Combinación sin guardar")},
         text={Text("Hay información nueva sin guardar. ¿Deseas descartarla y volver a Inicio?")},
         confirmButton={TextButton(onClick={confirmLeave=false;returnHome()}){Text("Descartar y volver")}},
