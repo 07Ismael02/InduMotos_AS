@@ -8,4 +8,6 @@ Reapertura offline: perfil de consulta limitado temporalmente, autenticación po
 
 Hitos pendientes: persistencia y pruebas SQLite; repositorios offline; UI/seguridad nativa; pruebas de conflictos/aislamiento/reinicio; APK y validación física. Registrar commits y resultados conforme ocurran. No marcar este diseño como implementado/verificado.
 
+Hito 1: esquema SQLDelight generado con 2.1.0 disponible localmente. SqlOfflineStore y OfflineSession implementados, drivers Android/iOS y contexto Koin conectados. Seis pruebas OfflinePersistenceTest aprobadas en SQLite JVM real (incluyen archivo cerrado/reabierto, aislamiento, revisión concurrente, logout y caducidad de perfil). Log local tmp/sprint2-auditoria/offline-store-test.log. No se ha verificado iOS ni dispositivo. Repositorios/UI de offline todavía en integración: no considerar este checkpoint un APK offline terminado.
+
 Referencias oficiales: https://developer.android.com/topic/architecture/data-layer/offline-first y https://sqldelight.github.io/sqldelight/ . PharmaMobile solo se inspecciona como referencia; no se modifica.

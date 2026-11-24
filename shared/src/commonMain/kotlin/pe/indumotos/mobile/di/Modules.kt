@@ -8,8 +8,13 @@ import pe.indumotos.mobile.domain.*
 import pe.indumotos.mobile.presentation.LogisticsViewModel
 import pe.indumotos.mobile.presentation.OperationsViewModel
 import org.koin.core.module.dsl.viewModel
+import org.koin.core.KoinApplication
+import pe.indumotos.mobile.db.OfflineDb
 expect val platformModule:Module
 val appModule = module {
+    single { OfflineDb(get()) }
+    single<OfflineStore> { pe.indumotos.mobile.data.SqlOfflineStore(get()) }
+    single { pe.indumotos.mobile.data.OfflineSession(get()) }
     single { createHttpClient(get()) }
     single { RemoteRepository(get()) }
     single<LogisticsRepository> { get<RemoteRepository>() }
@@ -25,4 +30,4 @@ val appModule = module {
     factory { LogisticsUseCase(get()) }
     viewModel { LogisticsViewModel(get(), get(), get(), get(), get()) }
 }
-fun initKoin()=startKoin{modules(platformModule,appModule)}
+fun initKoin(configure:KoinApplication.()->Unit={})=startKoin{configure();modules(platformModule,appModule)}

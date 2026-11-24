@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
+    id("app.cash.sqldelight")
 }
 
 kotlin {
@@ -37,14 +38,18 @@ kotlin {
     
     sourceSets {
         androidMain.dependencies {
+            implementation(libs.koin.android)
+            implementation("app.cash.sqldelight:android-driver:2.1.0")
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.compose.uiTooling)
             implementation(libs.ktor.client.okhttp)
         }
         iosMain.dependencies {
+            implementation("app.cash.sqldelight:native-driver:2.1.0")
             implementation(libs.ktor.client.darwin)
         }
         commonMain.dependencies {
+            implementation("app.cash.sqldelight:runtime:2.1.0")
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
             implementation(libs.compose.material3)
@@ -67,6 +72,9 @@ kotlin {
             implementation(libs.kotlin.test)
             implementation(libs.kotlinx.coroutines.test)
         }
+        getByName("androidHostTest").dependencies {
+            implementation("app.cash.sqldelight:sqlite-driver:2.1.0")
+        }
     }
 }
 
@@ -75,3 +83,7 @@ dependencies {
 }
 
 compose.resources { packageOfResClass = "pe.indumotos.mobile.resources" }
+
+sqldelight {
+    databases { create("OfflineDb") { packageName.set("pe.indumotos.mobile.db") } }
+}

@@ -1,0 +1,75 @@
+CREATE TABLE local_cache (
+ owner TEXT NOT NULL,
+ resource TEXT NOT NULL,
+ cache_key TEXT NOT NULL,
+ payload TEXT NOT NULL,
+ saved_ms INTEGER NOT NULL,
+ PRIMARY KEY(owner, resource, cache_key)
+);
+
+CREATE TABLE local_image (
+ owner TEXT NOT NULL,
+ guide_id INTEGER NOT NULL,
+ image_id INTEGER NOT NULL,
+ bytes BLOB NOT NULL,
+ PRIMARY KEY(owner, guide_id, image_id)
+);
+
+CREATE TABLE local_draft (
+ owner TEXT NOT NULL,
+ guide_id INTEGER NOT NULL,
+ position INTEGER NOT NULL,
+ payload TEXT NOT NULL,
+ baseline TEXT,
+ revision INTEGER NOT NULL,
+ state TEXT NOT NULL,
+ detail TEXT,
+ PRIMARY KEY(owner, guide_id, position)
+);
+
+CREATE TABLE offline_profile (
+ slot INTEGER NOT NULL PRIMARY KEY CHECK(slot=1),
+ owner TEXT NOT NULL,
+ origin TEXT NOT NULL,
+ access_json TEXT NOT NULL,
+ authenticated_ms INTEGER NOT NULL
+);
+
+getCache:
+SELECT * FROM local_cache WHERE owner=? AND resource=? AND cache_key=?;
+
+allCache:
+SELECT * FROM local_cache WHERE owner=? AND resource=?;
+
+putCache:
+INSERT OR REPLACE INTO local_cache(owner,resource,cache_key,payload,saved_ms) VALUES (?,?,?,?,?);
+
+dropCache:
+DELETE FROM local_cache WHERE owner=? AND resource=? AND cache_key=?;
+
+getImage:
+SELECT bytes FROM local_image WHERE owner=? AND guide_id=? AND image_id=?;
+
+putImage:
+INSERT OR REPLACE INTO local_image(owner,guide_id,image_id,bytes) VALUES (?,?,?,?);
+
+getDraft:
+SELECT * FROM local_draft WHERE owner=? AND guide_id=? AND position=?;
+
+allDrafts:
+SELECT * FROM local_draft WHERE owner=? ORDER BY guide_id,position;
+
+putDraft:
+INSERT OR REPLACE INTO local_draft(owner,guide_id,position,payload,baseline,revision,state,detail) VALUES (?,?,?,?,?,?,?,?);
+
+ackDraft:
+DELETE FROM local_draft WHERE owner=? AND guide_id=? AND position=? AND revision=?;
+
+getProfile:
+SELECT * FROM offline_profile WHERE slot=1;
+
+putProfile:
+INSERT OR REPLACE INTO offline_profile(slot,owner,origin,access_json,authenticated_ms) VALUES (1,?,?,?,?);
+
+dropProfile:
+DELETE FROM offline_profile WHERE slot=1;
