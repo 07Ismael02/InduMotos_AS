@@ -11,3 +11,5 @@ Leer README.md, docs/CONTINUIDAD.md y docs/SPRINT2.md antes de modificar código
 - Nunca borrar datos locales, desinstalar ante una firma incompatible, recrear volúmenes o reescribir migraciones para ocultar problemas. Conservar identificadores y respaldos.
 - La configuración del backend corresponde al entorno, no al trabajador. Evitar controles técnicos en el login final; temas y marca deben verse legibles en el dispositivo.
 - Antes de terminar cada bloque, actualizar README/CONTINUIDAD con fecha, rama/commit, verificación real y siguiente acción. No marcar Sprint 2 terminado solo por la urgencia del 19/11/2026.
+
+- Offline fue autorizado el 23/11/2026: seguir docs/OFFLINE-USO.md y OFFLINE-CONTINUIDAD.md. Consulta local y borradores de guías descargadas; no extender cola a operaciones sensibles. Backend vigente de integración: feature/sprint2-offline-borradores (base main 5b37b9b), no sustituir por la referencia histórica Sprint1.

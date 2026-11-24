@@ -1,3 +1,9 @@
+# Estado vigente — offline 0.3.2
+
+Leer OFFLINE-CONTINUIDAD.md y OFFLINE-USO.md. APK código92f3bce, backend95261ad; 51 pruebas móviles,2 backend,14 HTTP aprobadas. Samsung conservó el borrador después de actualización/reapertura y lo sincronizó: API confirma mismo motor, un borrador y stock0. Evidencias y manifiesto en docs. Main intacto. Falta validación integral Sprint2/release/iOS; no confundir las notas históricas siguientes con estado vigente.
+
+## Antecedentes cronológicos
+
 # Continuidad — 23/11/2026
 
 BLOQUE ACTIVO OFFLINE: ver OFFLINE-CONTINUIDAD.md. Usuario autorizó continuar con consulta local y conservación/sincronización segura de borradores, guardando avances por reinicios/RAM. Base be14bcf; arquitectura y alcance registrados antes de implementar. No confundir las pruebas anteriores con validación offline.

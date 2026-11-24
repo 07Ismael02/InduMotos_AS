@@ -1,61 +1,48 @@
 # Indumotos AS — aplicativo móvil
 
-**Estado vigente 23/11: 0.2.4.** Implementados los faltantes de usuarios, accesos completos y fichas vinculadas. API: 110 comprobaciones aprobadas, OCR real disponible en Docker. Validación Android parcial; no equivale a recorrido físico completo. [Cierre y pendientes exactos](docs/CIERRE-PARIDAD-20261123.md). Las notas cronológicas siguientes describen incrementos anteriores.
+Estado vigente: **0.3.2-sprint2-offline / código 9**, trabajo del 23/11/2026. Rama `feature/sprint2-paridad-web`; main permanece estable y sin este incremento. Leer primero [continuidad](docs/CONTINUIDAD.md), AGENTS.md y [uso offline](docs/OFFLINE-USO.md).
 
-**Paridad con web incompleta:** faltan listado/búsqueda de cuentas, selección de usuarios y catálogo completo de permisos en accesos, y fichas vinculadas al detalle de llegada. [Cotejo concreto y prioridades](docs/PARIDAD-WEB-SPRINT2.md). Los demás módulos presentes siguen sujetos a validación integral por rol.
+## Funciones y arquitectura
 
-Validación física 0.2.3: nueve comprobaciones de selección y Atrás aprobadas en Samsung; [informe y capturas](docs/REVISION-UX-PARIDAD-20261123.md). Observado en vertical/tema oscuro; los recorridos comerciales por rol y el diseño en otros tamaños siguen pendientes.
+Kotlin Multiplatform/Compose: `androidApp` inicia Android; `shared` separa presentation (pantallas/ViewModels), domain (modelos/contratos) y data (repositorios REST/locales), conectados mediante Koin. Pantalla → ViewModel → repositorio → Ktor/API o SQLDelight privado. Las autorizaciones definitivas las aplica el backend.
 
-Incremento 0.2.3: Catálogo adaptable y navegación Atrás a Inicio con doble pulsación para salir. [Cambios y pruebas pendientes de paridad](docs/REVISION-UX-PARIDAD-20261123.md). Cinco comprobaciones HTTP de salud/protección sin token ejecutadas; no acreditan todavía los recorridos por rol.
+Incluye catálogo con selección marca→modelo→color y alta administrativa explícita; inventario/búsqueda/paginación; fichas y copia de chasis; recepción con fotos protegidas, borradores, OCR revisable y finalización; solicitudes multilínea, asignación/retiro, historial, anulación y traslados; usuarios y permisos efectivos. PharmaMobile es referencia y no se modifica. Web/Figma corresponden a otros colaboradores.
 
-Corrección de catálogo 0.2.2: selección de marcas/modelos/colores existentes y opción explícita para añadir texto nuevo (solo administración). Consulta de catálogo confirmada por el usuario en Samsung con 0.2.1; selectores nuevos pendientes de validación física.
+## Offline implementado
 
-Entorno del 23/11: backend V23 HTTP 200 en copia aislada y APK 0.2.1 instalado en Samsung mediante actualización compatible. Login y recorridos manuales pendientes; ver [estado comprobado](docs/ENTORNO-PARIDAD-20261123.md).
+Descarga explícita de catálogo, inventario/fichas y guías con fotos. Consulta de lo descargado y guardado de borradores de guías previamente descargadas, separados por servidor/usuario. Cada pendiente conserva baseline y revisión; al reconectar renueva permisos y envía PUT condicional If-Match. Conflictos requieren revisión; no se reenvían automáticamente.
 
-Actualizado el 23/11/2026. Trabajo activo en `feature/sprint2-paridad-web`; no integrado a main. Objetivo: paridad funcional con la web dentro del recorrido de Sprint 2 y sus prerrequisitos de recepción/inventario. PharmaMobile se conserva solo como referencia.
+Reapertura local protegida por credencial nativa Android, máximo 24 horas desde login online. No restaura sesión del servidor ni guarda JWT/contraseñas. Logout retira la reapertura y conserva borradores separados para el próximo login de la misma cuenta. No se cachean credenciales ni administración de personal. Datos locales son la última lectura, no stock actual confirmado.
 
-## Referencias verificadas
+Sin conexión no se crean llegadas/fotos, ejecuta OCR, finaliza stock, asignan unidades, trasladan ni administran accesos. Esas operaciones requieren servidor. Sincronización explícita y periódica mientras la app está activa; no se promete ejecución con la app cerrada. [Procedimiento completo](docs/OFFLINE-USO.md).
 
-- Web: `Akatosh4019/SISTEMA-WEB-INDUMOTOS`, main `f2981a368b2315d7278920bfe7c170dad3e4af8b`.
-- Backend: `Akatosh4019/BACK-END-INDUMOTOS`, main `5b37b9b812c3c08e7edd4aeac67c3216e62850c7`.
-- Contraste y límites: [paridad funcional](docs/PARIDAD-WEB-SPRINT2.md).
+## Entorno actual
 
-## Arquitectura
+Backend correcto: [BACK-END-INDUMOTOS](https://github.com/Akatosh4019/BACK-END-INDUMOTOS), rama `feature/sprint2-offline-borradores`, código `95261ad`. Añade versión/If-Match sin migraciones nuevas y mantiene la web sin cabecera. Referencias contrastadas: web main `f2981a3`, backend main `5b37b9b`.
 
-Kotlin Multiplatform / Compose. `androidApp` es la entrada Android; `shared` contiene presentación, modelos y contratos de dominio, implementaciones REST y Koin. Pantalla → ViewModel → contrato de repositorio → API. Los flujos nuevos de catálogo y guías tienen componentes propios; la autorización efectiva permanece en backend. Android selecciona documentos con el selector del sistema, sin permisos generales de almacenamiento. La decodificación de fotos tiene adaptadores por plataforma.
-
-## Funciones del incremento
-
-- Catálogo maestro: administración agrega combinaciones; Comercial selecciona las opciones autorizadas, sin inventarlas a partir del inventario.
-- Llegadas pendientes/confirmadas, filtro por guía y paginación real.
-- Registro de llegada con 1–3 JPG/PNG; límites de tamaño y dimensiones, además de validación del servidor.
-- Fotos protegidas, ampliación y arrastre como referencia durante el registro de fichas.
-- Bloques de cinco motocicletas, guardar borradores en servidor, reanudar y finalizar la guía con confirmación.
-- OCR de todas las fotos mediante API: solo sugerencias; exige revisión y no guarda automáticamente fichas.
-- Edición con FICHAS_EDITAR; inventario, copia de chasis, solicitudes multilínea, seguimiento, asignación, retiro, anulación y traslados conservados.
-
-## Entorno y seguridad
-
-La API nueva requiere esquema Flyway V23. La base histórica de validación tenía V15: no lanzar la API nueva sobre ella ni sobre datos históricos sin respaldo/copia y revisión. Este bloque no aplicó migraciones ni modificó el backend o las cuentas.
-
-URL local incorporada: `http://127.0.0.1:8089`. Para backend aislado en PC:8090, usar `adb reverse tcp:8089 tcp:8090`. Si se cambia la URL de compilación, documentar el build exacto. No abrir PostgreSQL a la red.
-
-Se conserva applicationId `pe.indumotos.asapp` y la clave local existente. Nunca versionar claves, JWT, fotos de documentos reales sin autorización ni credenciales. No copiar sessionStorage de la web: la sesión móvil permanece en memoria. Cuentas y permisos se configuran en el entorno, no se amplían para aparentar pruebas aprobadas.
-
-## Build y pruebas
-
-Usar Java 21 y las herramientas existentes:
+Docker: PostgreSQL existente y API `indumotos-paridad-api`, imagen `indumotos-paridad-ocr:95261ad`, API solo `127.0.0.1:8090`. Copia aislada `indumotos_s2_paridad_20261123` V23; base histórica V15 y volúmenes conservados. No ejecutar down -v ni migraciones desde cero. Contenedor anterior conservado detenido como `indumotos-paridad-api-pre-offline`, con reinicio automático desactivado.
 
 ```powershell
-.\gradlew.bat :shared:testAndroidHostTest :androidApp:assembleDebug --console=plain
+./scripts/Iniciar-Entorno-Paridad.ps1 -Serial RFGL11XYCTD
+./scripts/Conectar-USB.ps1 -Serial RFGL11XYCTD
 ```
 
-APK: `androidApp/build/outputs/apk/debug/androidApp-debug.apk`. La instalación sobre un teléfono requiere comprobar primero firma y versión; nunca resolver conflictos borrando datos sin autorización.
+APK incorpora `http://127.0.0.1:8089`; túnel teléfono8089→PC8090. Restablecerlo tras reiniciar ADB/USB. Offline funciona sin cable para datos ya descargados; sincronizar actualmente requiere este túnel. No se contrató servidor público ni se expuso PostgreSQL. No afirmar conectividad Wi-Fi/HTTPS desplegada.
 
-Las suites locales verifican reglas y estados; todavía no acreditan funcionamiento contra API V23 ni pruebas físicas del nuevo APK. Las capturas del 19/11 pertenecen a la versión anterior. [Verificaciones históricas](docs/VALIDACION-SPRINT2-20261119.md). [Matriz manual del incremento](docs/PRUEBAS-PARIDAD-SPRINT2.md).
+## Build, instalación y evidencia
 
-## Continuidad
+Java21 y wrappers existentes. Configuración para ahorrar RAM: Gradle1536MB, un worker, Kotlin in-process; Android Studio puede permanecer cerrado.
 
-Leer [CONTINUIDAD](docs/CONTINUIDAD.md) y AGENTS.md. Web y Figma los trabajan otros colaboradores. Excel: solo la pestaña existente `SCRUM S2 19-11-2026`, con fecha real y sin modificar formato. No declarar pruebas físicas nuevas hasta ejecutarlas. No merge a main ni etiqueta final hasta validar el APK exacto.
+```powershell
+./gradlew.bat :shared:testAndroidHostTest :androidApp:assembleDebug --console=plain
+```
 
-Limitaciones: iOS no compilado en Windows; selector de fotos implementado en Android. No se añadió offline ni refresh token. El alcance no incluye historias de sprints posteriores. La regla de anulación pendiente sigue sujeta a aceptación de negocio.
+APK estable local ignorado por Git: `entrega/Indumotos-AS-0.3.2-sprint2-offline-debug.apk`. AppID `pe.indumotos.asapp`, misma firma Debug e instalación -r sin borrar datos. Código del APK `92f3bce`; hash/certificado/ruta exactos en [manifiesto](docs/build-offline-20261123.json). No es release de producción ni AAB/iOS certificado.
+
+Verificación actual: **51 pruebas móviles JVM/SQLite/HTTP aprobadas**, 2 unitarias backend y 14 comprobaciones HTTP reales de control de concurrencia. Las 110 comprobaciones API anteriores pertenecen al bloque previo. No son 51 recorridos físicos. Resultado Samsung y evidencias: [continuidad offline](docs/OFFLINE-CONTINUIDAD.md). Los hitos históricos no sustituyen la validación del APK actual.
+
+## Pendientes y entrega
+
+Completar los recorridos físicos integrales de Sprint2 por rol, tamaños/temas restantes, aceptación de negocio HU-27, firma release y validación iOS en macOS. No declarar Sprint2 terminado por la compilación o las pruebas API. No merge/main/tag final sin revisión y autorización.
+
+Excel: únicamente pestaña existente SCRUM S2 19-11-2026, fecha real, sin enlaces ni alterar formato. Este bloque no acredita su actualización. Nunca publicar claves, archivos privados, JWT, contraseñas o documentos personales. [Historia de paridad](docs/CIERRE-PARIDAD-20261123.md).

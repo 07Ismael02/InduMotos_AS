@@ -20,7 +20,7 @@ try {
     if ($ConPruebas) { $tasks += ':shared:testAndroidHostTest' }
     $configuration = @()
     if ($BackendUrl) { $configuration += "-Pindumotos.backendUrl=$BackendUrl" }
-    & ./gradlew.bat @tasks @configuration --console=plain --max-workers=2 --no-daemon
+    & ./gradlew.bat @tasks @configuration --console=plain --max-workers=1 --no-daemon
     if ($LASTEXITCODE -ne 0) { throw 'No se generó un APK válido. Revisa la salida de Gradle.' }
     $delivery = Join-Path $root 'entrega'
     New-Item -ItemType Directory -Path $delivery -Force | Out-Null

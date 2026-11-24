@@ -1,0 +1,12 @@
+{
+  "fecha": "2026-11-23T23:06:54-05:00",
+  "dispositivo": "Samsung SM-S948U1 / Android17 API37",
+  "version": "0.3.2-sprint2-offline",
+  "guiaId": 3,
+  "guia": "QA-CAS-20261123223029",
+  "borradoresServidor": 1,
+  "motorServidor": "MOTOROFFLINEQA2026",
+  "fichasStock": 0,
+  "sincronizacionComprobada": true,
+  "observado": "Pendiente conservado tras actualización/reapertura; login online y contador local cero; lectura API confirma el mismo motor, sin crear stock."
+}

@@ -1,0 +1,18 @@
+{
+  "fecha": "2026-11-23T22:52:21-05:00",
+  "versionName": "0.3.2-sprint2-offline",
+  "versionCode": 9,
+  "applicationId": "pe.indumotos.asapp",
+  "tipo": "Debug",
+  "commitCodigo": "92f3bce762d1149e438ec381a50ab3c048b88bf6",
+  "backendCommit": "95261ad1ad4e375150acd3c196969f7e73db627c",
+  "sha256": "d23324a74113dc419d330bc484981108e59f1f5035dacb3fa7f35218a315bcc1",
+  "certificadoSha256": "23c1a0373560f28c3d2b64103e50a0dff54bb955fd75b20ac40d52253e33b0f0",
+  "bytes": 23199208,
+  "rutaLocal": "C:\\Users\\Ismael Logacho\\Documents\\PharmaMobil\\proyecto-final-dam\\InduMotos-Sprint2\\entrega\\Indumotos-AS-0.3.2-sprint2-offline-debug.apk",
+  "tests": 51,
+  "fallos": 0,
+  "compilacion": "BUILD SUCCESSFUL",
+  "httpCas": 14,
+  "validacionFisica": "Samsung Android17: borrador persiste tras actualización y reapertura protegida; login online y sincronización confirmados por API, sin stock. Ver resultado-dispositivo-offline.json."
+}

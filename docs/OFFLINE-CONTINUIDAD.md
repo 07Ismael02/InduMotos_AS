@@ -1,19 +1,21 @@
-# Offline — bloque activo, 23/11/2026
+# Offline — resultado vigente, 23/11/2026
 
-Base be14bcf, rama feature/sprint2-paridad-web. No tocar PharmaMobile ni migraciones del servidor. Objetivo acordado: consulta local y conservación de borradores de motocicletas para guías previamente descargadas. No publicar nuevas llegadas/fotos, finalizar, asignar unidades, trasladar o administrar accesos sin confirmación online.
+Versión 0.3.2-sprint2-offline/código9, APK Debug instalado por actualización compatible en Samsung SM-S948U1, Android17/API37. Código móvil 92f3bce; backend 95261ad. No merge a main ni etiqueta final.
 
-Diseño: SQLDelight privado por servidor/usuario; catálogo, páginas de inventario, fichas y guías visitadas con fecha de descarga; borradores locales independientes del stock. Cada pendiente conserva baseline y revisión. Antes del PUT idempotente, consultar registro servidor; si cambió respecto al baseline, exigir revisión. No reintentar POST sensibles. No hacer fallback ante 401/403. No cachear usuarios/permisos administrativos ni JWT/contraseñas.
+## Comprobaciones
 
-Reapertura offline: perfil de consulta limitado temporalmente, autenticación por bloqueo del dispositivo Android, sin restablecer token ni habilitar escrituras remotas. Logout impide reabrir el perfil offline; conserva borradores particionados para recuperar solo tras login de la misma cuenta. Sincronización explícita y al recuperar conexión mientras app esté activa; no afirmar ejecución en segundo plano sin implementarla.
+- 51 pruebas móviles JVM/SQLite/HTTP aprobadas: persistencia, aislamiento de cuentas, caducidad/logout, imágenes de 5MB leídas por bloques, red/401/403 y concurrencia. No son 51 recorridos físicos.
+- Backend: 2 pruebas unitarias y 14 comprobaciones HTTP reales aprobadas; If-Match obsoleto devuelve412 sin sobrescribir; la web sin cabecera conserva contrato; guardar borrador no genera stock.
+- Samsung: consulta de guía/foto descargadas sin túnel; guardado local de un borrador; actualización -r a0.3.2 y reapertura protegida por credencial Android. El usuario completó el desbloqueo; se observó pendiente1 y motor MOTOROFFLINEQA2026 conservado.
+- Samsung final0.3.2: login online, sincronización y contador local0. Lectura API confirma guía3 con un solo borrador, motor MOTOROFFLINEQA2026 y cantidadFichas0. Captura final revisada y resultado en evidencias/offline-20261123.
+- Las capturas previas de reapertura contienen una ventana personal superpuesta: se conservaron privadas y no se publican. Esa parte tiene observación registrada, no captura pública limpia.
 
-Hitos pendientes: persistencia y pruebas SQLite; repositorios offline; UI/seguridad nativa; pruebas de conflictos/aislamiento/reinicio; APK y validación física. Registrar commits y resultados conforme ocurran. No marcar este diseño como implementado/verificado.
+## Entorno y límites
 
-Hito 1: esquema SQLDelight generado con 2.1.0 disponible localmente. SqlOfflineStore y OfflineSession implementados, drivers Android/iOS y contexto Koin conectados. Seis pruebas OfflinePersistenceTest aprobadas en SQLite JVM real (incluyen archivo cerrado/reabierto, aislamiento, revisión concurrente, logout y caducidad de perfil). Log local tmp/sprint2-auditoria/offline-store-test.log. No se ha verificado iOS ni dispositivo. Repositorios/UI de offline todavía en integración: no considerar este checkpoint un APK offline terminado.
+PostgreSQL se encontró detenido durante la validación; se inició el contenedor existente y se reinició solo la API. HTTP200 recuperado. Contenedor de respaldo pre-offline detenido con restart=no para evitar su reinicio automático. Ningún volumen/base recreado, ninguna migración nueva, ningún usuario histórico restablecido.
 
-Hito 2: repositorios con caché de lecturas operativas, fotos privadas y borradores persistentes; sincronización con baseline, revisión y PUT If-Match. Dieciséis pruebas offline aprobadas (6 persistencia + 10 sincronización/lecturas): 401/403 sin fallback, no duplicar envío confirmado, conflictos y permisos. Backend en worktree Backend-Offline-Integracion, rama feature/sprint2-offline-borradores, commit 95261ad; agrega versión/If-Match bajo bloqueo sin migraciones y conserva compatibilidad web. Dos pruebas backend aprobadas; despliegue y HTTP CAS aún pendientes. UI/reapertura protegida aún en integración.
+Consulta local y borradores de guías descargadas funcionan sin servidor; no se confirman stock, altas con fotos, OCR, asignaciones, traslados o administración offline. Reconexion actual: USB8089→PC8090. No hay despliegue HTTPS público ni sincronización con app cerrada. iOS no compilado. Pruebas físicas integrales por rol y firma release siguen pendientes; esto no cierra todo Sprint2.
 
-Hito 3: backend 95261ad desplegado en imagen indumotos-paridad-ocr:95261ad, mismo puerto loopback8090 y copia V23. Contenedor previo conservado detenido como indumotos-paridad-api-pre-offline. Catorce comprobaciones HTTP CAS aprobadas: versión original/nueva, rechazo 412 sin sobrescritura, reintento revisado, web sin cabecera y cero stock. Evidencia local privado-paridad/resultado-cas-http.json.
+Evidencias: resultado-cas-http.json (14), resultado-dispositivo-offline.json (lectura servidor) y offline-032-sincronizacion.png (pantalla final). Datos sintéticos aislados; los identificadores técnicos preexistentes se conservan para trazabilidad. Para nuevas pruebas usar nombres sencillos como Prueba1.
 
-UI offline integrada: Descarga de datos, modo local, login local mediante credencial Android (sin JWT guardado), sesión local de 24 h, logout local, estados de borrador y confirmación de revisión. Primera compilación UI aprobada con pruebas existentes; después se añadieron ajustes de búsqueda local/caché y pruebas HTTP JVM. Versión prevista 0.3.0-sprint2-offline/código7. Falta compilar el estado final, instalar y validar desconexión/reinicio/PIN en Samsung. No declarar esas pruebas físicas completadas.
-
-Referencias oficiales: https://developer.android.com/topic/architecture/data-layer/offline-first y https://sqldelight.github.io/sqldelight/ . PharmaMobile solo se inspecciona como referencia; no se modifica.
+Uso y arquitectura: OFFLINE-USO.md. Hash/firma/ruta: build-offline-20261123.json. Compilar con un worker, Gradle1536MB y Kotlin in-process. No recompilar solo para repetir verificaciones ya aprobadas.
