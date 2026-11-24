@@ -33,6 +33,9 @@ private fun Access.permits(code: String) = permisos.any { it.codigo==code && it.
     var action by remember { mutableStateOf<String?>(null) }
     var removal by remember { mutableStateOf<AssignedUnit?>(null) }
     var chassis by remember(state.line?.id) { mutableStateOf("") }
+    LocalSystemBack.current(state.selected!=null&&!state.busy) {
+        if(state.line!=null)vm.closeLine() else vm.list(state.page)
+    }
     DisposableEffect(account.usuarioId) { onDispose { vm.reset() } }
     LaunchedEffect(account.usuarioId) { vm.reset();vm.list() }
     LaunchedEffect(state.expired) { if(state.expired) expired() }
@@ -209,6 +212,7 @@ private data class DraftLine(val key: Int,val brand: String="",val model: String
     val vm: OperationsViewModel=koinViewModel(key="traslados-${account.usuarioId}");val state by vm.state.collectAsState()
     var motorcycle by remember{mutableStateOf("")};var loadedId by remember{mutableStateOf<Long?>(null)}
     var destination by remember(loadedId){mutableStateOf<Site?>(null)};var confirm by remember{mutableStateOf(false)}
+    LocalSystemBack.current(loadedId!=null&&!state.busy){loadedId=null;destination=null}
     DisposableEffect(account.usuarioId) { onDispose { vm.reset() } }
     LaunchedEffect(account.usuarioId){vm.reset();if(account.permits("INVENTARIO_CONSULTAR"))vm.motorcycles()}
     LaunchedEffect(state.expired){if(state.expired)expired()}

@@ -108,7 +108,7 @@ class RemoteRepository(private val http:HttpClient,private val offline:OfflineSe
   }
   return result
  }
- override suspend fun logout(){if(offline?.status?.value?.offline!=true)request("auth/logout","{}","POST");offline?.current?.let{store?.removeProfile(it.owner)};clearSession()}
+ override suspend fun logout(){if(offline?.status?.value?.offline!=true)request("auth/logout","{}","POST");clearSession()}
  override suspend fun currentLocation(id: Long): LocationRecord? =
      request("motocicletas/$id/ubicacion").takeIf { it.isNotBlank() }
          ?.let { json.decodeFromString<LocationRecord?>(it) }

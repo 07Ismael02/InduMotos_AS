@@ -1,7 +1,7 @@
 package pe.indumotos.mobile.data
 
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.*
 import pe.indumotos.mobile.domain.*
 
 class GuideRemoteRepository(private val remote:RemoteRepository,private val onlineOnly:Boolean=false):GuideRepository {
@@ -18,4 +18,6 @@ class GuideRemoteRepository(private val remote:RemoteRepository,private val onli
     override suspend fun conditionalSave(id:Long,draft:MotorcycleDraft,version:String):GuideRegistration=json.decodeFromString(remote.guideJson("llegadas/$id/registro/borradores/${draft.posicion}",json.encodeToString(draft),"PUT",onlineOnly=true,version=version))
     override suspend fun finish(id:Long):GuideRegistration = json.decodeFromString(request("llegadas/$id/registro/finalizar","{}","POST"))
     override suspend fun ocr(id:Long):OcrResult = json.decodeFromString(request("llegadas/$id/sugerencias-ocr"))
+    override suspend fun warehouses():List<Site> = json.decodeFromString<List<Site>>(remote.guideJson("ubicaciones",onlineOnly=true)).filter{it.tipo=="ALMACEN"&&it.activo}
+    override suspend fun finishAt(id:Long,warehouse:Long):GuideRegistration = json.decodeFromString(request("llegadas/$id/registro/finalizar",buildJsonObject{put("almacenId",warehouse)}.toString(),"POST"))
 }

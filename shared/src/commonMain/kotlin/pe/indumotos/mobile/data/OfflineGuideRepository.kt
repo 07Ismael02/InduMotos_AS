@@ -27,6 +27,12 @@ class OfflineGuideRepository(private val read:GuideRepository,private val server
         if(!session.readOnly())sync.synchronize()
         return read.registration(id)
     }
+    override suspend fun warehouses():List<Site> = server.warehouses()
+    override suspend fun finishAt(id:Long,warehouse:Long):GuideRegistration {
+        require(localDrafts(id).isEmpty()){ "Primero sincroniza o resuelve los borradores guardados en el teléfono." }
+        if(session.status.value.offline)throw AppException(AppError.Network)
+        return server.finishAt(id,warehouse)
+    }
     override suspend fun finish(id:Long):GuideRegistration {
         require(localDrafts(id).isEmpty()){ "Primero sincroniza o resuelve los borradores guardados en el teléfono." }
         if(session.status.value.offline)throw AppException(AppError.Network)

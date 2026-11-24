@@ -20,10 +20,7 @@ internal fun AppearanceSettings(
     onChange: (Appearance) -> Unit,
     onClose: () -> Unit
 ) {
-    AlertDialog(
-        onDismissRequest = onClose,
-        title = { Text("Ajustes") },
-        text = {
+    AccountPage("Preferencias",onClose) {
             Column(Modifier.selectableGroup()) {
                 Text("Tema de la aplicación")
                 Appearance.entries.forEach { option ->
@@ -41,7 +38,5 @@ internal fun AppearanceSettings(
                     }
                 }
             }
-        },
-        confirmButton = { TextButton(onClick = onClose) { Text("Listo") } }
-    )
+    }
 }

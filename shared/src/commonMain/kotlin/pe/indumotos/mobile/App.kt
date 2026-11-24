@@ -69,11 +69,14 @@ private fun createForm(module:Module):Form=when(module){
   if(isActive&&state.access!=null&&!offlineStatus.readOnlySession)while(true){delay(30000);vm.refreshConnection()}
  }
  var exitArmed by remember{mutableStateOf(false)}
- LaunchedEffect(state.module,state.access?.usuarioId){exitArmed=false}
+ LaunchedEffect(state.access?.usuarioId){exitArmed=false}
+ LaunchedEffect(state.module){if(state.module!=null)exitArmed=false}
  LaunchedEffect(exitArmed){if(exitArmed){delay(2000);exitArmed=false}}
  installSystemBack(true) {
      if(!state.busy) {
-         if(state.module!=null){exitArmed=false;vm.open(null)}
+         if(state.editing){vm.cancelEdit()}
+         else if(state.detail!=null){vm.closeDetail()}
+         else if(state.module!=null){exitArmed=false;vm.open(null);onExitHint();exitArmed=true}
          else if(exitArmed){exitArmed=false;onExitRequested()}
          else {exitArmed=true;onExitHint()}
      }
@@ -86,7 +89,7 @@ private fun createForm(module:Module):Form=when(module){
  }
  LaunchedEffect(darkTheme) { onDarkTheme(darkTheme) }
  IndumotosTheme(darkTheme = darkTheme){
-  CompositionLocalProvider(LocalSystemBack provides installSystemBack,LocalReturnHome provides {vm.open(null)}) {
+  CompositionLocalProvider(LocalSystemBack provides installSystemBack,LocalReturnHome provides {vm.open(null);onExitHint();exitArmed=true}) {
   Surface(Modifier.fillMaxSize(),color=MaterialTheme.colorScheme.background){
    if(state.access==null)Login(state,vm,backendUrl,unlockOffline)else Workspace(state,vm,appearance,pickGuidePhotos,offlineStatus) {
        appearance = it
@@ -113,7 +116,7 @@ private fun createForm(module:Module):Form=when(module){
    Module.entries.filter{vm.canRead(it)}.forEach{m->NavigationDrawerItem(label={Text(m.title)},icon={Icon(icon(m),null)},selected=state.module==m,onClick={if(!state.busy){vm.open(m);scope.launch{drawer.close()}}})}
   }
   HorizontalDivider()
-  AccountEntry(account, onClick = { showAccount = true })
+  AccountEntry(account, onClick = { scope.launch{drawer.close()};showAccount = true })
  }}){
   Scaffold(containerColor=MaterialTheme.colorScheme.background,topBar={TopAppBar(title={Column{Text(state.module?.title?:"Inicio",fontSize=18.sp,fontWeight=FontWeight.SemiBold);Text("INDUMOTOS",fontSize=10.sp,letterSpacing=2.sp,color=Muted)}},navigationIcon={IconButton(onClick={scope.launch{drawer.open()}}){Icon(Icons.Default.Menu,"Abrir menú de navegación")}},colors=TopAppBarDefaults.topAppBarColors(containerColor=MaterialTheme.colorScheme.surface))},floatingActionButton={
    val m=state.module;val permission=if(m==Module.INVENTORY)"FICHAS_REGISTRAR" else m?.permission
@@ -128,7 +131,7 @@ private fun createForm(module:Module):Form=when(module){
   }
  }
  LocalSystemBack.current(drawer.isOpen){scope.launch{drawer.close()}}
- if (showSettings) AppearanceSettings(appearance, onAppearanceChanged) { showSettings = false }
+ if (showSettings) AppearanceSettings(appearance, onAppearanceChanged) { showSettings = false;showAccount=true }
  if (showAccount) AccountMenu(
      account = account,
      canLogout = !state.busy,

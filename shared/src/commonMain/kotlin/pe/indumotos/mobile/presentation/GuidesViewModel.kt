@@ -10,7 +10,7 @@ data class GuidesState(val busy:Boolean=false,val error:String?=null,val message
     val page:ArrivalPage?=null,val query:String="",val filter:String="PENDIENTE",val selected:Arrival?=null,
     val registration:GuideRegistration?=null,val detail:ArrivalDetail?=null,val drafts:List<MotorcycleDraft> = emptyList(),val options:List<CatalogOption> = emptyList(),
     val images:List<GuideImage> = emptyList(),val imageIndex:Int=0,val imageBytes:ByteArray?=null,
-    val ocr:OcrResult?=null,val ocrReviewed:Boolean=true,val local:List<LocalDraftView> = emptyList())
+    val warehouses:List<Site> = emptyList(),val ocr:OcrResult?=null,val ocrReviewed:Boolean=true,val local:List<LocalDraftView> = emptyList())
 class GuidesViewModel(private val repo:GuideRepository,private val catalog:CatalogRepository):ViewModel() {
     private val mutable=MutableStateFlow(GuidesState());val state=mutable.asStateFlow()
     private var task:Job?=null;private var epoch=0
@@ -72,9 +72,10 @@ class GuidesViewModel(private val repo:GuideRepository,private val catalog:Catal
         val local=repo.localDrafts(id);val registration=repo.registration(id)
         mutable.update{it.copy(local=local,registration=registration,drafts=it.drafts.map{d->if(d.posicion==position)local.firstOrNull{r->r.draft.posicion==position}?.draft?:registration.borradores.firstOrNull{r->r.posicion==position}?:MotorcycleDraft(position) else d})}
     }
-    fun finish()=work(true) {
+    fun warehouses()=work{val rows=repo.warehouses();mutable.update{it.copy(warehouses=rows)}}
+    fun finish(warehouse:Long?=null)=work(true) {
         val s=mutable.value;require(s.local.isEmpty()&&s.ocrReviewed&&GuideRules.canFinish(requireNotNull(s.registration),s.drafts)){"Sincroniza todos los bloques y revisa los datos antes de finalizar."}
-        val result=repo.finish(requireNotNull(s.selected).id)
+        val result=if(warehouse!=null)repo.finishAt(requireNotNull(s.selected).id,warehouse)else repo.finish(requireNotNull(s.selected).id)
         mutable.update{it.copy(registration=result,drafts=emptyList(),selected=it.selected?.copy(estadoRegistro="CONFIRMADA"),message="Registro finalizado. La guía queda confirmada.")}
         val detail=repo.detail(requireNotNull(s.selected).id);mutable.update{it.copy(detail=detail)}
     }

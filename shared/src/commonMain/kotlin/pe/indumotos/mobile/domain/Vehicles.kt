@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable data class VehicleCard(val datos:VehicleSpecs=VehicleSpecs(),val fotos:List<VehiclePhoto> = emptyList())
 @Serializable data class VehicleAvailability(val id:Long,val chasis:String,val marca:String,val modelo:String,val color:String,val ubicacion:String?=null,val estado:String,val motivo:String,val actualizadoEn:String?=null,val registradoPor:String?=null,val puedeOfrecerse:Boolean=false)
 interface VehicleRepository {
+ suspend fun journey(id:Long):kotlinx.serialization.json.JsonObject
  suspend fun card(id:Long):VehicleCard
  suspend fun save(id:Long,specs:VehicleSpecs):VehicleCard
  suspend fun photo(id:Long,photo:Long):ByteArray

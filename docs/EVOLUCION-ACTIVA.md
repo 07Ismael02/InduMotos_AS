@@ -1,5 +1,15 @@
 # Bloque activo: catálogo, ventas y red privada — 24/11/2026
 
+## Corte comprobado: 24/11/2026, 06:14 Lima
+
+La información de planificación que sigue es antecedente. Backend integrado en fd9bad3 y ampliado en 67e54f2, rama feature/ismael-catalogo-ventas. Copia aislada indumotos_evolucion_20261124 en V34; base original V23 conservada. Servicio indumotos-evolucion-api: HTTPS en 192.168.137.1:8443 y loopback 127.0.0.1:8091, certificado local validado. Sin cambios al firewall ni publicación en campus. Salud HTTPS HTTP 200.
+
+Build Android 0.4.0-evolucion, código13, completado; 57 pruebas móviles, cero fallos/errores. Build Maven completado. Firma SHA-256 idéntica a la instalación anterior: 23c1a0373560f28c3d2b64103e50a0dff54bb955fd75b20ac40d52253e33b0f0. Instalación con actualización conservando datos: Success.
+
+Samsung conectado por ADB inalámbrico al hotspot, sin reverse. Login real con cuenta administrativa completado contra HTTPS; Inicio observado y descarga local completada. Evidencia privada: tmp/sprint2-auditoria/privado-paridad/040-inicio-hotspot.png (fuera de este repositorio). No representa todavía validación de todos los recorridos ni prueba offline. Pendientes: fotos propias, revisión visual de fichas/ventas, práctica offline y reconexión, documentación final, commits de los cambios posteriores al primer corte y publicación de las ramas. No merge a main.
+
+## Plan y antecedentes del bloque
+
 Solicitud: fotografías y características de motos, activar/desactivar unidades, alinear funciones/colores con web y backend nuevos, ventas con pagos académicos y práctica sin cable/offline. Usuario eligió hotspot Windows; PC inicialmente Campus UPeU L/Public. No abrir API en campus ni PostgreSQL. Mantener commits breves, ramas con Ismael, main intacto.
 
 Repositorios móviles: feature/ismael-catalogo-ventas desde6deea3b, carpeta InduMotos-Sprint2. Backend: worktree Backend-Evolucion, feature/ismael-catalogo-ventas desde3de526c. Se integró sin commit todavía origin/feature/gutierrez-mejoras-revision b3da44c; conflictos AuthController/SecurityConfig resueltos conservando credential stamp, cv de sesión del equipo, reset admin y If-Match CAS. Pruebas Maven en curso en tmp/sprint2-auditoria/integracion-equipo.log (sesión75763). Aún no desplegar ni tocar DB V23 actual.

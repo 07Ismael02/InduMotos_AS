@@ -23,7 +23,7 @@ class OfflineService(private val remote:RemoteRepository,private val guides:Guid
                 if(session.status.value.offline)throw AppException(AppError.Network)
                 for(row in result.items){
                     val id=row["id"]!!.jsonPrimitive.long;remote.detail(Module.FICHAS,id)
-                    vehicles?.let{v->val card=v.card(id);for(photo in card.fotos)v.photo(id,photo.id);if(access.permisos.any{it.codigo=="DISPONIBILIDAD_CONSULTAR"&&it.permitido})v.availability(id)}
+                    vehicles?.let{v->val card=v.card(id);for(photo in card.fotos)v.photo(id,photo.id);if(access.permisos.any{it.codigo=="DISPONIBILIDAD_CONSULTAR"&&it.permitido})v.availability(id);if(access.permisos.any{it.codigo==READ_LOCATIONS&&it.permitido})v.journey(id)}
                     if(session.status.value.offline)throw AppException(AppError.Network)
                 }
                 page++

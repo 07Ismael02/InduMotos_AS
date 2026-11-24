@@ -26,6 +26,7 @@ import kotlinx.serialization.json.*
     fun can(code:String)=account.permisos.any{it.codigo==code&&it.permitido}
     val canEdit=editing&&can("FICHAS_REGISTRAR")&&can("INVENTARIO_CONSULTAR")
     var query by remember{mutableStateOf("")};var creating by remember{mutableStateOf(false)}
+    var warehouse by remember{mutableStateOf<Site?>(null)}
     var confirmReload by remember{mutableStateOf(false)};var confirmFinish by remember{mutableStateOf(false)};var confirmLeave by remember{mutableStateOf(false)}
     var page by remember(s.selected?.id){mutableStateOf(0)};var zoom by remember{mutableStateOf(false)}
     var viewedFicha by remember(s.selected?.id){mutableStateOf<JsonObject?>(null)}
@@ -36,8 +37,13 @@ import kotlinx.serialization.json.*
     val returnHome=LocalReturnHome.current
     LocalSystemBack.current(true) {
         if(!s.busy) {
-            if(hasUnsaved()){leaveHome=true;confirmLeave=true}
-            else returnHome()
+            when {
+                viewedFicha!=null -> viewedFicha=null
+                zoom -> zoom=false
+                creating -> creating=false
+                s.selected!=null -> {leaveHome=false;if(hasUnsaved())confirmLeave=true else vm.list(s.query,s.filter)}
+                else -> returnHome()
+            }
         }
     }
     DisposableEffect(account.usuarioId,editing){onDispose{vm.reset()}}
@@ -153,7 +159,7 @@ import kotlinx.serialization.json.*
                             OutlinedButton(onClick={page--},enabled=!s.busy&&page>0){Text("5 anteriores")}
                             OutlinedButton(onClick={page++},enabled=!s.busy&&(page+1)*5<s.drafts.size){Text("5 siguientes")}
                         }
-                        Button(onClick={confirmFinish=true},enabled=!s.busy&&!offlineStatus.offline&&s.local.isEmpty()&&s.ocrReviewed&&GuideRules.canFinish(registration,s.drafts),modifier=Modifier.fillMaxWidth()){Text("Finalizar registro de la guía")}
+                        Button(onClick={warehouse=null;confirmFinish=true;vm.warehouses()},enabled=!s.busy&&!offlineStatus.offline&&s.local.isEmpty()&&s.ocrReviewed&&GuideRules.canFinish(registration,s.drafts),modifier=Modifier.fillMaxWidth()){Text("Finalizar registro de la guía")}
                         Text("Solo finalizar incorpora las fichas al inventario. No registres motos que no llegaron físicamente.")
                     }
                 } else if(registration?.terminado==true)item{Text("Registro confirmado. Esta guía está en modo consulta.")}
@@ -167,7 +173,11 @@ import kotlinx.serialization.json.*
     if(creating)NewArrivalDialog(s.busy,s.error,pickPhotos,{creating=false},vm::register)
     if(zoom&&s.imageBytes!=null)ZoomGuide(requireNotNull(s.imageBytes)){zoom=false}
     if(confirmReload)AlertDialog(onDismissRequest={confirmReload=false},title={Text("Recargar registro")},text={Text("Se conservarán los borradores del servidor y se descartarán los cambios locales sin guardar.")},confirmButton={TextButton(onClick={confirmReload=false;s.selected?.let{vm.select(it,canEdit)}}){Text("Recargar")}},dismissButton={TextButton(onClick={confirmReload=false}){Text("Cancelar")}})
-    if(confirmFinish)AlertDialog(onDismissRequest={confirmFinish=false},title={Text("Finalizar registro")},text={Text("Se incorporarán las motocicletas guardadas y la guía quedará confirmada. Verifica los datos y las cantidades antes de continuar.")},confirmButton={Button(onClick={confirmFinish=false;vm.finish()},enabled=!s.busy){Text("Finalizar")}},dismissButton={TextButton(onClick={confirmFinish=false}){Text("Cancelar")}})
+    if(confirmFinish)AlertDialog(onDismissRequest={if(!s.busy)confirmFinish=false},title={Text("Finalizar registro")},text={Column(verticalArrangement=Arrangement.spacedBy(12.dp)){
+        Text("Selecciona el almacén que recibió la guía. Se incorporarán las motos y se guardará su ubicación inicial.")
+        SimpleChoice("Almacén",warehouse?.let{"${it.codigo} · ${it.nombre}"}.orEmpty(),s.warehouses.map{"${it.codigo} · ${it.nombre}"},!s.busy){value->warehouse=s.warehouses.firstOrNull{"${it.codigo} · ${it.nombre}"==value}}
+        s.error?.let{Text(it,color=MaterialTheme.colorScheme.error)}
+    }},confirmButton={Button(onClick={confirmFinish=false;vm.finish(warehouse!!.id)},enabled=!s.busy&&warehouse!=null){Text("Finalizar")}},dismissButton={TextButton(onClick={confirmFinish=false},enabled=!s.busy){Text("Cancelar")}})
     if(confirmLeave)AlertDialog(onDismissRequest={confirmLeave=false},title={Text("Cambios sin guardar")},text={Text("Hay bloques editados que aún no están guardados en el servidor. ¿Deseas salir y descartar esos cambios locales?")},confirmButton={TextButton(onClick={confirmLeave=false;if(leaveHome)returnHome() else vm.list(s.query,s.filter)}){Text("Descartar y volver")}},dismissButton={TextButton(onClick={confirmLeave=false}){Text("Seguir editando")}})
 }
 

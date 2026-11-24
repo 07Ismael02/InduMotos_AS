@@ -1,5 +1,8 @@
 package pe.indumotos.mobile
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import kotlinx.serialization.json.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -14,6 +17,7 @@ import pe.indumotos.mobile.presentation.VehicleViewModel
 
 @Composable internal fun VehicleExtras(id:Long,account:Access,offline:Boolean,pick:((PhotoSelection)->Unit)->Unit,expired:()->Unit){
  val vm:VehicleViewModel=koinViewModel(key="ficha-$id-${account.usuarioId}");val s by vm.state.collectAsState()
+ var showJourney by remember(id){mutableStateOf(false)}
  var edit by remember(id){mutableStateOf(false)};var change by remember(id){mutableStateOf<String?>(null)};var reason by remember(id){mutableStateOf("")};var selectionError by remember(id){mutableStateOf<String?>(null)}
  fun can(code:String)=account.permisos.any{it.codigo==code&&it.permitido}
  DisposableEffect(id,account.usuarioId){onDispose{vm.reset()}}
@@ -37,11 +41,26 @@ import pe.indumotos.mobile.presentation.VehicleViewModel
    Text(if(a.puedeOfrecerse)"Disponible para ofrecer" else "No disponible para venta",style=MaterialTheme.typography.bodySmall)
    if(!offline&&can("DISPONIBILIDAD_CAMBIAR")&&a.estado !in listOf("VENDIDA","EN_TRANSITO"))OutlinedButton(onClick={reason="";change=if(a.estado=="BLOQUEADA")"HABILITADA"else"BLOQUEADA"},enabled=!s.busy){Text(if(a.estado=="BLOQUEADA")"Reactivar motocicleta"else"Desactivar motocicleta")}
   }}}
+  if(can(READ_LOCATIONS))OutlinedButton(onClick={showJourney=true;vm.journey()},enabled=!s.busy){Text("Ver recorrido completo")}
   s.card?.datos?.let{d->DetailGroup("Características"){
    DetailValue("Año",d.anio?.toString());DetailValue("Cilindrada",d.cilindrada?.let{"$it cc"});DetailValue("Transmisión",d.transmision?.takeIf{it.isNotBlank()});DetailValue("Combustible",d.combustible?.takeIf{it.isNotBlank()});DetailValue("Descripción",d.descripcion?.takeIf{it.isNotBlank()})
    if(!offline&&can("FICHAS_EDITAR"))OutlinedButton(onClick={edit=true},enabled=!s.busy){Text("Editar características")}
   }}
  }
+ if(showJourney)AlertDialog(onDismissRequest={showJourney=false},title={Text("Recorrido completo")},text={LazyColumn(Modifier.heightIn(max=420.dp),verticalArrangement=Arrangement.spacedBy(12.dp)){
+  if(s.busy)item{LinearProgressIndicator(Modifier.fillMaxWidth())}
+  s.error?.let{item{Text(it,color=MaterialTheme.colorScheme.error)}}
+  s.journey?.let{j->
+   item{Text("Ubicación: "+j["ubicacionActual"]?.jsonPrimitive?.contentOrNull.orEmpty())}
+   items(j["eventos"]?.jsonArray.orEmpty()){event->val e=event.jsonObject;OutlinedCard(Modifier.fillMaxWidth()){Column(Modifier.padding(12.dp),verticalArrangement=Arrangement.spacedBy(6.dp)){
+    Text(e["titulo"]?.jsonPrimitive?.contentOrNull.orEmpty(),style=MaterialTheme.typography.titleSmall)
+    Text(e["detalle"]?.jsonPrimitive?.contentOrNull.orEmpty())
+    Text(listOfNotNull(e["origen"]?.jsonPrimitive?.contentOrNull,e["destino"]?.jsonPrimitive?.contentOrNull).joinToString(" → "))
+    Text(e["responsable"]?.jsonPrimitive?.contentOrNull.orEmpty(),style=MaterialTheme.typography.bodySmall)
+    Text(e["fecha"]?.jsonPrimitive?.contentOrNull.orEmpty(),style=MaterialTheme.typography.bodySmall)
+   }}}
+  }
+ }},confirmButton={TextButton(onClick={showJourney=false}){Text("Cerrar")}})
  if(edit&&s.card!=null)VehicleSpecsDialog(s.card!!.datos,{edit=false}){edit=false;vm.save(it)}
  change?.let{target->AlertDialog(onDismissRequest={change=null},title={Text(if(target=="HABILITADA")"Reactivar motocicleta"else"Desactivar motocicleta")},text={Column{Text("Se conservarán la ficha y su historial. Indica el motivo.");OutlinedTextField(reason,{if(it.length<=500)reason=it},label={Text("Motivo")},modifier=Modifier.fillMaxWidth())}},confirmButton={Button(onClick={change=null;vm.change(target,reason)},enabled=reason.isNotBlank()&&!s.busy){Text("Confirmar")}},dismissButton={TextButton(onClick={change=null}){Text("Cancelar")}})}
 }

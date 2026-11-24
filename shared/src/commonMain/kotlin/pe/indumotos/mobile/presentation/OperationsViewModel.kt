@@ -62,6 +62,7 @@ class OperationsViewModel(private val repo: OperationsRepository, private val lo
         mutable.update { it.copy(selected=request, events=events, eligible=emptyList()) }
     }
     fun select(id: Long) = work { mutable.update { it.copy(line=null, assigned=emptyList()) }; refresh(id) }
+    fun closeLine(){if(!mutable.value.busy)mutable.update{it.copy(line=null,assigned=emptyList(),eligible=emptyList())}}
     fun create(body: NewRequest) = work(true) {
         OperationRules.validate(body)
         val saved=repo.createRequest(body)

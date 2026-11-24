@@ -30,6 +30,8 @@ interface GuideRepository {
     suspend fun image(id:Long,image:Long):ByteArray
     suspend fun registration(id:Long):GuideRegistration
     suspend fun saveDraft(id:Long,draft:MotorcycleDraft):GuideRegistration
+    suspend fun warehouses():List<Site> = emptyList()
+    suspend fun finishAt(id:Long,warehouse:Long):GuideRegistration = finish(id)
     suspend fun finish(id:Long):GuideRegistration
     suspend fun ocr(id:Long):OcrResult
 }

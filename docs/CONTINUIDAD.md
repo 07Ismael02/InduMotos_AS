@@ -1,4 +1,10 @@
-# Estado vigente — 0.3.5
+# Corte 24/11/2026 — perfil y navegación
+
+Rama feature/ismael-catalogo-ventas. Leer PERFIL-Y-NAVEGACION.md y EVOLUCION-ACTIVA.md. Correcciones de permanencia del perfil offline, pantallas de ajustes/perfil y Atrás por niveles. Suite móvil: 59 pruebas, cero fallos/errores. Versión0.4.1, código14; comprobar final del build en tmp/sprint2-auditoria/perfil-041-build.log. Samsung antes en192.168.137.64:45165 dejó de aceptar ADB: se solicitó nueva dirección principal, sin nuevo emparejamiento. No declarar instalada ni revisada físicamente esta versión hasta comprobarlo. Backend de este entorno: indumotos-evolucion-api, HTTPS192.168.137.1:8443, copiaDBV34; originalV23 conservado. No cambios backend para este bloque. Main intacto.
+
+## Antecedentes
+
+# Estado anterior — 0.3.5
 
 Leer DEMOSTRACION.md. Appf9c24db, backend0e84511; 53 pruebas móviles,8 backend y14 HTTP aprobadas. Recuperación mediante administrador, tokens anteriores invalidados y navegación de Traslados corregida. APK instalado sin borrado. Inventario: corrección del salto de carga, revisión perceptiva pendiente. Solo iniciar DB y API actuales; detalles/puertos/script en DEMOSTRACION.md. Main intacto.
 

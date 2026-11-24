@@ -50,7 +50,6 @@ internal fun MotorcycleDetail(record: JsonObject, busy: Boolean, close: () -> Un
                 contentPadding = PaddingValues(20.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                item { extras() }
                 item {
                     Card(
                         modifier = Modifier.fillMaxWidth(),
@@ -67,6 +66,7 @@ internal fun MotorcycleDetail(record: JsonObject, busy: Boolean, close: () -> Un
                         }
                     }
                 }
+                item { extras() }
                 item { location() }
                 item {
                     DetailGroup("Motor y documentación") {

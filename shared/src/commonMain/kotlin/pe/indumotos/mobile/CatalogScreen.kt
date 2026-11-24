@@ -32,7 +32,7 @@ import pe.indumotos.mobile.presentation.CatalogViewModel
     LocalSystemBack.current(true) {
         if(!state.busy) {
             if(showForm&&listOf(brand,model,color).any{it.isNotBlank()}&&!state.options.containsCombination(brand,model,color))confirmLeave=true
-            else returnHome()
+            else if(showForm)showForm=false else returnHome()
         }
     }
     DisposableEffect(account.usuarioId){onDispose{vm.reset()}}
@@ -107,7 +107,7 @@ import pe.indumotos.mobile.presentation.CatalogViewModel
     stateChange?.let{option->AlertDialog(onDismissRequest={stateChange=null},title={Text(if(option.activo)"Desactivar combinación"else"Activar combinación")},text={Text("${option.marca} ${option.modelo} · ${option.color}. Las motos registradas se conservan.")},confirmButton={Button(onClick={stateChange=null;vm.changeState(option)}){Text("Confirmar")}},dismissButton={TextButton(onClick={stateChange=null}){Text("Cancelar")}})}
     if(confirmLeave)AlertDialog(onDismissRequest={confirmLeave=false},title={Text("Combinación sin guardar")},
         text={Text("Hay información nueva sin guardar. ¿Deseas descartarla y volver a Inicio?")},
-        confirmButton={TextButton(onClick={confirmLeave=false;returnHome()}){Text("Descartar y volver")}},
+        confirmButton={TextButton(onClick={confirmLeave=false;showForm=false;brand="";model="";color=""}){Text("Descartar y volver")}},
         dismissButton={TextButton(onClick={confirmLeave=false}){Text("Seguir editando")}})
 }
 
