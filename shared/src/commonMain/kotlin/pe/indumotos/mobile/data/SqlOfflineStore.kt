@@ -26,7 +26,7 @@ class SqlOfflineStore(private val db:OfflineDb):OfflineStore {
             // Android CursorWindow cannot hold a multi-megabyte BLOB row. Read bounded slices.
             val bytes=ByteArray(size);var offset=0
             while(offset<size) {
-                val part=requireNotNull(q.imagePart(offset.toLong()+1,524288,owner,guide,image).executeAsOneOrNull())
+                val part=requireNotNull(q.imagePart((offset+1).toString(),"524288",owner,guide,image).executeAsOneOrNull())
                 require(part.isNotEmpty());part.copyInto(bytes,offset);offset+=part.size
             }
             bytes
