@@ -1,5 +1,11 @@
 package pe.indumotos.mobile
 
+import pe.indumotos.mobile.ui.*
+import pe.indumotos.mobile.presentation.session.*
+import pe.indumotos.mobile.presentation.inventory.*
+import pe.indumotos.mobile.presentation.guides.*
+import pe.indumotos.mobile.presentation.operations.*
+
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*

@@ -5,7 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.*
 import pe.indumotos.mobile.domain.*
-import pe.indumotos.mobile.presentation.OperationsViewModel
+import pe.indumotos.mobile.presentation.operations.OperationsViewModel
 import kotlin.test.*
 
 @OptIn(ExperimentalCoroutinesApi::class)

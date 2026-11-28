@@ -1,4 +1,5 @@
-package pe.indumotos.mobile
+package pe.indumotos.mobile.presentation.inventory
+
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn

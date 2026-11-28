@@ -1,4 +1,5 @@
-package pe.indumotos.mobile
+package pe.indumotos.mobile.ui
+
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -17,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.serialization.json.*
 import pe.indumotos.mobile.domain.*
-import pe.indumotos.mobile.presentation.*
 
 
 internal val Ink = Color(0xFF142E49)

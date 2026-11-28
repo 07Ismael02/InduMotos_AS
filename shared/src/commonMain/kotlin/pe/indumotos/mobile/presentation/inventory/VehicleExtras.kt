@@ -1,4 +1,7 @@
-package pe.indumotos.mobile
+package pe.indumotos.mobile.presentation.inventory
+
+import pe.indumotos.mobile.*
+import pe.indumotos.mobile.ui.*
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,7 +17,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import org.koin.compose.viewmodel.koinViewModel
 import pe.indumotos.mobile.domain.*
-import pe.indumotos.mobile.presentation.VehicleViewModel
+import pe.indumotos.mobile.presentation.inventory.VehicleViewModel
 
 @Composable
 internal fun VehicleExtras(

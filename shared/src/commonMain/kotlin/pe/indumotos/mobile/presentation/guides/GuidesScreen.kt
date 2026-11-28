@@ -1,4 +1,8 @@
-package pe.indumotos.mobile
+package pe.indumotos.mobile.presentation.guides
+
+import pe.indumotos.mobile.*
+import pe.indumotos.mobile.ui.*
+import pe.indumotos.mobile.presentation.inventory.*
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.rememberTransformableState
@@ -19,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import org.koin.compose.viewmodel.koinViewModel
 import pe.indumotos.mobile.domain.*
-import pe.indumotos.mobile.presentation.*
 import kotlinx.serialization.json.*
 
 @Composable

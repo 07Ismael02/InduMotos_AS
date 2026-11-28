@@ -4,7 +4,7 @@ import kotlin.test.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.*
 import pe.indumotos.mobile.domain.*
-import pe.indumotos.mobile.presentation.GuidesViewModel
+import pe.indumotos.mobile.presentation.guides.GuidesViewModel
 import kotlinx.serialization.json.*
 
 @OptIn(ExperimentalCoroutinesApi::class)

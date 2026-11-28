@@ -1,4 +1,5 @@
-package pe.indumotos.mobile
+package pe.indumotos.mobile.ui
+
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons

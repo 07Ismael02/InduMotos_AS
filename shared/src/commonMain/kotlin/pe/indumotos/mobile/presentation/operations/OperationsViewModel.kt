@@ -1,4 +1,5 @@
-package pe.indumotos.mobile.presentation
+package pe.indumotos.mobile.presentation.operations
+
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

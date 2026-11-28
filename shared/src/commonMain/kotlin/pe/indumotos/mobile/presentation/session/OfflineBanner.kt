@@ -1,4 +1,6 @@
-package pe.indumotos.mobile
+package pe.indumotos.mobile.presentation.session
+
+import pe.indumotos.mobile.ui.*
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState

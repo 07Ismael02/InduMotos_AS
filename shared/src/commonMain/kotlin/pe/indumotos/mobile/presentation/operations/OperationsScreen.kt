@@ -1,4 +1,7 @@
-package pe.indumotos.mobile
+package pe.indumotos.mobile.presentation.operations
+
+import pe.indumotos.mobile.*
+import pe.indumotos.mobile.ui.*
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,7 +18,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.koin.compose.viewmodel.koinViewModel
 import pe.indumotos.mobile.domain.*
-import pe.indumotos.mobile.presentation.*
 import kotlinx.serialization.json.*
 
 private fun Access.permits(code: String) = permisos.any { it.codigo == code && it.permitido }

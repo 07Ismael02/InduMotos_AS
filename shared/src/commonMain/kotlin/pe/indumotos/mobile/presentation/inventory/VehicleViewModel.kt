@@ -1,4 +1,5 @@
-package pe.indumotos.mobile.presentation
+package pe.indumotos.mobile.presentation.inventory
+
 
 import androidx.lifecycle.*
 import kotlinx.coroutines.*
