@@ -130,7 +130,13 @@ fun GuidesScreen(
                         if (editing) "Registrar motocicletas de una guía" else "Recepción de guías",
                         style = MaterialTheme.typography.headlineSmall
                     )
-                    Text(if (editing) "Selecciona una guía pendiente. Guarda cada moto como borrador antes de finalizar el registro." else "Almacén registra lo recibido y adjunta las fotos de la guía.")
+                    Text(
+                        when {
+                            editing -> "Selecciona una guía pendiente. Guarda cada moto como borrador antes de finalizar el registro."
+                            can("LLEGADAS_REGISTRAR") -> "Registra la guía recibida y adjunta sus fotos."
+                            else -> "Consulta de guías recibidas. El registro de una llegada nueva lo realiza Almacén."
+                        }
+                    )
                     if (!editing && can("LLEGADAS_REGISTRAR")) {
                         if (offlineStatus.offline) Text("Para registrar una llegada nueva con fotos necesitas conexión al servidor.")
                         else Button(
