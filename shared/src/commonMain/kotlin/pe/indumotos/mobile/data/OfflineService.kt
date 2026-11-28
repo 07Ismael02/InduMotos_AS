@@ -9,7 +9,8 @@ class OfflineService(
     private val guides: GuideRepository,
     private val session: OfflineSession,
     private val sync: DraftSynchronizer,
-    private val vehicles: VehicleRepository? = null
+    private val vehicles: VehicleRepository? = null,
+    private val catalog: CatalogRepository = CatalogRemoteRepository(remote)
 ) : OfflineWork {
     override val status = session.status
     override suspend fun availableProfiles(): List<OfflineProfile> =
@@ -38,7 +39,7 @@ class OfflineService(
                         "FICHAS_REGISTRAR",
                         "FICHAS_EDITAR"
                     ) && it.permitido
-                }) remote.catalog()
+                }) catalog.catalog()
             var page = 0
             do {
                 val result = remote.inventory(InventoryFilter(), page)

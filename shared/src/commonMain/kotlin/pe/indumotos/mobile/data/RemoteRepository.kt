@@ -16,7 +16,7 @@ class RemoteRepository(
     private val http: HttpClient,
     private val offline: OfflineSession? = null,
     private val store: OfflineStore? = null
-) : LogisticsRepository, LocationRepository, OperationsRepository, CatalogRepository {
+) : LogisticsRepository {
     private val json = Json {
         ignoreUnknownKeys = true;
         encodeDefaults = true
@@ -364,109 +364,6 @@ class RemoteRepository(
         );
         clearSession()
     }
-
-    override suspend fun currentLocation(id: Long): LocationRecord? =
-        request("motocicletas/$id/ubicacion").takeIf { it.isNotBlank() }
-            ?.let { json.decodeFromString<LocationRecord?>(it) }
-
-    override suspend fun sites(): List<Site> = json.decodeFromString(request("ubicaciones"))
-
-    override suspend fun registerLocation(id: Long, destinationId: Long): LocationRecord {
-        val payload = buildJsonObject { put("destinoId", destinationId) }
-        val response = try {
-            request("motocicletas/$id/ubicacion", payload.toString(), "POST")
-        } catch (exception: AppException) {
-            if (exception.error is AppError.Conflict) {
-                throw AppException(
-                    AppError.Conflict(
-                        "La motocicleta ya tiene ubicación. Actualiza la consulta para ver el destino guardado."
-                    )
-                )
-            }
-            throw exception
-        }
-        return json.decodeFromString(response)
-    }
-
-    override suspend fun catalog(): List<CatalogOption> =
-        json.decodeFromString(request("catalogo-motocicletas"))
-
-    override suspend fun requestOptions(): List<CatalogOption> =
-        json.decodeFromString(request("solicitudes/opciones-motocicleta"))
-
-
-    override suspend fun requests(page: Int): List<AssemblyRequest> = json.decodeFromString(
-        request(
-            "solicitudes",
-            params = mapOf("pagina" to page.toString(), "tamano" to "20")
-        )
-    )
-
-    override suspend fun request(id: Long): AssemblyRequest =
-        json.decodeFromString(request("solicitudes/$id"))
-
-    override suspend fun createRequest(body: NewRequest): AssemblyRequest =
-        json.decodeFromString(request("solicitudes", json.encodeToString(body), "POST"))
-
-    override suspend fun events(id: Long): List<RequestEvent> =
-        json.decodeFromString(request("solicitudes/$id/seguimiento"))
-
-    override suspend fun advance(id: Long, status: String, reason: String) {
-        request(
-            "solicitudes/$id/seguimiento",
-            buildJsonObject {
-                put("estado", status);
-                put("motivo", reason)
-            }.toString(),
-            "POST"
-        )
-    }
-
-    override suspend fun cancel(id: Long, reason: String) {
-        request(
-            "solicitudes/$id/anulacion",
-            buildJsonObject { put("motivo", reason) }.toString(),
-            "POST"
-        )
-    }
-
-    override suspend fun eligible(chassis: String): List<EligibleUnit> = json.decodeFromString(
-        request(
-            "motocicletas/elegibles",
-            params = mapOf("chasis" to chassis)
-        )
-    )
-
-    override suspend fun assigned(id: Long, line: Long): List<AssignedUnit> =
-        json.decodeFromString(request("solicitudes/$id/lineas/$line/unidades"))
-
-    override suspend fun assign(id: Long, line: Long, motorcycle: Long) {
-        request(
-            "solicitudes/$id/lineas/$line/unidades",
-            buildJsonObject { put("motocicletaId", motorcycle) }.toString(),
-            "POST"
-        )
-    }
-
-    override suspend fun remove(id: Long, line: Long, association: Long, reason: String) {
-        request(
-            "solicitudes/$id/lineas/$line/unidades/$association",
-            buildJsonObject { put("motivo", reason) }.toString(),
-            "DELETE"
-        )
-    }
-
-    override suspend fun transfer(motorcycle: Long, destination: Long): TransferRecord =
-        json.decodeFromString(
-            request(
-                "motocicletas/$motorcycle/traslados",
-                buildJsonObject { put("destinoId", destination) }.toString(),
-                "POST"
-            )
-        )
-
-    override suspend fun transfers(motorcycle: Long): List<TransferRecord> =
-        json.decodeFromString(request("motocicletas/$motorcycle/ubicacion/historial"))
 
     override fun clearSession() {
         token = "";

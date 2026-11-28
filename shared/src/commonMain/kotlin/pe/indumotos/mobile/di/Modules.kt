@@ -20,7 +20,7 @@ val appModule = module {
     single { createHttpClient(get()) }
     single { RemoteRepository(get(), get(), get()) }
     single<LogisticsRepository> { get<RemoteRepository>() }
-    single<LocationRepository> { get<RemoteRepository>() }
+    single<LocationRepository> { pe.indumotos.mobile.data.LocationRemoteRepository(get()) }
     single { pe.indumotos.mobile.data.GuideRemoteRepository(get()) }
     single {
         pe.indumotos.mobile.data.DraftSynchronizer(
@@ -58,8 +58,8 @@ val appModule = module {
     single<VehicleRepository> { pe.indumotos.mobile.data.VehicleRemoteRepository(get()) }
     viewModel { pe.indumotos.mobile.presentation.inventory.VehicleViewModel(get()) }
     viewModel { pe.indumotos.mobile.presentation.guides.GuidesViewModel(get(), get()) }
-    single<CatalogRepository> { get<RemoteRepository>() }
-    single<OperationsRepository> { get<RemoteRepository>() }
+    single<CatalogRepository> { pe.indumotos.mobile.data.CatalogRemoteRepository(get()) }
+    single<OperationsRepository> { pe.indumotos.mobile.data.OperationsRemoteRepository(get()) }
     viewModel { OperationsViewModel(get(), get(), get(), get()) }
     factory { LogisticsUseCase(get()) }
     viewModel { LogisticsViewModel(get(), get(), get(), get(), get(), get()) }
