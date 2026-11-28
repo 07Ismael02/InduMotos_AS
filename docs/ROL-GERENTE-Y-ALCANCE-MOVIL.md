@@ -52,3 +52,32 @@ El aplicativo decide los módulos por permisos del servidor. Cuando el backend c
 APK 0.5.0-campo (código 18, commit bc3b4a9) instalado con install -r y la firma original en el Samsung, conectado por USB a la API de la imagen 67e54f2. Con admin.indumotos el inicio muestra solo los cinco módulos de campo y Llegadas se abre en modo consulta. Con almacen.indumotos aparece primero Llegadas con el botón de registro. Se registró una guía con una foto de cámara. El servidor confirma la llegada 5, del receptor almacen.indumotos, con una imagen JPEG de 413 226 bytes. Las fechas se ven en hora de Lima. Evidencia en evidencias/alcance-movil-20261128.
 
 Observaciones abiertas: el número de guía acepta letras, igual que la web y el backend, y se aceptó una cantidad recibida mayor que la declarada. No se registraron fichas ni se finalizó el stock de esa guía.
+
+## Segundo bloque — 28/11/2026: módulos por rol, Gerente y duplicados
+
+Indicaciones del responsable: cada rol ve solo lo que usa; Gerente es el rol principal; no se debe poder registrar dos veces lo mismo; la guía sigue el formato serie-número de SUNAT.
+
+| Repositorio | Commit | Cambio |
+|---|---|---|
+| Móvil | 20d4e5b | Fechas del servidor en hora de Lima |
+| Móvil | bc3b4a9 | Llegadas distingue consulta y registro |
+| Móvil | 3e720f5, 94eba98 | Guía serie-número SUNAT; aviso junto al campo |
+| Móvil | 174afe8 | Módulos por rol (FieldAccess) además del permiso del servidor |
+| Móvil | c230724 | Chasis o motor repetidos dentro de una guía, también sin conexión |
+| Móvil | b1659c9 | Descripción del módulo según lo que la cuenta puede hacer |
+| Móvil | 5e211c7 | Rechazo de guía repetida dentro de la ventana Nueva llegada |
+| Backend | 78765ff | V35: rol GERENTE; ADMIN solo personal |
+| Backend | edb72e0 | V36: guía y número de motor únicos; 409 claro |
+
+| Rol | Módulos móviles |
+|---|---|
+| Almacén | Llegadas, Inventario, Traslados, Solicitudes |
+| Inventarios | Fichas, Inventario |
+| Comercial, Ensamblaje | Solicitudes |
+| Facturación | Inventario |
+| Gerente | Inventario, Traslados, Solicitudes (consulta y anulación) |
+| Administración | Ninguno: personal y permisos en la web |
+
+Verificación: 67 pruebas móviles y 126 del backend sin fallos. Base local respaldada antes de V35/V36 y migrada con la imagen edb72e0. En el Samsung: gerente.indumotos ve sus tres módulos; T001-1 se registró como T001-00000001 y el segundo intento fue rechazado con un único registro en la base; el responsable confirmó el aviso en rojo en el campo. Las capturas 03 y 04 son anteriores a las correcciones b1659c9 y 5e211c7.
+
+Pendiente: integración de V35/V36 en main y web (ver Backend-Evolucion/docs/ROL-GERENTE-Y-DUPLICADOS-20261128.md), cuenta Gerente en la base del equipo, recorrido de fichas y finalización de stock, iOS.

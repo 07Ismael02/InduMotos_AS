@@ -23,8 +23,24 @@
     "bytes": 413226
   },
   "observaciones": [
-    "El número de guía aceptó letras y números (1737jfj17); web y backend aceptan texto de hasta 120 caracteres.",
+    "El número de guía se valida como serie-número SUNAT en el móvil; web y backend aún aceptan texto libre (pendiente de Roberto en la web).",
     "Se aceptó recibida 3 con declarada 2; web y backend también lo permiten."
   ],
-  "noVerificado": "Registro de fichas de esta guía, finalización de stock, rol GERENTE en servidor e iOS."
+  "noVerificado": "Registro de fichas de esta guía, finalización de stock, rol GERENTE en servidor e iOS.",
+  "segundoBloque": {
+    "apk": "0.5.0-campo / versionCode 18, commit 5e211c7, firma debug original",
+    "backend": "indumotos-evolucion:edb72e0 (V35 rol Gerente, V36 guía y motor únicos); respaldo previo verificado con 32 tablas",
+    "comprobaciones": [
+      "gerente.indumotos (rol GERENTE, id 11) ve solo Inventario, Traslados y Solicitudes, descritos como consulta y autorización de anulaciones",
+      "ADMIN queda con 4 permisos de personal; sin módulos de campo en el móvil",
+      "Campo de guía filtra la escritura: eg07x-1a2b3 queda EG07-123; T001 sin número se rechaza sin enviar",
+      "T001-1 registrada como T001-00000001; el segundo intento se rechaza y la base conserva un único registro",
+      "El rechazo por guía repetida se muestra en rojo en el campo de la ventana Nueva llegada (confirmado por el responsable)"
+    ],
+    "pruebas": {
+      "movil": 67,
+      "backend": 126,
+      "fallos": 0
+    }
+  }
 }
