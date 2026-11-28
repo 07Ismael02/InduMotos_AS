@@ -5,7 +5,7 @@ import kotlinx.coroutines.CancellationException
 import pe.indumotos.mobile.domain.*
 
 class OfflineSession(val store: OfflineStore) {
-    var current: OfflineProfile? = null;
+    var current: OfflineProfile? = null
     private set
     private val mutable = MutableStateFlow(OfflineStatus())
     val status = mutable.asStateFlow()
@@ -83,3 +83,4 @@ class OfflineSession(val store: OfflineStore) {
         }
     }
 }
+
