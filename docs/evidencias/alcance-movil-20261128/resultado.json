@@ -1,0 +1,30 @@
+{
+  "fecha": "2026-11-28",
+  "dispositivo": "Samsung SM-S948U1 por USB (adb reverse 8443 -> PC 8092)",
+  "apk": "0.5.0-campo / versionCode 18, commit bc3b4a9, firma debug original",
+  "apkSha256": "14491ca67ab332792399236deea8c81264176670776d4d35437905b6052e1d53",
+  "backend": "indumotos-usb-defensa-api, imagen 67e54f2, base indumotos_evolucion_20261124",
+  "comprobaciones": [
+    "admin.indumotos ve solo los cinco módulos de campo; sin ventas, catálogo, cuentas ni permisos",
+    "admin.indumotos ve Llegadas en consulta: no tiene LLEGADAS_REGISTRAR",
+    "almacen.indumotos ve Llegadas primero y el botón Nueva llegada con fotos",
+    "Fechas de guías mostradas en hora de Lima (23/11/2026 22:30 para 2026-11-24T03:30Z)",
+    "Registro físico de una guía con una foto JPEG desde la cámara del Samsung"
+  ],
+  "lecturaServidor": {
+    "idLlegada": 5,
+    "receptor": "almacen.indumotos",
+    "fechaLima": "2026-11-28 10:31",
+    "cantidadDeclarada": 2,
+    "cantidadRecibida": 3,
+    "estado": "PENDIENTE",
+    "fotos": 1,
+    "mime": "image/jpeg",
+    "bytes": 413226
+  },
+  "observaciones": [
+    "El número de guía aceptó letras y números (1737jfj17); web y backend aceptan texto de hasta 120 caracteres.",
+    "Se aceptó recibida 3 con declarada 2; web y backend también lo permiten."
+  ],
+  "noVerificado": "Registro de fichas de esta guía, finalización de stock, rol GERENTE en servidor e iOS."
+}

@@ -46,3 +46,9 @@ El aplicativo decide los módulos por permisos del servidor. Cuando el backend c
 ## Verificación
 
 `:shared:testAndroidHostTest` 59 pruebas sin fallos (64 anteriores − 8 retiradas con sus módulos + 3 nuevas de navegación por rol) y `:androidApp:assembleDebug` exitoso el 28/11/2026. No se instaló en el Samsung ni se probó contra la API en este bloque; versión todavía 0.4.4/código 17.
+
+## Recorrido físico — 28/11/2026
+
+APK 0.5.0-campo (código 18, commit bc3b4a9) instalado con install -r y la firma original en el Samsung, conectado por USB a la API de la imagen 67e54f2. Con admin.indumotos el inicio muestra solo los cinco módulos de campo y Llegadas se abre en modo consulta. Con almacen.indumotos aparece primero Llegadas con el botón de registro. Se registró una guía con una foto de cámara. El servidor confirma la llegada 5, del receptor almacen.indumotos, con una imagen JPEG de 413 226 bytes. Las fechas se ven en hora de Lima. Evidencia en evidencias/alcance-movil-20261128.
+
+Observaciones abiertas: el número de guía acepta letras, igual que la web y el backend, y se aceptó una cantidad recibida mayor que la declarada. No se registraron fichas ni se finalizó el stock de esa guía.
