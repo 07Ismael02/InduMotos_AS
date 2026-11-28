@@ -322,7 +322,7 @@ class LogisticsViewModel(
                 val rows = repo.arrivals("")
                 require(rows.isNotEmpty()) { "No hay recepciones disponibles. Registra primero una llegada con una cuenta autorizada." }
                 val labels =
-                    rows.associate { it["id"]!!.jsonPrimitive.content to ("Guía " + it["numeroGuia"]!!.jsonPrimitive.content + " · " + it["fechaLlegada"]!!.jsonPrimitive.content) }
+                    rows.associate { it["id"]!!.jsonPrimitive.content to ("Guía " + it["numeroGuia"]!!.jsonPrimitive.content + " · " + limaTimestamp(it["fechaLlegada"]!!.jsonPrimitive.content)) }
                 mutable.update {
                     it.copy(form = form.copy(fields = form.fields.map { f ->
                         if (f.key == "llegadaId") f.copy(

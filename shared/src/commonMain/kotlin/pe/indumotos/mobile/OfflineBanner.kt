@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import pe.indumotos.mobile.domain.OfflineStatus
+import pe.indumotos.mobile.domain.limaTimestamp
 
 @OptIn(kotlin.time.ExperimentalTime::class)
 @Composable
@@ -60,9 +61,9 @@ internal fun OfflineBanner(
                 )
                 status.lastDownloadMs?.let {
                     Text(
-                        "Última lectura online: " + kotlin.time.Instant.fromEpochMilliseconds(
-                            it
-                        ).toString().replace('T', ' ').take(16) + " UTC",
+                        "Última lectura online: " + limaTimestamp(
+                            kotlin.time.Instant.fromEpochMilliseconds(it).toString()
+                        ),
                         style = MaterialTheme.typography.labelSmall
                     )
                 }

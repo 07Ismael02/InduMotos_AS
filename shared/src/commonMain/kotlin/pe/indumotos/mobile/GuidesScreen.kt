@@ -180,7 +180,7 @@ fun GuidesScreen(
                                 style = MaterialTheme.typography.titleMedium
                             )
                             Text("${row.estadoRegistro} · ${row.cantidadRecibida} recibidas")
-                            Text("${row.fechaLlegada} · ${row.receptorUsuario}")
+                            Text("${limaTimestamp(row.fechaLlegada)} · ${row.receptorUsuario}")
                             Text(if (canEdit && row.estadoRegistro == "PENDIENTE") "Continuar registro →" else "Consultar guía →")
                         }
                     }

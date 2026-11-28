@@ -19,6 +19,7 @@ import androidx.compose.ui.window.DialogProperties
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.contentOrNull
+import pe.indumotos.mobile.domain.limaTimestamp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -202,8 +203,4 @@ internal fun DetailValue(label: String, value: String?) {
 private fun JsonObject.value(key: String): String? =
     (get(key) as? JsonPrimitive)?.contentOrNull?.takeIf { it.isNotBlank() }
 
-internal fun recordTimestamp(value: String): String {
-    val utc = Regex("""(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})(?::\d{2}(?:\.\d+)?)?(?:Z|\+00:00)""")
-        .matchEntire(value) ?: return value
-    return "${utc.groupValues[1]} · ${utc.groupValues[2]} UTC"
-}
+internal fun recordTimestamp(value: String): String = limaTimestamp(value)

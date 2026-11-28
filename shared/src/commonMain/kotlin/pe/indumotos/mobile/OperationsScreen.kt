@@ -218,7 +218,7 @@ fun RequestsScreen(account: Access, expired: () -> Unit) {
                             Column(Modifier.padding(14.dp)) {
                                 Text(unit.chasis, fontWeight = FontWeight.SemiBold)
                                 Text(
-                                    "Moto #${unit.motocicletaId} · ${unit.asignador}\n${unit.fecha}",
+                                    "Moto #${unit.motocicletaId} · ${unit.asignador}\n${limaTimestamp(unit.fecha)}",
                                     fontSize = 12.sp
                                 )
                                 if (account.permits(ASSIGN_UNITS) && selected.estado == "EN_PREPARACION")
@@ -269,7 +269,7 @@ fun RequestsScreen(account: Access, expired: () -> Unit) {
                         Column(Modifier.padding(14.dp)) {
                             Text(statusLabel(event.estado), fontWeight = FontWeight.SemiBold)
                             event.motivo?.let { Text(it) }
-                            Text("${event.registrador} · ${event.fecha}", fontSize = 12.sp)
+                            Text("${event.registrador} · ${limaTimestamp(event.fecha)}", fontSize = 12.sp)
                         }
                     }
                 }
@@ -689,7 +689,7 @@ fun TransfersScreen(account: Access, expired: () -> Unit) {
                             fontWeight = FontWeight.SemiBold
                         )
                         Text("${movement.origenId?.let { "Origen #$it → " } ?: ""}${movement.destinoNombre}")
-                        Text("${movement.registrador}\n${movement.fecha}", fontSize = 12.sp)
+                        Text("${movement.registrador}\n${limaTimestamp(movement.fecha)}", fontSize = 12.sp)
                     }
                 }
             }

@@ -173,7 +173,7 @@ internal fun VehicleExtras(
                                     style = MaterialTheme.typography.bodySmall
                                 )
                                 Text(
-                                    e["fecha"]?.jsonPrimitive?.contentOrNull.orEmpty(),
+                                    limaTimestamp(e["fecha"]?.jsonPrimitive?.contentOrNull.orEmpty()),
                                     style = MaterialTheme.typography.bodySmall
                                 )
                             }
