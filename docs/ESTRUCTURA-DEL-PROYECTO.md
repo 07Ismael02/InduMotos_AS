@@ -1,3 +1,33 @@
+# Estructura vigente — 28/11/2026
+
+Refactorización realizada en commits separados y sin cambio de comportamiento (71 pruebas aprobadas tras cada paso):
+
+| Commit | Cambio |
+|---|---|
+| fe7a56e | App.kt pasa de 1088 a 375 líneas: login, inicio, inventario y componentes en archivos propios |
+| 859ea94 | Pantallas y ViewModels agrupados por función en paquetes |
+| b1d8c43 | RemoteRepository separado por contrato: ubicación, catálogo y operaciones |
+| 3f1696e | El canal HTTP compartido se llama send |
+
+```
+shared/src/commonMain/kotlin/pe/indumotos/mobile/
+├── App.kt                  composición de sesión y navegación
+├── AppearanceSettings.kt   tema elegido (usado por MainActivity)
+├── IndumotosTheme.kt, SystemBack.kt, GuideImage.kt (expect)
+├── ui/                     componentes compartidos y selector de fotos
+├── presentation/
+│   ├── LogisticsViewModel.kt   sesión, navegación por rol e inventario
+│   ├── session/            login, inicio, cuenta y estado offline
+│   ├── inventory/          inventario, ficha, ubicación y VehicleViewModel
+│   ├── guides/             llegadas, fichas y GuidesViewModel
+│   └── operations/         solicitudes, traslados y OperationsViewModel
+├── domain/                 modelos, contratos y reglas (FieldAccess, GuideRules, TimeFormat)
+├── data/                   RemoteRepository (HTTP y sesión) + un repositorio por contrato, offline y SQLDelight
+└── di/                     módulos Koin
+```
+
+Pendiente menor: los archivos conservan punto y coma redundante del formato anterior; retirarlo es solo estético. iOS no se ha compilado tras mover paquetes (requiere macOS). El análisis siguiente es el diagnóstico del 24/11 que originó estos cambios.
+
 # Estructura del aplicativo
 
 Revisión del 24/11/2026. Referencia leída: PharmaMobile, en AndroidStudioProjects. Comparación del repositorio móvil completo: fuentes Android, comunes e iOS, pruebas, recursos, Gradle, documentación y scripts. No es una nueva validación funcional ni una auditoría del backend.

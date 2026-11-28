@@ -1,0 +1,20 @@
+{
+  "fecha": "2026-11-28",
+  "version": "0.5.0-campo",
+  "versionCode": 18,
+  "applicationId": "pe.indumotos.asapp",
+  "tipo": "debug",
+  "sourceCommit": "3f1696e4cd5c225bc56b8ae159b2be78aca200bf",
+  "backendCommit": "edb72e0 (feature/ismael-rol-gerente)",
+  "backendUrl": "https://127.0.0.1:8443 (USB: adb reverse tcp:8443 tcp:8092)",
+  "apk": "entregables/android/Indumotos-AS-0.5.0-campo-debug.apk",
+  "bytes": 23566340,
+  "sha256": "12166e0b0540f5b4cdee4bd1ef3d6a5a0c9b98caeba864d978cec106222143fc",
+  "certificadoSha256": "23c1a0373560f28c3d2b64103e50a0dff54bb955fd75b20ac40d52253e33b0f0",
+  "pruebasMoviles": 71,
+  "pruebasBackend": 126,
+  "fallos": 0,
+  "instalacion": "adb install -r: Success en Samsung SM-S948U1; firma original y datos conservados",
+  "verificacionFisica": "Comprobado en Samsung con la compilación de 5e211c7: llegada con foto (Almacén), módulos de Gerente, rechazo de guía repetida y aviso en el campo. Después: reglas offline 0599205, ba63884 y 23ca71d verificadas con pruebas; reorganización fe7a56e..3f1696e sin cambio de comportamiento, verificada con las 71 pruebas. Recorrido físico completo por rol pendiente.",
+  "noIncluye": "iOS no compilado; integración del backend en main pendiente; release firmado de producción."
+}
