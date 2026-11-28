@@ -107,7 +107,8 @@ fun GuidesScreen(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
             ) { Text("← Volver a guías") }
             if (s.busy) LinearProgressIndicator(Modifier.fillMaxWidth())
-            s.error?.let {
+            // Con la ventana de nueva llegada abierta, el aviso se muestra dentro de ella.
+            s.error?.takeUnless { creating }?.let {
                 Text(
                     it,
                     color = MaterialTheme.colorScheme.error,
@@ -626,6 +627,8 @@ private fun NewArrivalDialog(
 
     var local by remember { mutableStateOf<String?>(null) }
     var guideError by remember { mutableStateOf<String?>(null) }
+    // Si el servidor rechaza la guía por repetida, el aviso se muestra en su propio campo.
+    LaunchedEffect(error) { if (error?.contains("ya está registrada") == true) guideError = error }
     AlertDialog(
         onDismissRequest = { if (!busy) close() },
         title = { Text("Nueva llegada") },
@@ -634,6 +637,10 @@ private fun NewArrivalDialog(
                 Modifier.verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
+                // Los avisos van arriba: al pie quedaban ocultos por las fotos y el teclado.
+                (local ?: error?.takeUnless { it.contains("ya está registrada") })?.let {
+                    Text(it, color = MaterialTheme.colorScheme.error)
+                }
                 OutlinedTextField(
                     guide,
                     {
@@ -699,7 +706,6 @@ private fun NewArrivalDialog(
                         }, enabled = !busy) { Text("Quitar") }
                     }
                 }
-                (local ?: error)?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             }
         },
         confirmButton = {
