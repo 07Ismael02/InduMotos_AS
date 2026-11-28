@@ -625,6 +625,7 @@ private fun NewArrivalDialog(
     var photos by remember { mutableStateOf<List<GuidePhoto>>(emptyList()) };
 
     var local by remember { mutableStateOf<String?>(null) }
+    var guideError by remember { mutableStateOf<String?>(null) }
     AlertDialog(
         onDismissRequest = { if (!busy) close() },
         title = { Text("Nueva llegada") },
@@ -635,10 +636,14 @@ private fun NewArrivalDialog(
             ) {
                 OutlinedTextField(
                     guide,
-                    { guide = GuideRules.guideNumberTyping(it) },
+                    {
+                        guide = GuideRules.guideNumberTyping(it);
+                        guideError = null
+                    },
                     label = { Text("Guía de remisión (serie-número)") },
                     placeholder = { Text("T001-00012345") },
-                    supportingText = { Text("Serie de 4 caracteres, guion y número, como figura en la guía.") },
+                    isError = guideError != null,
+                    supportingText = { Text(guideError ?: "Serie de 4 caracteres, guion y número, como figura en la guía.") },
                     singleLine = true,
                     enabled = !busy,
                     keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters)
@@ -699,7 +704,8 @@ private fun NewArrivalDialog(
         },
         confirmButton = {
             Button(onClick = {
-                local = runCatching {
+                guideError = runCatching { GuideRules.guideNumber(guide) }.exceptionOrNull()?.message
+                local = if (guideError != null) null else runCatching {
                     GuideRules.arrival(
                         guide,
                         declared.toIntOrNull() ?: 0,
@@ -707,7 +713,7 @@ private fun NewArrivalDialog(
                         photos
                     )
                 }.exceptionOrNull()?.message
-                if (local == null) submit(guide, declared.toInt(), received.toInt(), note, photos)
+                if (guideError == null && local == null) submit(guide, declared.toInt(), received.toInt(), note, photos)
             }, enabled = !busy) { Text("Registrar llegada") }
         },
         dismissButton = { TextButton(onClick = close, enabled = !busy) { Text("Cancelar") } })
