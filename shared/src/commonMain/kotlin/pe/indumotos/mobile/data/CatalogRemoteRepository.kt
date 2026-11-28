@@ -12,8 +12,8 @@ class CatalogRemoteRepository(private val remote: RemoteRepository) : CatalogRep
     }
 
     override suspend fun catalog(): List<CatalogOption> =
-        json.decodeFromString(remote.guideJson("catalogo-motocicletas"))
+        json.decodeFromString(remote.send("catalogo-motocicletas"))
 
     override suspend fun requestOptions(): List<CatalogOption> =
-        json.decodeFromString(remote.guideJson("solicitudes/opciones-motocicleta"))
+        json.decodeFromString(remote.send("solicitudes/opciones-motocicleta"))
 }

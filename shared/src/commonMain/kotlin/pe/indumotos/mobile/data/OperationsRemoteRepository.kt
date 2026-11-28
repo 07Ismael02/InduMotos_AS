@@ -12,23 +12,23 @@ class OperationsRemoteRepository(private val remote: RemoteRepository) : Operati
     }
 
     override suspend fun requests(page: Int): List<AssemblyRequest> = json.decodeFromString(
-        remote.guideJson(
+        remote.send(
             "solicitudes",
             params = mapOf("pagina" to page.toString(), "tamano" to "20")
         )
     )
 
     override suspend fun request(id: Long): AssemblyRequest =
-        json.decodeFromString(remote.guideJson("solicitudes/$id"))
+        json.decodeFromString(remote.send("solicitudes/$id"))
 
     override suspend fun createRequest(body: NewRequest): AssemblyRequest =
-        json.decodeFromString(remote.guideJson("solicitudes", json.encodeToString(body), "POST"))
+        json.decodeFromString(remote.send("solicitudes", json.encodeToString(body), "POST"))
 
     override suspend fun events(id: Long): List<RequestEvent> =
-        json.decodeFromString(remote.guideJson("solicitudes/$id/seguimiento"))
+        json.decodeFromString(remote.send("solicitudes/$id/seguimiento"))
 
     override suspend fun advance(id: Long, status: String, reason: String) {
-        remote.guideJson(
+        remote.send(
             "solicitudes/$id/seguimiento",
             buildJsonObject {
                 put("estado", status);
@@ -39,7 +39,7 @@ class OperationsRemoteRepository(private val remote: RemoteRepository) : Operati
     }
 
     override suspend fun cancel(id: Long, reason: String) {
-        remote.guideJson(
+        remote.send(
             "solicitudes/$id/anulacion",
             buildJsonObject { put("motivo", reason) }.toString(),
             "POST"
@@ -47,17 +47,17 @@ class OperationsRemoteRepository(private val remote: RemoteRepository) : Operati
     }
 
     override suspend fun eligible(chassis: String): List<EligibleUnit> = json.decodeFromString(
-        remote.guideJson(
+        remote.send(
             "motocicletas/elegibles",
             params = mapOf("chasis" to chassis)
         )
     )
 
     override suspend fun assigned(id: Long, line: Long): List<AssignedUnit> =
-        json.decodeFromString(remote.guideJson("solicitudes/$id/lineas/$line/unidades"))
+        json.decodeFromString(remote.send("solicitudes/$id/lineas/$line/unidades"))
 
     override suspend fun assign(id: Long, line: Long, motorcycle: Long) {
-        remote.guideJson(
+        remote.send(
             "solicitudes/$id/lineas/$line/unidades",
             buildJsonObject { put("motocicletaId", motorcycle) }.toString(),
             "POST"
@@ -65,7 +65,7 @@ class OperationsRemoteRepository(private val remote: RemoteRepository) : Operati
     }
 
     override suspend fun remove(id: Long, line: Long, association: Long, reason: String) {
-        remote.guideJson(
+        remote.send(
             "solicitudes/$id/lineas/$line/unidades/$association",
             buildJsonObject { put("motivo", reason) }.toString(),
             "DELETE"
@@ -74,7 +74,7 @@ class OperationsRemoteRepository(private val remote: RemoteRepository) : Operati
 
     override suspend fun transfer(motorcycle: Long, destination: Long): TransferRecord =
         json.decodeFromString(
-            remote.guideJson(
+            remote.send(
                 "motocicletas/$motorcycle/traslados",
                 buildJsonObject { put("destinoId", destination) }.toString(),
                 "POST"
@@ -82,5 +82,5 @@ class OperationsRemoteRepository(private val remote: RemoteRepository) : Operati
         )
 
     override suspend fun transfers(motorcycle: Long): List<TransferRecord> =
-        json.decodeFromString(remote.guideJson("motocicletas/$motorcycle/ubicacion/historial"))
+        json.decodeFromString(remote.send("motocicletas/$motorcycle/ubicacion/historial"))
 }

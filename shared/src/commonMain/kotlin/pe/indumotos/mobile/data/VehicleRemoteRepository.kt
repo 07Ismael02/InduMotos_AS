@@ -11,13 +11,13 @@ class VehicleRemoteRepository(private val remote: RemoteRepository) : VehicleRep
     }
 
     override suspend fun journey(id: Long): JsonObject =
-        json.parseToJsonElement(remote.guideJson("motocicletas/$id/recorrido")).jsonObject
+        json.parseToJsonElement(remote.send("motocicletas/$id/recorrido")).jsonObject
 
     override suspend fun card(id: Long): VehicleCard =
-        json.decodeFromString(remote.guideJson("motocicletas/$id/ficha-ampliada"))
+        json.decodeFromString(remote.send("motocicletas/$id/ficha-ampliada"))
 
     override suspend fun save(id: Long, specs: VehicleSpecs): VehicleCard = json.decodeFromString(
-        remote.guideJson(
+        remote.send(
             "motocicletas/$id/ficha-ampliada",
             json.encodeToString(specs),
             "PUT",
@@ -32,14 +32,14 @@ class VehicleRemoteRepository(private val remote: RemoteRepository) : VehicleRep
         json.decodeFromString(remote.uploadImage("motocicletas/$id/fotos", emptyMap(), photo))
 
     override suspend fun availability(id: Long): VehicleAvailability =
-        json.decodeFromString(remote.guideJson("motocicletas/$id/disponibilidad"))
+        json.decodeFromString(remote.send("motocicletas/$id/disponibilidad"))
 
     override suspend fun changeAvailability(
         id: Long,
         state: String,
         reason: String
     ): VehicleAvailability = json.decodeFromString(
-        remote.guideJson(
+        remote.send(
             "motocicletas/$id/disponibilidad",
             buildJsonObject {
                 put("estado", state);

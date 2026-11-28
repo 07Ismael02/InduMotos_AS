@@ -18,7 +18,7 @@ class GuideRemoteRepository(
         body: String? = null,
         method: String = "GET",
         params: Map<String, String> = emptyMap()
-    ) = remote.guideJson(path, body, method, params, onlineOnly)
+    ) = remote.send(path, body, method, params, onlineOnly)
 
     override suspend fun detail(id: Long): ArrivalDetail =
         json.decodeFromString(request("llegadas/$id/detalle"))
@@ -67,7 +67,7 @@ class GuideRemoteRepository(
         draft: MotorcycleDraft,
         version: String
     ): GuideRegistration = json.decodeFromString(
-        remote.guideJson(
+        remote.send(
             "llegadas/$id/registro/borradores/${draft.posicion}",
             json.encodeToString(draft),
             "PUT",
@@ -83,7 +83,7 @@ class GuideRemoteRepository(
         json.decodeFromString(request("llegadas/$id/sugerencias-ocr"))
 
     override suspend fun warehouses(): List<Site> =
-        json.decodeFromString<List<Site>>(remote.guideJson("ubicaciones", onlineOnly = true))
+        json.decodeFromString<List<Site>>(remote.send("ubicaciones", onlineOnly = true))
             .filter { it.tipo == "ALMACEN" && it.activo }
 
     override suspend fun finishAt(id: Long, warehouse: Long): GuideRegistration =

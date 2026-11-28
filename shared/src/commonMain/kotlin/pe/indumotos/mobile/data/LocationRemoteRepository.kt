@@ -12,15 +12,15 @@ class LocationRemoteRepository(private val remote: RemoteRepository) : LocationR
     }
 
     override suspend fun currentLocation(id: Long): LocationRecord? =
-        remote.guideJson("motocicletas/$id/ubicacion").takeIf { it.isNotBlank() }
+        remote.send("motocicletas/$id/ubicacion").takeIf { it.isNotBlank() }
             ?.let { json.decodeFromString<LocationRecord?>(it) }
 
-    override suspend fun sites(): List<Site> = json.decodeFromString(remote.guideJson("ubicaciones"))
+    override suspend fun sites(): List<Site> = json.decodeFromString(remote.send("ubicaciones"))
 
     override suspend fun registerLocation(id: Long, destinationId: Long): LocationRecord {
         val payload = buildJsonObject { put("destinoId", destinationId) }
         val response = try {
-            remote.guideJson("motocicletas/$id/ubicacion", payload.toString(), "POST")
+            remote.send("motocicletas/$id/ubicacion", payload.toString(), "POST")
         } catch (exception: AppException) {
             if (exception.error is AppError.Conflict) {
                 throw AppException(

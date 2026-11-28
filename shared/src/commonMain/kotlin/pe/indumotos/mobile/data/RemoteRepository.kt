@@ -89,7 +89,7 @@ class RemoteRepository(
         return text
     }
 
-    internal suspend fun guideJson(
+    internal suspend fun send(
         path: String,
         body: String? = null,
         method: String = "GET",
