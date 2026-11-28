@@ -420,13 +420,13 @@ private fun Workspace(
                     vm::expireSession
                 )
             }) {
-            if (vm.allowed("FICHAS_EDITAR")) OutlinedButton(
+            if (!offlineStatus.offline && vm.allowed("FICHAS_EDITAR")) OutlinedButton(
                 onClick = vm::beginEdit,
                 enabled = !state.busy
             ) { Text("Editar ficha") }
             if (id != null && vm.allowed(READ_LOCATIONS)) {
                 LocationSection(
-                    location, vm.allowed(WRITE_LOCATION), state.busy, state.error, state.message,
+                    location, !offlineStatus.offline && vm.allowed(WRITE_LOCATION), state.busy, state.error, state.message,
                     onLoad = { vm.loadLocation(id) },
                     onSave = { vm.registerLocation(id, it) }
                 )

@@ -234,6 +234,7 @@ class LogisticsViewModel(
 
     fun beginEdit() = work {
         require(allowed("FICHAS_EDITAR"));
+        require(!offlineStatus.value.offline) { "Editar una ficha requiere conexión al servidor." }
 
         val options = requireNotNull(catalog).catalog();
         mutable.update {
@@ -250,6 +251,7 @@ class LogisticsViewModel(
 
     fun updateMotorcycle(draft: MotorcycleDraft) = work {
         require(allowed("FICHAS_EDITAR"));
+        require(!offlineStatus.value.offline) { "Editar una ficha requiere conexión al servidor." }
         GuideRules.draft(draft, mutable.value.editOptions)
         val id = requireNotNull(mutable.value.detail?.get("id")?.jsonPrimitive?.longOrNull)
         val body = buildJsonObject {
@@ -305,7 +307,7 @@ class LogisticsViewModel(
     }
 
     fun registerLocation(id: Long, destination: Site) {
-        if (!allowed(READ_LOCATIONS) || !allowed(WRITE_LOCATION)) return
+        if (!allowed(READ_LOCATIONS) || !allowed(WRITE_LOCATION) || offlineStatus.value.offline) return
         val current = mutableLocation.value ?: return
         if (current.current != null || destination !in current.destinations) return
         work {
