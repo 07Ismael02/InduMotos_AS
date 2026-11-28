@@ -1,6 +1,7 @@
 package pe.indumotos.mobile.data
 
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.encodeToString
 import pe.indumotos.mobile.domain.*
 
@@ -51,6 +52,11 @@ class OfflineGuideRepository(
 
     override suspend fun saveDraft(id: Long, draft: MotorcycleDraft): GuideRegistration {
         val owner = session.owner()
+        // Las mismas reglas que el servidor, para que un borrador sin conexión no nazca inválido.
+        val access = session.current?.access
+        if (access?.permisos?.any { it.codigo == "FICHAS_REGISTRAR" && it.permitido } != true)
+            throw AppException(AppError.Forbidden)
+        GuideRules.uniqueAgainst(draft, knownUnits(owner, id, draft.posicion))
         val key = OfflineReads.key("llegadas/$id/registro", emptyMap())
         val current = store.get(owner, "http", key)
             ?.let { json.decodeFromString<GuideRegistration>(it.payload) } ?: read.registration(id)
@@ -61,6 +67,18 @@ class OfflineGuideRepository(
         session.refresh()
         if (!session.readOnly()) sync.synchronize()
         return read.registration(id)
+    }
+
+    private suspend fun knownUnits(owner: String, guide: Long, position: Int): List<GuideRules.KnownUnit> {
+        fun text(o: kotlinx.serialization.json.JsonObject, key: String) =
+            (o[key] as? kotlinx.serialization.json.JsonPrimitive)?.content.orEmpty()
+        val downloaded = store.all(owner, "inventory-row").mapNotNull {
+            runCatching { json.parseToJsonElement(it.payload).jsonObject }.getOrNull()
+        }.map { GuideRules.KnownUnit(text(it, "chasisCompleto"), text(it, "numeroMotor")) }
+        val drafts = store.drafts(owner).filterNot { it.guideId == guide && it.position == position }
+            .mapNotNull { runCatching { json.decodeFromString<MotorcycleDraft>(it.payload) }.getOrNull() }
+            .map { GuideRules.KnownUnit(it.chasisCompleto, it.numeroMotor) }
+        return downloaded + drafts
     }
 
     override suspend fun warehouses(): List<Site> = server.warehouses()

@@ -177,6 +177,20 @@ object GuideRules {
         }
     }
 
+    /** Motocicleta ya conocida por el teléfono: descargada del inventario o en otro borrador. */
+    data class KnownUnit(val chasis: String, val motor: String)
+
+    /** Mismo criterio que el servidor: chasis y motor no se repiten, sin importar mayúsculas. */
+    fun uniqueAgainst(d: MotorcycleDraft, known: List<KnownUnit>) {
+        fun key(value: String) = value.trim().uppercase()
+        require(known.none { it.chasis.isNotBlank() && key(it.chasis) == key(d.chasisCompleto) }) {
+            "El chasis ${d.chasisCompleto.trim()} ya figura en otra ficha o borrador."
+        }
+        require(known.none { it.motor.isNotBlank() && key(it.motor) == key(d.numeroMotor) }) {
+            "El número de motor ${d.numeroMotor.trim()} ya figura en otra ficha o borrador."
+        }
+    }
+
     fun draft(d: MotorcycleDraft, options: List<CatalogOption>) {
         require(
             listOf(
