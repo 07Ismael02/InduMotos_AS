@@ -59,7 +59,7 @@ Indicaciones del responsable: cada rol ve solo lo que usa; Gerente es el rol pri
 
 | Repositorio | Commit | Cambio |
 |---|---|---|
-| Móvil | 20d4e5b | Fechas del servidor en hora de Lima |
+| Móvil | 4295ae5 | Fechas del servidor en hora de Lima |
 | Móvil | bc3b4a9 | Llegadas distingue consulta y registro |
 | Móvil | 3e720f5, 94eba98 | Guía serie-número SUNAT; aviso junto al campo |
 | Móvil | 174afe8 | Módulos por rol (FieldAccess) además del permiso del servidor |
