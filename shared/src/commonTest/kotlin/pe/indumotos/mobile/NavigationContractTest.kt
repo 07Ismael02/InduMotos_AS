@@ -46,16 +46,49 @@ class NavigationContractTest {
         assertEquals(1, repo.inventoryCalls)
     }
 
-    private class Fake : LogisticsRepository, LocationRepository {
+    @Test
+    fun managerSeesFollowUpModulesGrantedByTheServer() = runTest {
+        val repo = Fake(
+            "GERENTE",
+            listOf(
+                Permission(READ_REQUESTS, true),
+                Permission(CANCEL_REQUESTS, true),
+                Permission("INVENTARIO_CONSULTAR", true),
+                Permission(READ_LOCATIONS, true)
+            )
+        )
+        val vm = LogisticsViewModel(repo, LogisticsUseCase(repo), repo)
+        vm.login("http://localhost", "gerente", "unused")
+        advanceUntilIdle()
+        assertEquals("Gerencia", roleLabel(vm.state.value.access!!.rolCodigo))
+        val visible = Module.entries.filter(vm::canRead)
+        assertTrue(visible.containsAll(listOf(Module.INVENTORY, Module.TRANSFERS, Module.REQUESTS)))
+    }
+
+    @Test
+    fun accountAdministrationAloneOpensNoMobileModule() = runTest {
+        val repo = Fake(
+            "ADMIN",
+            listOf(Permission("USUARIOS_CREAR", true), Permission("PERMISOS_ASIGNAR", true))
+        )
+        val vm = LogisticsViewModel(repo, LogisticsUseCase(repo), repo)
+        vm.login("http://localhost", "admin", "unused")
+        advanceUntilIdle()
+        assertTrue(Module.entries.none(vm::canRead))
+    }
+
+    private class Fake(
+        private val role: String = "INVENTARIOS",
+        private val permissions: List<Permission> = listOf(
+            Permission("INVENTARIO_CONSULTAR", true),
+            Permission("FICHAS_REGISTRAR", true)
+        )
+    ) : LogisticsRepository, LocationRepository {
         var inventoryCalls = 0;
 
         var arrivalCalls = 0
-        override suspend fun login(baseUrl: String, user: String, password: String) = Access(
-            1,
-            user,
-            "INVENTARIOS",
-            listOf(Permission("INVENTARIO_CONSULTAR", true), Permission("FICHAS_REGISTRAR", true))
-        )
+        override suspend fun login(baseUrl: String, user: String, password: String) =
+            Access(1, user, role, permissions)
 
         override suspend fun arrivals(guide: String): List<JsonObject> {
             arrivalCalls++;

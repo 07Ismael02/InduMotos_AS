@@ -71,6 +71,7 @@ object Rules {
 }
 
 fun roleLabel(code: String) = when (code) {
+    "GERENTE" -> "Gerencia";
     "ADMIN" -> "Administración";
     "ALMACEN" -> "Almacén";
     "INVENTARIOS" -> "Inventarios";
