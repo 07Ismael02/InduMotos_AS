@@ -20,4 +20,18 @@ object FieldAccess {
 
     fun belongsToRole(role: String, module: Module): Boolean =
         module in byRole[role].orEmpty()
+
+    /** Describe el módulo según lo que la cuenta realmente puede hacer en él. */
+    fun description(module: Module, allowed: (String) -> Boolean): String = when (module) {
+        Module.ARRIVALS ->
+            if (allowed(module.permission)) module.description else "Consultar las guías recibidas"
+        Module.TRANSFERS ->
+            if (allowed(TRANSFER_UNITS)) module.description else "Consultar ubicación y recorrido de cada moto"
+        Module.REQUESTS -> when {
+            allowed(CREATE_REQUESTS) || allowed(ADVANCE_REQUESTS) || allowed(ASSIGN_UNITS) -> module.description
+            allowed(CANCEL_REQUESTS) -> "Seguir solicitudes y autorizar anulaciones"
+            else -> "Consultar el avance de las solicitudes"
+        }
+        else -> module.description
+    }
 }

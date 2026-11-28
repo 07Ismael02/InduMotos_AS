@@ -503,7 +503,7 @@ private fun Home(state: UiState, vm: LogisticsViewModel) {
                         );
                         Spacer(Modifier.height(5.dp));
                         Text(
-                            if (m == Module.ARRIVALS && !vm.allowed(m.permission)) "Consultar las guías recibidas" else m.description,
+                            FieldAccess.description(m, vm::allowed),
                             color = Muted,
                             fontSize = 12.sp
                         )

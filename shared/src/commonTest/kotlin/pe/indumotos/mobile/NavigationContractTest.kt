@@ -66,6 +66,8 @@ class NavigationContractTest {
             listOf(Module.INVENTORY, Module.TRANSFERS, Module.REQUESTS),
             Module.entries.filter(vm::canRead)
         )
+        assertEquals("Consultar ubicación y recorrido de cada moto", FieldAccess.description(Module.TRANSFERS, vm::allowed))
+        assertEquals("Seguir solicitudes y autorizar anulaciones", FieldAccess.description(Module.REQUESTS, vm::allowed))
     }
 
     @Test
