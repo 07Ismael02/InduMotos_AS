@@ -2,8 +2,6 @@ package pe.indumotos.mobile.domain
 
 import kotlinx.serialization.Serializable
 
-const val MANAGE_CATALOG = "CATALOGO_GESTIONAR"
-
 @Serializable
 data class CatalogOption(
     val marca: String,
@@ -13,13 +11,10 @@ data class CatalogOption(
     val activo: Boolean = true
 )
 
+// Solo lectura: marcas, modelos y colores se administran en la web.
 interface CatalogRepository {
-    suspend fun catalogState(id: Long, active: Boolean): CatalogOption =
-        error("Cambio de catálogo no disponible")
-
     suspend fun catalog(): List<CatalogOption>
     suspend fun requestOptions(): List<CatalogOption>
-    suspend fun addCatalog(option: CatalogOption): CatalogOption
 }
 
 fun List<CatalogOption>.brands() = filter { it.activo }.map { it.marca }.distinct().sorted()

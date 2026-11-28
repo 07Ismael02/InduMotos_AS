@@ -394,31 +394,6 @@ class RemoteRepository(
     override suspend fun requestOptions(): List<CatalogOption> =
         json.decodeFromString(request("solicitudes/opciones-motocicleta"))
 
-    override suspend fun addCatalog(option: CatalogOption): CatalogOption {
-        val saved = json.decodeFromString<CatalogOption>(
-            request(
-                "catalogo-motocicletas",
-                json.encodeToString(option),
-                "POST"
-            )
-        )
-        if (store != null && offline?.current != null) {
-            val key = OfflineReads.key("catalogo-motocicletas", emptyMap());
-
-            val owner = offline.owner()
-            store.get(owner, "http", key)?.let { old ->
-                val rows = json.decodeFromString<List<CatalogOption>>(old.payload);
-                store.put(
-                    owner,
-                    "http",
-                    key,
-                    json.encodeToString((rows + saved).distinct()),
-                    epochMillis()
-                )
-            }
-        }
-        return saved
-    }
 
     override suspend fun requests(page: Int): List<AssemblyRequest> = json.decodeFromString(
         request(
@@ -496,17 +471,5 @@ class RemoteRepository(
     override fun clearSession() {
         token = "";
         offline?.close()
-    }
-
-    override suspend fun catalogState(id: Long, active: Boolean): CatalogOption {
-        val saved = json.decodeFromString<CatalogOption>(
-            request(
-                "catalogo-motocicletas/$id/estado",
-                buildJsonObject { put("activo", active) }.toString(),
-                "PUT",
-                onlineOnly = true
-            )
-        )
-        return saved
     }
 }

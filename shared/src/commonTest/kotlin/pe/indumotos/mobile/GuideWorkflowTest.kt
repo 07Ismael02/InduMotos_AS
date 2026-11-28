@@ -235,6 +235,5 @@ class GuideWorkflowTest {
 
         override suspend fun catalog() = listOf(CatalogOption("Honda", "Wave", "Rojo"))
         override suspend fun requestOptions() = catalog()
-        override suspend fun addCatalog(option: CatalogOption) = option
     }
 }

@@ -41,7 +41,6 @@ data class InventoryFilter(
 )
 
 enum class Module(val title: String, val permission: String, val description: String) {
-    CATALOG("Catálogo", MANAGE_CATALOG, "Administrar marcas, modelos y colores"),
     REQUESTS("Solicitudes de ensamblaje", READ_REQUESTS, "Crear y atender solicitudes por líneas"),
     TRANSFERS("Traslados", READ_LOCATIONS, "Consultar recorrido y trasladar motocicletas"),
     INVENTORY("Inventario", "INVENTARIO_CONSULTAR", "Buscar y filtrar motocicletas"),

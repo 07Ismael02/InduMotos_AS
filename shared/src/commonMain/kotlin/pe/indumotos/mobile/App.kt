@@ -30,7 +30,6 @@ private val Blue: Color @Composable get() = MaterialTheme.colorScheme.secondary
 private val Muted: Color @Composable get() = MaterialTheme.colorScheme.onSurfaceVariant
 private fun JsonObject.text(key: String) = get(key)?.jsonPrimitive?.contentOrNull.orEmpty()
 private fun icon(m: Module) = when (m) {
-    Module.CATALOG -> Icons.Default.Category;
     Module.REQUESTS -> Icons.Default.Assignment;
     Module.TRANSFERS -> Icons.Default.LocalShipping;
     Module.INVENTORY -> Icons.Default.Inventory2;
@@ -39,7 +38,7 @@ private fun icon(m: Module) = when (m) {
 }
 
 private fun createForm(module: Module): Form = when (module) {
-    Module.CATALOG, Module.REQUESTS, Module.TRANSFERS -> error("Operación mediante su pantalla específica")
+    Module.REQUESTS, Module.TRANSFERS -> error("Operación mediante su pantalla específica")
     Module.INVENTORY, Module.FICHAS -> Form(
         "Registrar ficha de motocicleta",
         "motocicletas",
@@ -354,11 +353,6 @@ private fun Workspace(
                         pickGuidePhotos,
                         vm::expireSession,
                         offlineStatus
-                    );
-                    Module.CATALOG -> CatalogScreen(
-                        account,
-                        vm::expireSession,
-                        offlineStatus.offline
                     );
                     Module.REQUESTS -> RequestsScreen(
                         account,

@@ -35,7 +35,6 @@ class OfflineService(
         try {
             if (access.permisos.any {
                     it.codigo in listOf(
-                        MANAGE_CATALOG,
                         "FICHAS_REGISTRAR",
                         "FICHAS_EDITAR"
                     ) && it.permitido

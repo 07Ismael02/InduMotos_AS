@@ -378,7 +378,6 @@ class LogisticsViewModel(
 
     fun canRead(module: Module): Boolean {
         if (offlineStatus.value.offline && module !in listOf(
-                Module.CATALOG,
                 Module.INVENTORY,
                 Module.ARRIVALS,
                 Module.FICHAS
