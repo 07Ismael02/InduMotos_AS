@@ -134,8 +134,33 @@ object GuideRules {
         ) { "Selecciona fotos JPG/PNG de hasta 5 MB." }
     }
 
+    // Guía de remisión SUNAT: serie de 4 caracteres (T001, EG07, 0001), guion y correlativo.
+    private val guideNumberPattern = Regex("""([A-Z0-9]{4})-(\d{1,8})""")
+    const val GUIDE_NUMBER_MAX = 13
+
+    /** Devuelve la guía como SERIE-00000000 o rechaza un formato distinto al de SUNAT. */
+    fun guideNumber(input: String): String {
+        val match = guideNumberPattern.matchEntire(input.trim().uppercase())
+            ?: throw IllegalArgumentException("Ingresa la guía como serie-número, por ejemplo T001-00012345.")
+        val (series, number) = match.destructured
+        require(number.trimStart('0').isNotEmpty()) { "El número de la guía debe ser mayor que cero." }
+        return "$series-${number.padStart(8, '0')}"
+    }
+
+    /** Al escribir: serie de hasta 4 letras o dígitos, un guion y luego solo dígitos. */
+    fun guideNumberTyping(input: String): String {
+        val text = input.uppercase()
+        val dash = text.indexOf('-')
+        val series = (if (dash < 0) text else text.substring(0, dash))
+            .filter { it in 'A'..'Z' || it.isDigit() }.take(4)
+        if (dash < 0) return series
+        val number = text.substring(dash + 1).filter { it.isDigit() }.take(8)
+        return "$series-$number".take(GUIDE_NUMBER_MAX)
+    }
+
     fun arrival(guide: String, declared: Int, received: Int, photos: List<GuidePhoto>) {
-        require(guide.isNotBlank() && guide.length <= 120 && declared > 0 && received > 0) { "Completa la guía y cantidades enteras positivas." }
+        guideNumber(guide)
+        require(declared > 0 && received > 0) { "Ingresa cantidades enteras positivas." }
         require(photos.size in 1..3) { "Selecciona entre una y tres fotos." };
         photos.forEach(::photo)
     }

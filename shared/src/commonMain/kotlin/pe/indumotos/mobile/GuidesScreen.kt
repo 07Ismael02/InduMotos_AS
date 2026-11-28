@@ -13,6 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -634,9 +635,13 @@ private fun NewArrivalDialog(
             ) {
                 OutlinedTextField(
                     guide,
-                    { if (it.length <= 120) guide = it },
-                    label = { Text("Número de guía") },
-                    enabled = !busy
+                    { guide = GuideRules.guideNumberTyping(it) },
+                    label = { Text("Guía de remisión (serie-número)") },
+                    placeholder = { Text("T001-00012345") },
+                    supportingText = { Text("Serie de 4 caracteres, guion y número, como figura en la guía.") },
+                    singleLine = true,
+                    enabled = !busy,
+                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters)
                 )
                 OutlinedTextField(
                     declared,

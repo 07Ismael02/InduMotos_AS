@@ -59,13 +59,39 @@ class GuideWorkflowTest {
     }
 
     @Test
+    fun guideNumberFollowsSunatSeriesAndNumber() {
+        assertEquals("T001-00012345", GuideRules.guideNumber("t001-12345"))
+        assertEquals("EG07-00000123", GuideRules.guideNumber(" EG07-123 "))
+        assertEquals("0001-00000042", GuideRules.guideNumber("0001-42"))
+        listOf("1737jfj17", "T001", "T01-123", "T001-", "T001-123456789", "T001-0000").forEach {
+            assertFailsWith<IllegalArgumentException>(it) { GuideRules.guideNumber(it) }
+        }
+        assertEquals("T001-12", GuideRules.guideNumberTyping("t0 01-1a2"))
+        assertEquals("EG07", GuideRules.guideNumberTyping("eg07x"))
+        assertEquals("T001-12345678", GuideRules.guideNumberTyping("T001-123456789-"))
+    }
+
+    @Test
+    fun invalidGuideIsNotSentAndValidOneIsNormalized() = runTest {
+        val repo = Fake()
+        val vm = GuidesViewModel(repo, repo)
+        val photo = listOf(GuidePhoto("foto", "image/png", byteArrayOf(1)))
+        vm.register("1737jfj17", 1, 1, "", photo)
+        advanceUntilIdle()
+        assertEquals(0, repo.uploads)
+        vm.register("t001-123", 1, 1, "", photo)
+        advanceUntilIdle()
+        assertEquals("T001-00000123", repo.lastGuide)
+    }
+
+    @Test
     fun ambiguousUploadDoesNotRetryOrInventArrival() = runTest {
         val repo = Fake();
         repo.failUpload = true;
 
         val vm = GuidesViewModel(repo, repo)
         vm.register(
-            "GUIA",
+            "T001-1",
             1,
             1,
             "",
@@ -181,6 +207,7 @@ class GuideWorkflowTest {
         var uploads = 0;
 
         var failUpload = false;
+        var lastGuide: String? = null
 
         var gate: CompletableDeferred<Unit>? = null
         override suspend fun arrivals(guide: String, state: String, page: Int) =
@@ -194,6 +221,7 @@ class GuideWorkflowTest {
             photos: List<GuidePhoto>
         ): Arrival {
             uploads++;
+            lastGuide = guide;
             if (failUpload) throw AppException(AppError.Network);
             return arrival
         }

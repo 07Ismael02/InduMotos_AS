@@ -100,7 +100,7 @@ class GuidesViewModel(private val repo: GuideRepository, private val catalog: Ca
     ) = work(true) {
         GuideRules.arrival(guide, declared, received, photos);
         require(note.length <= 1000)
-        val saved = repo.register(guide.trim(), declared, received, note.trim(), photos)
+        val saved = repo.register(GuideRules.guideNumber(guide), declared, received, note.trim(), photos)
         // Commit the success before any optional read: a failed reload must never suggest repeating POST.
         mutable.update {
             it.copy(
