@@ -51,9 +51,7 @@ enum class Module(val title: String, val permission: String, val description: St
         "Fichas de motocicletas",
         "FICHAS_REGISTRAR",
         "Registrar desde guía y reanudar borradores"
-    ),
-    USERS("Crear cuenta", "USUARIOS_CREAR", "Registrar personal autorizado"),
-    PERMISSIONS("Roles y permisos", "PERMISOS_ASIGNAR", "Consultar y administrar accesos")
+    )
 }
 
 interface LogisticsRepository {
@@ -84,7 +82,6 @@ fun roleLabel(code: String) = when (code) {
     else -> code
 }
 
-val RoleCodes = listOf("ALMACEN", "INVENTARIOS", "COMERCIAL", "ENSAMBLAJE", "FACTURACION", "ADMIN")
 val PermissionLabels = linkedMapOf(
     "USUARIOS_CREAR" to "Crear cuentas",
     "PERMISOS_ASIGNAR" to "Administrar permisos",

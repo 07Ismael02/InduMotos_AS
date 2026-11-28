@@ -320,7 +320,6 @@ class RemoteRepository(
     override suspend fun detail(module: Module, id: Long): JsonObject {
         val path = when (module) {
             Module.ARRIVALS -> "llegadas/$id/detalle";
-            Module.PERMISSIONS -> "usuarios/$id/permisos";
             else -> "motocicletas/$id"
         }
         val result = json.parseToJsonElement(request(path)).jsonObject

@@ -59,8 +59,6 @@ val appModule = module {
     viewModel { pe.indumotos.mobile.presentation.SalesViewModel(get()) }
     single<VehicleRepository> { pe.indumotos.mobile.data.VehicleRemoteRepository(get()) }
     viewModel { pe.indumotos.mobile.presentation.VehicleViewModel(get()) }
-    single<UsersRepository> { pe.indumotos.mobile.data.UsersRemoteRepository(get()) }
-    viewModel { pe.indumotos.mobile.presentation.UsersViewModel(get()) }
     viewModel { pe.indumotos.mobile.presentation.GuidesViewModel(get(), get()) }
     single<CatalogRepository> { get<RemoteRepository>() }
     viewModel { pe.indumotos.mobile.presentation.CatalogViewModel(get()) }

@@ -29,7 +29,6 @@ private val Yellow = Color(0xFFEEE51B)
 private val Blue: Color @Composable get() = MaterialTheme.colorScheme.secondary
 private val Muted: Color @Composable get() = MaterialTheme.colorScheme.onSurfaceVariant
 private fun JsonObject.text(key: String) = get(key)?.jsonPrimitive?.contentOrNull.orEmpty()
-private val roleNames = RoleCodes.associateWith(::roleLabel)
 private fun icon(m: Module) = when (m) {
     Module.SALES -> Icons.Default.PointOfSale;
     Module.CATALOG -> Icons.Default.Category;
@@ -37,9 +36,7 @@ private fun icon(m: Module) = when (m) {
     Module.TRANSFERS -> Icons.Default.LocalShipping;
     Module.INVENTORY -> Icons.Default.Inventory2;
     Module.ARRIVALS -> Icons.Default.LocalShipping;
-    Module.FICHAS -> Icons.Default.Description;
-    Module.USERS -> Icons.Default.PersonAdd;
-    Module.PERMISSIONS -> Icons.Default.AdminPanelSettings
+    Module.FICHAS -> Icons.Default.Description
 }
 
 private fun createForm(module: Module): Form = when (module) {
@@ -69,24 +66,6 @@ private fun createForm(module: Module): Form = when (module) {
             Field("observacion", "Observación (opcional)", required = false, maxLength = 1000)
         )
     )
-
-    Module.USERS -> Form(
-        "Crear cuenta",
-        "usuarios",
-        listOf(
-            Field("nombreCompleto", "Nombre completo", maxLength = 180),
-            Field("nombreUsuario", "Usuario", maxLength = 80),
-            Field(
-                "clave",
-                "Contraseña inicial (12–100 caracteres)",
-                secret = true,
-                maxLength = 100
-            ),
-            Field("rolCodigo", "Rol", options = RoleCodes, labels = roleNames)
-        )
-    )
-
-    Module.PERMISSIONS -> error("Selecciona primero una cuenta")
 }
 
 // A theme-aware wordmark; the original bitmap remains in resources unchanged.
@@ -387,13 +366,6 @@ private fun Workspace(
                         vm::expireSession,
                         offlineStatus.offline
                     );
-                    Module.USERS, Module.PERMISSIONS -> UsersScreen(
-                        account,
-                        state.module == Module.PERMISSIONS,
-                        state.message,
-                        { vm.form(createForm(Module.USERS)) },
-                        vm::expireSession
-                    );
                     Module.REQUESTS -> RequestsScreen(
                         account,
                         vm::expireSession
@@ -692,7 +664,7 @@ private fun Login(
     if (showRecovery) AlertDialog(
         onDismissRequest = { showRecovery = false },
         title = { Text("Recuperar acceso") },
-        text = { Text("Comunícate con el administrador de Indumotos e indica tu usuario. Después de verificar tu identidad, podrá restablecer tu contraseña desde Personal registrado. No compartas tu contraseña anterior. La recuperación requiere conexión; este formulario no envía correos ni cambia contraseñas automáticamente.") },
+        text = { Text("Comunícate con el administrador de Indumotos e indica tu usuario. Después de verificar tu identidad, podrá restablecer tu contraseña desde Trabajadores, en el sistema web. No compartas tu contraseña anterior. La recuperación requiere conexión; este formulario no envía correos ni cambia contraseñas automáticamente.") },
         confirmButton = { TextButton(onClick = { showRecovery = false }) { Text("Entendido") } })
     if (showOffline) OfflineAccountDialog(
         state.offlineProfiles,
