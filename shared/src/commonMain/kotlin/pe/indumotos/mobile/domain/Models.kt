@@ -40,16 +40,18 @@ data class InventoryFilter(
     val color: String = ""
 )
 
+// El orden sigue el recorrido de campo: llega la guía, se registran sus
+// motocicletas y después se consultan, trasladan y preparan.
 enum class Module(val title: String, val permission: String, val description: String) {
-    REQUESTS("Solicitudes de ensamblaje", READ_REQUESTS, "Crear y atender solicitudes por líneas"),
-    TRANSFERS("Traslados", READ_LOCATIONS, "Consultar recorrido y trasladar motocicletas"),
-    INVENTORY("Inventario", "INVENTARIO_CONSULTAR", "Buscar y filtrar motocicletas"),
-    ARRIVALS("Llegadas", "LLEGADAS_REGISTRAR", "Registrar y consultar recepciones"),
+    ARRIVALS("Llegadas", "LLEGADAS_REGISTRAR", "Registrar la guía recibida con sus fotos"),
     FICHAS(
         "Fichas de motocicletas",
         "FICHAS_REGISTRAR",
-        "Registrar desde guía y reanudar borradores"
-    )
+        "Registrar las motos de una guía y reanudar borradores"
+    ),
+    INVENTORY("Inventario", "INVENTARIO_CONSULTAR", "Buscar una motocicleta por chasis"),
+    TRANSFERS("Traslados", READ_LOCATIONS, "Consultar recorrido y trasladar motocicletas"),
+    REQUESTS("Solicitudes de ensamblaje", READ_REQUESTS, "Crear y atender solicitudes por líneas")
 }
 
 interface LogisticsRepository {

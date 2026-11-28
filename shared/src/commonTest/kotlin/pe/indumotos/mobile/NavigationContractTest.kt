@@ -66,6 +66,26 @@ class NavigationContractTest {
     }
 
     @Test
+    fun warehouseStartsWithTheGuideArrival() = runTest {
+        val repo = Fake(
+            "ALMACEN",
+            listOf(
+                Permission("LLEGADAS_REGISTRAR", true),
+                Permission("FICHAS_REGISTRAR", true),
+                Permission("INVENTARIO_CONSULTAR", true),
+                Permission(READ_LOCATIONS, true)
+            )
+        )
+        val vm = LogisticsViewModel(repo, LogisticsUseCase(repo), repo)
+        vm.login("http://localhost", "almacen", "unused")
+        advanceUntilIdle()
+        assertEquals(
+            listOf(Module.ARRIVALS, Module.FICHAS, Module.INVENTORY, Module.TRANSFERS),
+            Module.entries.filter(vm::canRead)
+        )
+    }
+
+    @Test
     fun accountAdministrationAloneOpensNoMobileModule() = runTest {
         val repo = Fake(
             "ADMIN",

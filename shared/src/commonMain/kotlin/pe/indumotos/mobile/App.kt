@@ -514,7 +514,7 @@ private fun Home(state: UiState, vm: LogisticsViewModel) {
         }
         if (Module.entries.none { vm.canRead(it) }) item {
             Text(
-                "Tu cuenta no tiene apartados habilitados. Solicita al administrador que revise tus permisos.",
+                "Tu cuenta no tiene operaciones de campo. La gestión de personal, permisos, catálogo y ventas se realiza en el sistema web.",
                 color = Muted
             )
         }
