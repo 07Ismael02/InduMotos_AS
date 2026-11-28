@@ -115,6 +115,37 @@ class NavigationContractTest {
     }
 
     @Test
+    fun offlineKeepsTheSameRoleLimitsAndOnlyLocalModules() = runTest {
+        val permisos = listOf(
+            "LLEGADAS_REGISTRAR", "FICHAS_REGISTRAR", "INVENTARIO_CONSULTAR", READ_LOCATIONS, READ_REQUESTS
+        ).map { Permission(it, true) }
+        val expected = mapOf(
+            "ALMACEN" to listOf(Module.ARRIVALS, Module.INVENTORY),
+            "INVENTARIOS" to listOf(Module.FICHAS, Module.INVENTORY),
+            "GERENTE" to listOf(Module.INVENTORY),
+            "COMERCIAL" to emptyList(),
+            "ADMIN" to emptyList()
+        )
+        expected.forEach { (role, modules) ->
+            val access = Access(1, role.lowercase(), role, permisos)
+            val offline = object : OfflineWork {
+                override val status = kotlinx.coroutines.flow.MutableStateFlow(
+                    OfflineStatus(offline = true, readOnlySession = true)
+                )
+                override suspend fun availableProfiles() = emptyList<OfflineProfile>()
+                override suspend fun resumeReadOnly(profile: OfflineProfile) = access
+                override suspend fun downloadInventory() = Unit
+                override suspend fun synchronize() = Unit
+            }
+            val repo = Fake(role, permisos)
+            val vm = LogisticsViewModel(repo, LogisticsUseCase(repo), repo, offline = offline)
+            vm.openOffline(OfflineProfile(role, "http://localhost", access, 0))
+            advanceUntilIdle()
+            assertEquals(modules, Module.entries.filter(vm::canRead), role)
+        }
+    }
+
+    @Test
     fun roleModuleStillNeedsTheServerPermission() = runTest {
         val repo = Fake("FACTURACION", emptyList())
         val vm = LogisticsViewModel(repo, LogisticsUseCase(repo), repo)
