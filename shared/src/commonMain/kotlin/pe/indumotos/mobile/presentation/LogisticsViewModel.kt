@@ -377,6 +377,8 @@ class LogisticsViewModel(
         state.value.access?.permisos?.any { it.codigo == permission && it.permitido } == true
 
     fun canRead(module: Module): Boolean {
+        val role = state.value.access?.rolCodigo ?: return false
+        if (!FieldAccess.belongsToRole(role, module)) return false
         if (offlineStatus.value.offline && module !in listOf(
                 Module.INVENTORY,
                 Module.ARRIVALS,

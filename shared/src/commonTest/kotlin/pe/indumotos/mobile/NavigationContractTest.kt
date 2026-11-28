@@ -33,10 +33,11 @@ class NavigationContractTest {
             Module.FICHAS,
             vm.state.value.module
         )
+        // Llegadas no pertenece a Inventarios: el módulo abierto no cambia.
         vm.open(Module.ARRIVALS);
         advanceUntilIdle();
         assertEquals(
-            Module.ARRIVALS,
+            Module.FICHAS,
             vm.state.value.module
         )
         assertEquals(0, repo.arrivalCalls);
@@ -61,8 +62,10 @@ class NavigationContractTest {
         vm.login("http://localhost", "gerente", "unused")
         advanceUntilIdle()
         assertEquals("Gerencia", roleLabel(vm.state.value.access!!.rolCodigo))
-        val visible = Module.entries.filter(vm::canRead)
-        assertTrue(visible.containsAll(listOf(Module.INVENTORY, Module.TRANSFERS, Module.REQUESTS)))
+        assertEquals(
+            listOf(Module.INVENTORY, Module.TRANSFERS, Module.REQUESTS),
+            Module.entries.filter(vm::canRead)
+        )
     }
 
     @Test
@@ -73,23 +76,59 @@ class NavigationContractTest {
                 Permission("LLEGADAS_REGISTRAR", true),
                 Permission("FICHAS_REGISTRAR", true),
                 Permission("INVENTARIO_CONSULTAR", true),
-                Permission(READ_LOCATIONS, true)
+                Permission(READ_LOCATIONS, true),
+                Permission(READ_REQUESTS, true)
             )
         )
         val vm = LogisticsViewModel(repo, LogisticsUseCase(repo), repo)
         vm.login("http://localhost", "almacen", "unused")
         advanceUntilIdle()
+        // Aunque tuviera FICHAS_REGISTRAR, registrar fichas es tarea de Inventarios.
         assertEquals(
-            listOf(Module.ARRIVALS, Module.FICHAS, Module.INVENTORY, Module.TRANSFERS),
+            listOf(Module.ARRIVALS, Module.INVENTORY, Module.TRANSFERS, Module.REQUESTS),
             Module.entries.filter(vm::canRead)
         )
     }
 
     @Test
-    fun accountAdministrationAloneOpensNoMobileModule() = runTest {
+    fun eachRoleSeesOnlyItsOwnWorkEvenWithBroadPermissions() = runTest {
+        val everything = listOf(
+            "LLEGADAS_REGISTRAR", "FICHAS_REGISTRAR", "INVENTARIO_CONSULTAR",
+            READ_LOCATIONS, READ_REQUESTS
+        ).map { Permission(it, true) }
+        val expected = mapOf(
+            "INVENTARIOS" to listOf(Module.FICHAS, Module.INVENTORY),
+            "COMERCIAL" to listOf(Module.REQUESTS),
+            "ENSAMBLAJE" to listOf(Module.REQUESTS),
+            "FACTURACION" to listOf(Module.INVENTORY),
+            "DESCONOCIDO" to emptyList()
+        )
+        expected.forEach { (role, modules) ->
+            val repo = Fake(role, everything)
+            val vm = LogisticsViewModel(repo, LogisticsUseCase(repo), repo)
+            vm.login("http://localhost", role.lowercase(), "unused")
+            advanceUntilIdle()
+            assertEquals(modules, Module.entries.filter(vm::canRead), role)
+        }
+    }
+
+    @Test
+    fun roleModuleStillNeedsTheServerPermission() = runTest {
+        val repo = Fake("FACTURACION", emptyList())
+        val vm = LogisticsViewModel(repo, LogisticsUseCase(repo), repo)
+        vm.login("http://localhost", "facturacion", "unused")
+        advanceUntilIdle()
+        assertTrue(Module.entries.none(vm::canRead))
+    }
+
+    @Test
+    fun administrationHasNoFieldModulesEvenWithEveryPermission() = runTest {
         val repo = Fake(
             "ADMIN",
-            listOf(Permission("USUARIOS_CREAR", true), Permission("PERMISOS_ASIGNAR", true))
+            listOf(
+                "USUARIOS_CREAR", "PERMISOS_ASIGNAR", "INVENTARIO_CONSULTAR",
+                READ_REQUESTS, READ_LOCATIONS, "LLEGADAS_REGISTRAR"
+            ).map { Permission(it, true) }
         )
         val vm = LogisticsViewModel(repo, LogisticsUseCase(repo), repo)
         vm.login("http://localhost", "admin", "unused")

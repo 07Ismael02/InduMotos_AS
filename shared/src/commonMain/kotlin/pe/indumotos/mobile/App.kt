@@ -312,7 +312,7 @@ private fun Workspace(
                 val m = state.module;
 
                 val permission = if (m == Module.INVENTORY) "FICHAS_REGISTRAR" else m?.permission
-                if (m == Module.INVENTORY && vm.allowed("FICHAS_REGISTRAR")) ExtendedFloatingActionButton(
+                if (m == Module.INVENTORY && vm.canRead(Module.FICHAS) && vm.allowed("FICHAS_REGISTRAR")) ExtendedFloatingActionButton(
                     onClick = { vm.open(Module.FICHAS) },
                     icon = { Icon(Icons.Default.Add, null) },
                     text = { Text("Registrar desde guía") })
