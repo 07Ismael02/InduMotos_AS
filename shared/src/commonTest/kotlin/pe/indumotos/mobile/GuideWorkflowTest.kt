@@ -72,6 +72,20 @@ class GuideWorkflowTest {
     }
 
     @Test
+    fun guideCannotRepeatChassisOrEngineBetweenItsMotorcycles() {
+        val first = MotorcycleDraft(1, "Honda", "Wave", "Rojo", "CH-1", "MO-1", "DUA", "1")
+        val others = listOf(first, MotorcycleDraft(2))
+        GuideRules.uniqueInGuide(first, others)
+        assertFailsWith<IllegalArgumentException> {
+            GuideRules.uniqueInGuide(first.copy(posicion = 2, numeroMotor = "MO-2"), listOf(first))
+        }
+        assertFailsWith<IllegalArgumentException> {
+            GuideRules.uniqueInGuide(first.copy(posicion = 2, chasisCompleto = "CH-2", numeroMotor = " mo-1 "), listOf(first))
+        }
+        GuideRules.uniqueInGuide(first.copy(posicion = 2, chasisCompleto = "CH-2", numeroMotor = "MO-2"), others)
+    }
+
+    @Test
     fun invalidGuideIsNotSentAndValidOneIsNormalized() = runTest {
         val repo = Fake()
         val vm = GuidesViewModel(repo, repo)

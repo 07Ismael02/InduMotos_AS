@@ -177,6 +177,7 @@ class GuidesViewModel(private val repo: GuideRepository, private val catalog: Ca
 
         val arrival = requireNotNull(s.selected);
         GuideRules.draft(draft, s.options)
+        GuideRules.uniqueInGuide(draft, s.drafts)
         require(s.ocrReviewed) { "Revisa las sugerencias OCR antes de guardar." }
         val normalized = draft.copy(
             chasisCompleto = draft.chasisCompleto.trim(),

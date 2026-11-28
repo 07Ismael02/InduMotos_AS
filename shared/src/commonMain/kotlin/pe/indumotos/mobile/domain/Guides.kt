@@ -165,6 +165,18 @@ object GuideRules {
         photos.forEach(::photo)
     }
 
+    /** Una guía no puede repetir chasis ni número de motor entre sus motocicletas. */
+    fun uniqueInGuide(d: MotorcycleDraft, others: List<MotorcycleDraft>) {
+        fun key(value: String) = value.trim().uppercase()
+        val rest = others.filter { it.posicion != d.posicion }
+        require(rest.none { it.chasisCompleto.isNotBlank() && key(it.chasisCompleto) == key(d.chasisCompleto) }) {
+            "El chasis ${d.chasisCompleto.trim()} ya está en otra moto de esta guía."
+        }
+        require(rest.none { it.numeroMotor.isNotBlank() && key(it.numeroMotor) == key(d.numeroMotor) }) {
+            "El número de motor ${d.numeroMotor.trim()} ya está en otra moto de esta guía."
+        }
+    }
+
     fun draft(d: MotorcycleDraft, options: List<CatalogOption>) {
         require(
             listOf(
